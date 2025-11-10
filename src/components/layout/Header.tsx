@@ -65,19 +65,27 @@ export default function Header() {
           </motion.button>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item, index) => (
               <motion.button
                 key={item.name}
                 onClick={() => scrollToSection(item.href)}
-                className="md3-btn-outlined"
+                className="relative px-4 py-2 text-[var(--md-sys-color-on-surface)] md3-label-large transition-colors group cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                {item.name}
+                <span className="relative z-10 group-hover:text-[var(--md-sys-color-primary)] transition-colors">
+                  {item.name}
+                </span>
+                <motion.span
+                  className="absolute bottom-0 left-1/2 h-0.5 bg-[var(--md-sys-color-primary)] rounded-full"
+                  initial={{ width: 0, x: '-50%' }}
+                  whileHover={{ width: '80%' }}
+                  transition={{ duration: 0.3 }}
+                />
               </motion.button>
             ))}
           </div>
