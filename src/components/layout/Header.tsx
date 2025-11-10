@@ -39,8 +39,8 @@ export default function Header() {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-[var(--md-sys-color-surface-container)]/80 backdrop-blur-xl border-b border-[var(--md-sys-color-outline-variant)] shadow-lg' 
+        isScrolled
+          ? 'bg-[var(--md-sys-color-surface-container)]/80 backdrop-blur-xl shadow-lg'
           : 'bg-transparent'
       }`}
     >

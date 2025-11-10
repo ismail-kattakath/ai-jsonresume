@@ -6,7 +6,7 @@ import { contactInfo } from '@/lib/data/portfolio'
 
 export default function Hero() {
   return (
-    <section className="min-h-screen bg-gradient-to-br from-[var(--md-sys-color-primary-container)] to-[var(--md-sys-color-secondary-container)] flex items-center relative">
+    <section className="min-h-screen flex items-center relative backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-6 py-24 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -13,11 +13,11 @@
   --md-sys-color-surface-container-high: #2a283a;
   --md-sys-color-surface-container-highest: #353345;
   
-  /* M3 Primary Colors (Teal) */
-  --md-sys-color-primary: #00f5d4;
-  --md-sys-color-on-primary: #003d34;
-  --md-sys-color-primary-container: #005248;
-  --md-sys-color-on-primary-container: #99ffee;
+  /* M3 Primary Colors (Vibrant Cyan - matching background) */
+  --md-sys-color-primary: #00d9ff;
+  --md-sys-color-on-primary: #003544;
+  --md-sys-color-primary-container: #004d66;
+  --md-sys-color-on-primary-container: #b3f0ff;
   
   /* M3 Secondary Colors (Magenta) */  
   --md-sys-color-secondary: #ff00f5;
@@ -72,10 +72,17 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 body {
-  background: var(--md-sys-color-surface);
+  background-color: var(--md-sys-color-surface);
+  background-image: url('/images/background.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
   color: var(--md-sys-color-on-surface);
   font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;

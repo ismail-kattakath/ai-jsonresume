@@ -5,7 +5,7 @@ import { summary } from '@/lib/data/portfolio'
 
 export default function About() {
   return (
-    <section id="about" className="py-24" style={{background: 'var(--md-sys-color-surface-container-lowest)'}}>
+    <section id="about" className="py-24 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
