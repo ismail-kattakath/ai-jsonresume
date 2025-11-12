@@ -1,3 +1,7 @@
+:root {
+  --md-sys-color-surface: white;
+}
+
 * {
   hyphens: none;
   -webkit-hyphens: none;
