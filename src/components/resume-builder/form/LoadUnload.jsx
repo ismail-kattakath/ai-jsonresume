@@ -75,46 +75,40 @@ const LoadUnload = () => {
   };
 
   return (
-    <div className="flex flex-wrap gap-4 mb-2 justify-center">
-      <div className="inline-flex flex-row items-center gap-2">
-        <h2 className="text-[1.2rem] text-white">Load Data</h2>
-        <label className="p-2 text-white bg-[deepskyblue] rounded cursor-pointer">
-          <FaCloudUploadAlt className="text-[1.2rem] text-white" />
-          <input
-            aria-label="Load Data"
-            type="file"
-            className="hidden"
-            onChange={handleLoad}
-            accept=".json"
-          />
-        </label>
-      </div>
-      <div className="inline-flex flex-row items-center gap-2">
-        <h2 className="text-[1.2rem] text-white">Save Data</h2>
-        <button
-          aria-label="Save Data"
-          className="p-2 text-white bg-[deepskyblue] rounded"
-          onClick={(event) =>
-            handleDownload(
-              resumeData,
-              generateFilename(),
-              event
-            )
-          }
-        >
-          <FaCloudDownloadAlt className="text-[1.2rem] text-white" />
-        </button>
-      </div>
-      <div className="inline-flex flex-row items-center gap-2">
-        <h2 className="text-[1.2rem] text-white">PDF</h2>
-        <button
-          aria-label="Download PDF"
-          className="p-2 text-white bg-[deepskyblue] rounded"
-          onClick={handlePrint}
-        >
-          <MdPictureAsPdf className="text-[1.2rem] text-white" />
-        </button>
-      </div>
+    <div className="flex flex-wrap gap-3 mb-2 justify-center">
+      <label className="inline-flex items-center gap-2 px-4 py-2 text-white bg-[deepskyblue] rounded cursor-pointer hover:bg-[#00a0e3] transition-colors">
+        <FaCloudUploadAlt className="text-[1.2rem]" />
+        <span className="text-[1rem] font-medium">Load Data</span>
+        <input
+          aria-label="Load Data"
+          type="file"
+          className="hidden"
+          onChange={handleLoad}
+          accept=".json"
+        />
+      </label>
+      <button
+        aria-label="Save Data"
+        className="inline-flex items-center gap-2 px-4 py-2 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors"
+        onClick={(event) =>
+          handleDownload(
+            resumeData,
+            generateFilename(),
+            event
+          )
+        }
+      >
+        <FaCloudDownloadAlt className="text-[1.2rem]" />
+        <span className="text-[1rem] font-medium">Save Data</span>
+      </button>
+      <button
+        aria-label="Download PDF"
+        className="inline-flex items-center gap-2 px-4 py-2 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors"
+        onClick={handlePrint}
+      >
+        <MdPictureAsPdf className="text-[1.2rem]" />
+        <span className="text-[1rem] font-medium">Download PDF</span>
+      </button>
     </div>
   );
 };
