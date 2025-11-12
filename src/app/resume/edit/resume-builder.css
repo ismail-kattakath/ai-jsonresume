@@ -101,6 +101,13 @@ input:focus {
   flex-direction: column;
 }
 
+/* Allow Tailwind md:flex-row to work at medium breakpoint */
+@media (min-width: 768px) {
+  .md\:flex-row.f-col {
+    flex-direction: row;
+  }
+}
+
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
