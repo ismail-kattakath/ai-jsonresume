@@ -53,19 +53,27 @@ const LoadUnload = () => {
   // Generate consistent filename for JSON download matching PDF title format
   const generateFilename = () => {
     const now = new Date();
-    const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const yearMonth = `${now.getFullYear()}${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}`;
 
     // Convert to PascalCase: split by spaces, capitalize first letter of each word, join together
     const toPascalCase = (str) => {
       return str
         .split(/\s+/)
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('');
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join("");
     };
 
     // Remove all special characters except spaces, then convert to PascalCase
-    const cleanName = toPascalCase(resumeData.name.replace(/[^a-zA-Z0-9\s]/g, ''));
-    const cleanPosition = toPascalCase(resumeData.position.replace(/[^a-zA-Z0-9\s]/g, ''));
+    const cleanName = toPascalCase(
+      resumeData.name.replace(/[^a-zA-Z0-9\s]/g, "")
+    );
+    const cleanPosition = toPascalCase(
+      resumeData.position.replace(/[^a-zA-Z0-9\s]/g, "")
+    );
 
     return `${yearMonth}-${cleanName}-${cleanPosition}-Resume.json`;
   };
@@ -76,7 +84,7 @@ const LoadUnload = () => {
 
   return (
     <div className="flex flex-wrap gap-2 mb-2 justify-center">
-      <label className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-[deepskyblue] rounded cursor-pointer hover:bg-[#00a0e3] transition-colors text-sm">
+      <label className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-red-800 rounded cursor-pointer hover:opacity-90 transition-colors text-sm">
         <VscJson className="text-lg" />
         <span>Load</span>
         <input
@@ -89,13 +97,9 @@ const LoadUnload = () => {
       </label>
       <button
         aria-label="Save"
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors text-sm cursor-pointer"
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-red-800 rounded hover:opacity-90 transition-colors text-sm cursor-pointer"
         onClick={(event) =>
-          handleDownload(
-            resumeData,
-            generateFilename(),
-            event
-          )
+          handleDownload(resumeData, generateFilename(), event)
         }
       >
         <VscJson className="text-lg" />
@@ -103,7 +107,7 @@ const LoadUnload = () => {
       </button>
       <button
         aria-label="Print"
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors text-sm cursor-pointer"
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-red-800 rounded hover:opacity-90 transition-colors text-sm cursor-pointer"
         onClick={handlePrint}
       >
         <MdPictureAsPdf className="text-lg" />

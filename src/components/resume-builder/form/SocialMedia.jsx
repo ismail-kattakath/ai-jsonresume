@@ -146,7 +146,7 @@ const SocialMedia = () => {
         return (
           <div
             key={index}
-            className="flex items-center gap-2 hover:bg-black-900/20 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+            className="flex items-center gap-2 hover:opacity-90 border-1 border-white/20 hover:border-red-800 rounded px-2 py-1 -mx-2 transition-colors"
           >
             <div className="flex-shrink-0 flex items-center">
               {getStatusIcon()}
@@ -170,7 +170,7 @@ const SocialMedia = () => {
             <button
               type="button"
               onClick={() => deleteSocialMedia(index)}
-              className="flex-shrink-0 p-1 text-[deepskyblue] hover:opacity-70 rounded transition-opacity flex items-center"
+              className="flex-shrink-0 p-1 text-red-800 cursor-pointer hover:opacity-90 rounded transition-opacity flex items-center"
               title="Delete this social media"
             >
               <MdDelete className="text-xl" />

@@ -7,7 +7,7 @@ const FormButton = ({ size, remove, add, label = "Item" }) => {
         type="button"
         onClick={add}
         aria-label={`Add ${label}`}
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors text-sm cursor-pointer"
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-red-800 rounded hover:opacity-90 transition-colors text-sm cursor-pointer"
       >
         <MdAddCircle className="text-lg" />
         <span>Add {label}</span>
@@ -17,7 +17,7 @@ const FormButton = ({ size, remove, add, label = "Item" }) => {
           type="button"
           onClick={remove}
           aria-label={`Remove ${label}`}
-          className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors text-sm cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-1.5 text-white bg-red-800 rounded hover:opacity-90 transition-colors text-sm cursor-pointer"
         >
           <MdRemoveCircle className="text-lg" />
           <span>Remove {label}</span>

@@ -60,7 +60,7 @@ const WorkExperience = () => {
       {resumeData.workExperience.map((workExperience, index) => (
         <div
           key={index}
-          className="flex flex-col hover:bg-black-900/20 rounded px-2 py-2 -mx-2 -my-2 transition-colors"
+          className="flex flex-col hover:opacity-90 border-1 border-white/20 hover:border-red-800 rounded px-2 py-2 -mx-2 transition-colors"
         >
           <input
             type="text"
@@ -123,7 +123,7 @@ const WorkExperience = () => {
             <button
               type="button"
               onClick={() => deleteWorkExperience(index)}
-              className="flex-shrink-0 p-1 text-[deepskyblue] hover:opacity-70 rounded transition-opacity"
+              className="flex-shrink-0 p-1 text-red-800 cursor-pointer hover:opacity-90 rounded transition-opacity"
               title="Delete this work experience"
             >
               <MdDelete className="text-xl" />

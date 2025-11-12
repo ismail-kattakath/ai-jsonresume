@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from "react";
 import "./resume-builder.css";
@@ -25,9 +25,11 @@ export default function ResumeEditPage() {
   useEffect(() => {
     if (resumeData.skills && resumeData.skills.length > 0) {
       const needsMigration = resumeData.skills.some((skillCategory: any) =>
-        skillCategory.skills.some((skill: any) =>
-          typeof skill === "string" ||
-          ((skill as any).underline !== undefined && skill.highlight === undefined)
+        skillCategory.skills.some(
+          (skill: any) =>
+            typeof skill === "string" ||
+            ((skill as any).underline !== undefined &&
+              skill.highlight === undefined)
         )
       );
 
@@ -41,8 +43,14 @@ export default function ResumeEditPage() {
                 return { text: skill, highlight: false };
               }
               // Handle old 'underline' property
-              if ((skill as any).underline !== undefined && skill.highlight === undefined) {
-                return { text: skill.text, highlight: (skill as any).underline };
+              if (
+                (skill as any).underline !== undefined &&
+                skill.highlight === undefined
+              ) {
+                return {
+                  text: skill.text,
+                  highlight: (skill as any).underline,
+                };
               }
               return skill;
             }),
@@ -60,7 +68,10 @@ export default function ResumeEditPage() {
     if (file instanceof Blob) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setResumeData({ ...resumeData, profilePicture: event.target?.result as string });
+        setResumeData({
+          ...resumeData,
+          profilePicture: event.target?.result as string,
+        });
       };
       reader.readAsDataURL(file);
     } else {
@@ -83,7 +94,7 @@ export default function ResumeEditPage() {
         }}
       >
         <div className="flex flex-col md:flex-row md:h-screen bg-black">
-          <form className="flex-1 p-4 bg-[royalblue] exclude-print md:h-screen md:overflow-y-scroll [&>*:not(:first-child)]:pt-2 [&>*:not(:first-child)]:mt-2 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-white/30">
+          <form className="flex-1 p-4 bg-black exclude-print md:h-screen md:overflow-y-scroll [&>*:not(:first-child)]:pt-2 [&>*:not(:first-child)]:mt-2 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-white/30">
             <LoadUnload />
             <PersonalInformation />
             <SocialMedia />

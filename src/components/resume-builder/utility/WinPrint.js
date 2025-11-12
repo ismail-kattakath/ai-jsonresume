@@ -8,7 +8,7 @@ const WinPrint = () => {
   return (
     <button
       aria-label="Download Resume"
-      className="exclude-print fixed bottom-5 right-10 font-bold rounded-full bg-white text-[deepskyblue] shadow-lg border-2 border-white"
+      className="exclude-print fixed bottom-5 right-10 font-bold rounded-full bg-white text-red-800 cursor-pointer shadow-lg border-2 border-white"
       onClick={print}
     >
       <MdPictureAsPdf className="w-10 h-10" title="Download Resume" />

@@ -58,7 +58,7 @@ const Education = () => {
             id="showEducationDates"
             checked={resumeData.showEducationDates}
             onChange={handleToggleEducationDates}
-            className="w-4 h-4 text-[deepskyblue] bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
+            className="w-4 h-4 text-red-800 cursor-pointer bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
           />
           <label
             htmlFor="showEducationDates"
@@ -71,7 +71,7 @@ const Education = () => {
       {resumeData.education.map((education, index) => (
         <div
           key={index}
-          className="flex flex-col hover:bg-black-900/20 rounded px-2 py-2 -mx-2 -my-2 transition-colors"
+          className="flex flex-col hover:opacity-90 border-1 border-white/20 hover:border-red-800 rounded px-2 py-2 -mx-2 transition-colors"
         >
           <input
             type="text"
@@ -117,7 +117,7 @@ const Education = () => {
             <button
               type="button"
               onClick={() => deleteEducation(index)}
-              className="flex-shrink-0 p-1 text-[deepskyblue] hover:opacity-70 rounded transition-opacity"
+              className="flex-shrink-0 p-1 text-red-800 cursor-pointer hover:opacity-90 rounded transition-opacity"
               title="Delete this education"
             >
               <MdDelete className="text-xl" />

@@ -8,7 +8,7 @@ const FormCP = ({ formClose, setFormClose }) => {
   return (
     <button
       aria-label="Form Open/Close"
-      className="exclude-print fixed bottom-5 left-10 font-bold rounded-full bg-white text-[deepskyblue] shadow-lg border-2 border-white"
+      className="exclude-print fixed bottom-5 left-10 font-bold rounded-full bg-white text-red-800 cursor-pointer shadow-lg border-2 border-white"
       onClick={() => setFormClose(!formClose)}
     >
       {formClose ? (

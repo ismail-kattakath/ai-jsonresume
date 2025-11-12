@@ -47,7 +47,7 @@ const Language = () => {
             id="showLanguages"
             checked={resumeData.showLanguages}
             onChange={handleToggleLanguages}
-            className="w-4 h-4 text-[deepskyblue] bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
+            className="w-4 h-4 text-red-800 cursor-pointer bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
           />
           <label
             htmlFor="showLanguages"
@@ -60,7 +60,7 @@ const Language = () => {
       {resumeData[skillType].map((skill, index) => (
         <div
           key={index}
-          className="flex items-center gap-2 hover:bg-black-900/20 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+          className="flex items-center gap-2 hover:opacity-90 border-1 border-white/20 hover:border-red-800 rounded px-2 py-1 -mx-2 transition-colors"
         >
           <input
             type="text"
@@ -73,7 +73,7 @@ const Language = () => {
           <button
             type="button"
             onClick={() => deleteSkill(index)}
-            className="flex-shrink-0 p-1 text-[deepskyblue] hover:opacity-70 rounded transition-opacity"
+            className="flex-shrink-0 p-1 text-red-800 cursor-pointer hover:opacity-90 rounded transition-opacity"
             title="Delete this language"
           >
             <MdDelete className="text-xl" />

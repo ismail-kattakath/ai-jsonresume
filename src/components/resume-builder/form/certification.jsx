@@ -38,7 +38,7 @@ const Certification = () => {
       {resumeData[skillType].map((skill, index) => (
         <div
           key={index}
-          className="flex items-center gap-2 hover:bg-black-900/20 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+          className="flex items-center gap-2 hover:opacity-90 border-1 border-white/20 hover:border-red-800 rounded px-2 py-1 -mx-2 transition-colors"
         >
           <input
             type="text"
@@ -51,7 +51,7 @@ const Certification = () => {
           <button
             type="button"
             onClick={() => deleteSkill(index)}
-            className="flex-shrink-0 p-1 text-[deepskyblue] hover:opacity-70 rounded transition-opacity"
+            className="flex-shrink-0 p-1 text-red-800 cursor-pointer hover:opacity-90 rounded transition-opacity"
             title="Delete this certification"
           >
             <MdDelete className="text-xl" />

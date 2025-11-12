@@ -51,7 +51,7 @@ export default function Hero() {
           <div className="flex flex-col justify-center items-center h-full text-center">
             <h1 className="text-6xl font-bold text-gray-800 mb-2">
               Get hired with an ATS <br />
-              <span className="text-[deepskyblue]">
+              <span className="text-red">
                 <Typewriter
                   words={["optimized", "Perfect", "Professional"]}
                   loop={0}
@@ -76,7 +76,7 @@ export default function Hero() {
             </p>
             <Link
               href="/builder"
-              className="inline-block bg-[deepskyblue] text-[deepskyblue] px-6 py-3 rounded-lg font-bold text-lg hover:bg-[deepskyblue] transition duration-200 hover:-translate-y-1 transform hover:shadow-lg"
+              className="inline-block bg-red-800 text-red-800 cursor-pointer px-6 py-3 rounded-lg font-bold text-lg hover:bg-red-800 transition duration-200 hover:-translate-y-1 transform hover:shadow-lg"
             >
               Make My Resume
             </Link>
@@ -95,7 +95,7 @@ const About = () => {
         <div className="mt-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Features</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <GrOptimize className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -108,7 +108,7 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <GrFingerPrint className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -121,7 +121,7 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <MdMoneyOff className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">Free</h1>
@@ -132,7 +132,7 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <DiResponsive className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -145,7 +145,7 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <FcDataBackup className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">
@@ -158,7 +158,7 @@ const About = () => {
                 </p>
               </div>
             </div>
-            <div className="flex bg-[deepskyblue] rounded-lg shadow-lg p-4">
+            <div className="flex bg-red-800 rounded-lg shadow-lg p-4">
               <FcUpload className="text-8xl text-gray-800 mr-4" />
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold text-gray-800">

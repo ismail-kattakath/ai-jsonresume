@@ -17,7 +17,7 @@ const Summary = () => {
             id="showSummary"
             checked={resumeData.showSummary}
             onChange={handleToggleSummary}
-            className="w-4 h-4 text-[deepskyblue] bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
+            className="w-4 h-4 text-red-800 cursor-pointer bg-gray-100 border-gray-300 rounded focus:ring-fuchsia-500"
           />
           <label
             htmlFor="showSummary"
