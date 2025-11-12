@@ -82,8 +82,8 @@ export default function ResumeEditPage() {
           handleChange,
         }}
       >
-        <div className="f-col gap-4 lg:flex-row md:h-screen">
-          <form className="p-4 bg-[royalblue] exclude-print lg:flex-1 md:h-screen md:overflow-y-scroll [&>*:not(:first-child)]:pt-4 [&>*:not(:first-child)]:mt-4 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-white/30">
+        <div className="f-col gap-4 md:flex-row justify-evenly md:h-screen">
+          <form className="p-4 bg-[royalblue] exclude-print md:max-w-[40%] md:h-screen md:overflow-y-scroll [&>*:not(:first-child)]:pt-4 [&>*:not(:first-child)]:mt-4 [&>*:not(:first-child)]:border-t [&>*:not(:first-child)]:border-white/30">
             <LoadUnload />
             <PersonalInformation />
             <SocialMedia />

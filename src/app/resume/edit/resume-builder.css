@@ -101,9 +101,9 @@ input:focus {
   flex-direction: column;
 }
 
-/* Allow Tailwind lg:flex-row to work at large breakpoint */
-@media (min-width: 1024px) {
-  .lg\:flex-row.f-col {
+/* Allow Tailwind md:flex-row to work at medium breakpoint */
+@media (min-width: 768px) {
+  .md\:flex-row.f-col {
     flex-direction: row;
   }
 }
