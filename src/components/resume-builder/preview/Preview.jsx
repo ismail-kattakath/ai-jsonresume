@@ -213,7 +213,7 @@ const Preview = () => {
           )}
         />
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="f-col items-center mb-2 pb-1 border-b-2 border-gray-300 border-dashed">
+          <div className="flex flex-col items-center mb-2 pb-1 border-b-2 border-gray-300 border-dashed">
             {resumeData.profilePicture.length > 0 && (
               <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[black]">
                 <Image

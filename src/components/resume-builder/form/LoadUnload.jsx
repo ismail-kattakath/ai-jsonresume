@@ -77,8 +77,8 @@ const LoadUnload = () => {
   return (
     <div className="flex flex-wrap gap-3 mb-2 justify-center">
       <label className="inline-flex items-center gap-2 px-4 py-2 text-white bg-[deepskyblue] rounded cursor-pointer hover:bg-[#00a0e3] transition-colors">
-        <VscJson className="text-[1.2rem]" />
-        <span className="text-[1rem] font-medium">Load</span>
+        <VscJson className="text-xl" />
+        <span className="text-base font-medium">Load</span>
         <input
           aria-label="Load"
           type="file"
@@ -98,16 +98,16 @@ const LoadUnload = () => {
           )
         }
       >
-        <VscJson className="text-[1.2rem]" />
-        <span className="text-[1rem] font-medium">Save</span>
+        <VscJson className="text-xl" />
+        <span className="text-base font-medium">Save</span>
       </button>
       <button
         aria-label="Print"
         className="inline-flex items-center gap-2 px-4 py-2 text-white bg-[deepskyblue] rounded hover:bg-[#00a0e3] transition-colors"
         onClick={handlePrint}
       >
-        <MdPictureAsPdf className="text-[1.2rem]" />
-        <span className="text-[1rem] font-medium">Print</span>
+        <MdPictureAsPdf className="text-xl" />
+        <span className="text-base font-medium">Print</span>
       </button>
     </div>
   );
