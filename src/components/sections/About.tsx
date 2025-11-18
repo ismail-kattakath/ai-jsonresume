@@ -17,11 +17,6 @@ export default function About() {
           <h2 className="md3-headline-large mb-4">
             About Me
           </h2>
-          <p className="md3-body-large md3-on-surface-variant max-w-3xl mx-auto">
-            A passionate technologist with deep expertise in AI/ML engineering
-            and full-stack development, committed to building innovative solutions
-            that make a meaningful impact.
-          </p>
         </motion.div>
 
         <motion.div
