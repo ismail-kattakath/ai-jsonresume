@@ -18,10 +18,6 @@ export default function Experience() {
           <h2 className="md3-headline-large mb-4">
             Professional Experience
           </h2>
-          <p className="md3-body-large md3-on-surface-variant max-w-3xl mx-auto">
-            A journey through innovative technology companies, leading AI/ML initiatives
-            and building scalable software solutions that impact millions of users.
-          </p>
         </motion.div>
 
         <div className="max-w-4xl mx-auto">
