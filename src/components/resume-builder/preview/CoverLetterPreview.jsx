@@ -37,7 +37,6 @@ const CoverLetterPreview = () => {
 
   return (
     <div className="w-full md:w-[8.5in] absolute -z-10 md:sticky md:z-10 md:top-0 preview rm-padding-print p-6 md:overflow-y-scroll md:h-screen bg-white text-black font-[sans-serif]">
-      <div className="max-w-[650px] mx-auto">
       <div className="flex flex-col items-center mb-2 pb-1 border-b-2 border-gray-300 border-dashed">
         {resumeData.profilePicture && resumeData.profilePicture.length > 0 && (
           <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[black]">
@@ -109,7 +108,6 @@ const CoverLetterPreview = () => {
           <p>Thanks and regards,</p>
           <p>{capitalizedName}</p>
         </div>
-      </div>
       </div>
     </div>
   );
