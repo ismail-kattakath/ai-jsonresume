@@ -6,7 +6,7 @@ import DefaultResumeData from '@/components/resume-builder/utility/DefaultResume
 
 export const dynamic = 'force-static'
 
-export const alt = `${DefaultResumeData.name} - ${DefaultResumeData.position}`
+export const alt = DefaultResumeData.name.toUpperCase()
 export const size = {
   width: 1200,
   height: 600,
