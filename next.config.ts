@@ -1,15 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: '/book',
-        destination: 'https://calendar.app.google/yqSPTMV9VXkMvpAL6',
-        permanent: true,
-      },
-    ]
-  },
   output: 'export',
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
