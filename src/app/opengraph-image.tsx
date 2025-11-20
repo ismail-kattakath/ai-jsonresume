@@ -2,10 +2,11 @@ import { ImageResponse } from 'next/og'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { Logo } from '@/components/Logo'
+import DefaultResumeData from '@/components/resume-builder/utility/DefaultResumeData'
 
 export const dynamic = 'force-static'
 
-export const alt = 'Ismail Kattakath - Principal Software Engineer & Technical Leader'
+export const alt = `${DefaultResumeData.name} - ${DefaultResumeData.position}`
 export const size = {
   width: 1200,
   height: 630,
