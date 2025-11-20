@@ -22,6 +22,12 @@ export default async function Image() {
     backgroundImageBuffer.byteOffset + backgroundImageBuffer.byteLength
   )
 
+  // Read path-based SVG logo
+  const logoSvg = readFileSync(
+    join(process.cwd(), 'public', 'images', 'logo.svg'),
+    'utf-8'
+  )
+
   return new ImageResponse(
     (
       <div
@@ -62,39 +68,16 @@ export default async function Image() {
           }}
         />
 
-        {/* Text Logo - Centered */}
+        {/* SVG Logo - Centered */}
         <div
           style={{
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             zIndex: 1,
           }}
-        >
-          <div
-            style={{
-              fontSize: 110,
-              fontWeight: 800,
-              color: '#ffffff',
-              fontFamily: 'Roboto, sans-serif',
-              letterSpacing: '-2px',
-              marginBottom: '8px',
-            }}
-          >
-            ISMAIL
-          </div>
-          <div
-            style={{
-              fontSize: 66,
-              fontWeight: 300,
-              color: '#ffffff',
-              fontFamily: 'Roboto, sans-serif',
-              letterSpacing: '8px',
-            }}
-          >
-            KATTAKATH
-          </div>
-        </div>
+          dangerouslySetInnerHTML={{ __html: logoSvg.replace('<svg', '<svg width="560" height="auto"') }}
+        />
       </div>
     ),
     {
