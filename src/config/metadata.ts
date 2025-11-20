@@ -14,19 +14,27 @@ export function generateSiteMetadata(): Metadata {
   )
   const linkedInHandle = linkedInProfile?.link.replace('linkedin.com/in/', '')
 
-  // Use name as title with fallback
-  const siteTitle = name || 'Portfolio'
+  // OG title: "Name - Position"
+  const siteTitle = name && position ? `${name} - ${position}` : name || 'Portfolio'
 
-  // Generate description meeting 55-200 char requirement
-  let siteDescription = position || 'Professional Portfolio'
+  // OG description: First sentence from summary (55-200 chars)
+  let siteDescription = 'Professional Portfolio'
 
-  // If description is too short, append from summary
-  if (siteDescription.length < 55 && summary) {
+  if (summary) {
     // Extract first sentence from summary
     const firstSentence = summary.split(/[.!?]/)[0]?.trim()
     if (firstSentence) {
-      // Combine position with summary until we reach ~150 chars
-      siteDescription = `${position} - ${firstSentence}`
+      siteDescription = firstSentence
+
+      // Ensure 55-200 character requirement
+      if (siteDescription.length < 55) {
+        // If too short, try adding second sentence
+        const sentences = summary.split(/[.!?]/).filter(s => s.trim())
+        if (sentences.length > 1) {
+          siteDescription = `${sentences[0].trim()}. ${sentences[1].trim()}`
+        }
+      }
+
       // Truncate if too long
       if (siteDescription.length > 200) {
         siteDescription = siteDescription.substring(0, 197) + '...'
