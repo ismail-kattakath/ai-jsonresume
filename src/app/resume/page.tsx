@@ -1,42 +1,34 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Preview from "@/components/resume-builder/preview/Preview";
+import { ResumeContext } from "@/app/resume/edit/ResumeContext";
+import DefaultResumeData from "@/components/resume-builder/utility/DefaultResumeData";
+import "@/app/resume/edit/resume-builder.css";
 
 export default function ResumeDownloadPage() {
-  const router = useRouter();
+  const [resumeData, setResumeData] = useState(DefaultResumeData);
 
   useEffect(() => {
-    // Check if static PDF exists, otherwise redirect to edit page
-    fetch("/resume.pdf", { method: "HEAD" })
-      .then((response) => {
-        if (response.ok) {
-          // PDF exists, trigger download
-          const link = document.createElement("a");
-          link.href = "/resume.pdf";
-          link.download = "Ismail_Kattakath_Resume.pdf";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          // No PDF found, redirect to edit page with print instruction
-          router.push("/resume/edit");
-        }
-      })
-      .catch(() => {
-        // Error checking, redirect to edit
-        router.push("/resume/edit");
-      });
-  }, [router]);
+    // Load resume data from localStorage if available
+    const storedData = localStorage.getItem("resumeData");
+    if (storedData) {
+      setResumeData(JSON.parse(storedData));
+    }
+
+    // Wait for page to load before triggering print
+    const timer = setTimeout(() => {
+      window.print();
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
-      <div className="text-center">
-        <h1 className="text-2xl mb-4">Preparing your resume...</h1>
-        <p className="text-gray-400">
-          If download doesn't start, you'll be redirected to the editor.
-        </p>
+    <ResumeContext.Provider value={{ resumeData, setResumeData }}>
+      <div className="bg-white">
+        <Preview />
       </div>
-    </div>
+    </ResumeContext.Provider>
   );
 }

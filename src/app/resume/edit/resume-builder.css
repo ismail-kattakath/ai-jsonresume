@@ -101,7 +101,11 @@ input:focus {
   }
 
   .preview {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
     overflow-y: visible !important;
+    z-index: 0 !important;
   }
 
   .preview::after {
