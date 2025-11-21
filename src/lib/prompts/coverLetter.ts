@@ -61,14 +61,16 @@ CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
 6. Use ONLY the specific metrics, achievements, and details provided in the candidate's experience
 
 WRITING INSTRUCTIONS:
-1. Write a professional summary that is 2-3 paragraphs (approximately 150-300 words, max 500 words)
-2. Start with a strong opening that positions the candidate for the target role
-3. Highlight 2-3 key achievements from the candidate's ACTUAL experience that align with the job
-4. Demonstrate how the candidate's DOCUMENTED skills solve the employer's needs
-5. Use ONLY the specific metrics and examples from the candidate's background provided above
-6. Write in third person if the name is provided, otherwise first person
-7. Focus on impact, results, and measurable outcomes
-8. Tailor the summary to emphasize skills/experience relevant to the job description
+1. Write a professional summary as a SINGLE PARAGRAPH (approximately 150-200 words, 600-900 characters)
+2. Start with role/expertise, then current focus, then key achievements, then proven abilities
+3. Use semicolons to separate major sections within the paragraph (NOT multiple paragraphs)
+4. Highlight 2-3 key achievements from the candidate's ACTUAL experience with specific metrics
+5. Demonstrate how the candidate's DOCUMENTED skills solve the employer's needs
+6. Use ONLY the specific metrics and examples from the candidate's background provided above
+7. Write in third person if the name is provided, otherwise first person
+8. Focus on impact, results, and measurable outcomes
+9. Tailor the summary to emphasize skills/experience relevant to the job description
+10. End with a forward-looking statement about proven abilities
 
 ACCURACY VERIFICATION:
 Before writing each sentence, verify that ANY claim about the candidate's background is explicitly stated in the candidate information above. If you cannot find it in the provided information, DO NOT include it.
@@ -93,9 +95,15 @@ export function validateSummary(content: string): {
     errors.push("Summary is too short (minimum 100 characters)");
   }
 
-  // Check maximum length
-  if (content.length > 2000) {
-    errors.push("Summary is too long (maximum 2000 characters)");
+  // Check maximum length (matching default summary style: ~900 chars)
+  if (content.length > 900) {
+    errors.push("Summary is too long (maximum 900 characters for single paragraph)");
+  }
+
+  // Check for multiple paragraphs (should be single paragraph)
+  const paragraphs = content.trim().split(/\n\n+/);
+  if (paragraphs.length > 1) {
+    errors.push("Summary should be a single paragraph (no line breaks)");
   }
 
   // Check for suspicious patterns
