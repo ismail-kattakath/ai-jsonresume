@@ -1,4 +1,5 @@
 import DefaultResumeData from '@/components/resume-builder/utility/DefaultResumeData'
+import { SITE_URL } from '@/config/site'
 import type { Metadata } from 'next'
 
 /**
@@ -43,7 +44,7 @@ export function generateSiteMetadata(): Metadata {
   }
 
   return {
-    metadataBase: new URL('https://ismail.kattakath.com'),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: siteTitle,
       template: `%s | ${name}`,
@@ -55,7 +56,7 @@ export function generateSiteMetadata(): Metadata {
     openGraph: {
       title: siteTitle,
       description: siteDescription,
-      url: 'https://ismail.kattakath.com',
+      url: SITE_URL,
       siteName: name,
       type: 'website',
       locale: 'en_US',

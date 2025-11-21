@@ -1,6 +1,8 @@
 /** @type {import('next-sitemap').IConfig} */
+const SITE_URL = 'https://ismail.kattakath.com'
+
 module.exports = {
-  siteUrl: 'https://ismail.kattakath.com',
+  siteUrl: SITE_URL,
   generateRobotsTxt: true,
   generateIndexSitemap: false, // Single sitemap (not index + multiple)
   outDir: 'out', // Output to 'out' directory for static export

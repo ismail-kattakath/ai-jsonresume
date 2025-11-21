@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/config/site";
 
 const TITLE = "Book Meeting";
 const DESCRIPTION = "Let's discuss how we can work together.";
-const URL = "https://ismail.kattakath.com/book";
+const URL = `${SITE_URL}/book`;
 
 export const metadata: Metadata = {
   title: TITLE,

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import { SITE_URL } from '@/config/site'
 
 const TITLE = 'Download Resume'
 const DESCRIPTION = 'Print my latest resume in PDF'
-const URL = 'https://ismail.kattakath.com/resume'
+const URL = `${SITE_URL}/resume`
 
 export const metadata: Metadata = {
   title: TITLE,
