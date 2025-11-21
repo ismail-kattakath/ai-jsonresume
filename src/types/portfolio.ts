@@ -29,4 +29,5 @@ export interface ContactInfo {
   github: string;
   linkedin: string;
   website?: string;
+  calendar?: string;
 }

@@ -6,15 +6,27 @@ const linkedInProfile = DefaultResumeData.socialMedia.find(s => s.socialMedia ==
 const githubProfile = DefaultResumeData.socialMedia.find(s => s.socialMedia === "Github");
 const websiteProfile = DefaultResumeData.socialMedia.find(s => s.socialMedia === "Website");
 
+// Extract location from address (e.g., "24-242 John Garland Blvd, Toronto, ON M9V 1N8" -> "Toronto, ON 🇨🇦")
+const extractLocation = (address: string): string => {
+  const match = address.match(/,\s*([^,]+),\s*([A-Z]{2})/);
+  if (match) {
+    const city = match[1].trim();
+    const province = match[2].trim();
+    return `${city}, ${province} 🇨🇦`;
+  }
+  return "Toronto, ON 🇨🇦"; // Fallback
+};
+
 export const contactInfo: ContactInfo = {
   name: DefaultResumeData.name,
   title: DefaultResumeData.position,
-  location: "Toronto, ON 🇨🇦", // Can be derived from address if needed
+  location: extractLocation(DefaultResumeData.address),
   phone: DefaultResumeData.contactInformation,
   email: DefaultResumeData.email,
   github: githubProfile?.link || "",
   linkedin: linkedInProfile?.link || "",
-  website: websiteProfile?.link || ""
+  website: websiteProfile?.link || "",
+  calendar: DefaultResumeData.calendarLink || ""
 };
 
 // Use summary from DefaultResumeData
@@ -39,19 +51,6 @@ function formatDateRange(startDate: string, endDate: string): string {
   return `${start} - ${end}`;
 }
 
-// Technologies mapping for work experience (not in DefaultResumeData yet)
-const technologiesMap: { [company: string]: string[] } = {
-  "Silver Creek Insights Inc.": ["Google Vertex AI", "GKE", "Docker", "Kubernetes", "vLLM", "TGI",
-                                  "Triton Inference Server", "CUDA Optimization", "OAuth2.0", "MCP Protocol", "Python", "Node.js"],
-  "Homewood Health Inc.": ["Next.js", "ReactJS", "Node.js", "MongoDB", "AngularJS", "Express",
-                          "SAML 2.0", "OAuth 2.0", "PKCE", "Microsoft Identity", "Docker", "AWS", "CI/CD", "Terraform"],
-  "Etuper Technologies Pvt. Ltd.": ["AngularJS", "Node.js", "Express", "MySQL", "MongoDB", "Docker",
-                                    "Microservices", "OpenAPI", "Ionic", "React Native"],
-  "RM plc.": ["Java", "Struts", "JSP", "AngularJS", "SOAP", "REST", "OpenAPI",
-              "MySQL", "Linux", "Tomcat", "Apache"],
-  "Posibolt Solutions Pvt. Ltd.": ["HTML", "CSS", "JavaScript", "jQuery", "Selenium WebDriver", "Java", "JSP"]
-};
-
 // Convert work experience from DefaultResumeData
 export const experience: Experience[] = DefaultResumeData.workExperience.map(job => ({
   title: job.position,
@@ -60,7 +59,7 @@ export const experience: Experience[] = DefaultResumeData.workExperience.map(job
   duration: formatDateRange(job.startYear, job.endYear),
   summary: job.description, // Company/role description
   description: job.keyAchievements.split('\n').filter(h => h.trim()),
-  technologies: technologiesMap[job.company] || []
+  technologies: job.technologies || []
 }));
 
 export const projects: Project[] = [

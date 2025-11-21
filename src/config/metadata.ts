@@ -7,7 +7,7 @@ import type { Metadata } from 'next'
  * Single source of truth for all site metadata
  */
 export function generateSiteMetadata(): Metadata {
-  const { name, position, summary, socialMedia } = DefaultResumeData
+  const { name, position, summary, socialMedia, skills } = DefaultResumeData
 
   // Find LinkedIn handle for Twitter creator field
   const linkedInProfile = socialMedia.find(
@@ -43,6 +43,37 @@ export function generateSiteMetadata(): Metadata {
     }
   }
 
+  // Generate keywords from position and skills
+  const generateKeywords = (): string => {
+    const keywordSet = new Set<string>()
+
+    // Add position title components
+    if (position) {
+      position.split(/[|,]/).forEach(part => {
+        keywordSet.add(part.trim())
+      })
+    }
+
+    // Priority skills to include (curated from skills array)
+    const prioritySkills = [
+      'Generative AI', 'AI/ML', 'LLM', 'RAG Systems', 'vLLM',
+      'Kubernetes', 'Docker', 'Cloud Architecture',
+      'OAuth 2.0', 'SAML 2.0', 'SSO', 'Authentication',
+      'CI/CD', 'DevOps', 'Terraform',
+      'Node.js', 'Next.js', 'ReactJS', 'TypeScript', 'Python',
+      'MongoDB', 'PostgreSQL',
+      'AWS', 'Google Cloud', 'GCP', 'GKE',
+      'Microservices', 'RESTful APIs',
+      'Technical Leadership', 'Software Engineering'
+    ]
+
+    prioritySkills.forEach(skill => keywordSet.add(skill))
+
+    return Array.from(keywordSet).join(', ')
+  }
+
+  const siteKeywords = generateKeywords()
+
   return {
     metadataBase: new URL(SITE_URL),
     title: {
@@ -50,8 +81,7 @@ export function generateSiteMetadata(): Metadata {
       template: `%s | ${name}`,
     },
     description: siteDescription,
-    keywords:
-      'Principal Software Engineer, Technical Leader, Full Stack, AI/ML, OAuth, SSO, CI/CD, Kubernetes, MCP Gateways, RAG Systems, GenAI, Machine Learning, Cloud Architecture',
+    keywords: siteKeywords,
     authors: [{ name }],
     openGraph: {
       title: siteTitle,

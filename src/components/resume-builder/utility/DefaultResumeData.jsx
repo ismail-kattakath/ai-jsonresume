@@ -20,6 +20,7 @@ const DefaultResumeData = {
       link: "github.com/ismail-kattakath",
     },
   ],
+  calendarLink: "https://calendar.app.google/yqSPTMV9VXkMvpAL6",
   summary:
     "Principal Software Engineer with deep expertise in full-stack development and cloud infrastructure, delivering high-impact, scalable systems at scale. Currently architecting and operating production-grade GenAI inference platforms using vLLM, Kubernetes, and multi-GPU clusters, achieving 25% cost reduction and 40% latency improvement. Previously rescued an abandoned healthcare MEAN-stack application and transformed it into a nationally deployed platform with 99.5% uptime; led the AngularJS-to-Next.js modernization, implemented enterprise federated authentication (OAuth 2.0 + SAML 2.0) across 5+ partners, and established DevOps practices that reduced deployment time by 92% and production incidents by 65%. Proven ability to drive end-to-end architecture, performance optimization, security/compliance, and measurable business outcomes in distributed cloud environments.",
   showSummary: true,
@@ -41,6 +42,7 @@ const DefaultResumeData = {
         "Aloshy.ai: AI-as-a-Service platform providing B2B APIs for media manipulation and custom-trained generative AI pipelines tailored to specific business needs.",
       keyAchievements:
         "Architected scalable GenAI inference infrastructure using Kubernetes/Containerization, vLLM etc. supporting multiple Diffusion and LLM models, and deployed on GCP/GKE and AWS/EKS for production.\nImplemented advanced techniques such as KV-cache, Distributed Inference, Multi-GPU/Node Scaling, CUDA optimization and memory/load management to reduce inference latency by 40%, and cutting operational costs by 25%.\nDesigned and documented GPU cluster management playbooks including model versioning/rollbacks, utilization monitoring, failure recovery, and load balancing strategies.\nBuilt enterprise-grade secured API architecture using centralized gateway/aggregator for serving internal and curated third-party MCP servers/tools.",
+      technologies: ["Google Vertex AI", "GKE", "Docker", "Kubernetes", "vLLM", "TGI", "Triton Inference Server", "CUDA Optimization", "OAuth2.0", "MCP Protocol", "Python", "Node.js"],
       startYear: "2024-08-01",
       endYear: "Present",
     },
@@ -52,6 +54,7 @@ const DefaultResumeData = {
         "Homeweb.ca: Canada's leading digital mental health provider, delivering EFAP and CBT solutions to hundreds of thousands of employees nationwide.",
       keyAchievements:
         "Inherited and revitalized an abandoned, undocumented MEAN stack application, transforming it into a maintainable, production-ready web platform with 99.5% uptime.\nRebuilt authentication system implementing OAuth 2.0 PKCE flow for SSO integration with Microsoft Identity Platform.\nCollaborated with 15+ federated vendors to configure and troubleshoot SAML 2.0 authentication, enabling seamless user login.\nLed complete frontend migration from AngularJS to Next.js upon framework EOL, preserving existing UI/UX and API compatibility.\nEstablished comprehensive DevOps practices including automated testing, CI/CD pipelines (reducing deployment time from 4 hours to 20 minutes), containerization, monitoring, and backup systems.\nLed infrastructure migration from DigitalOcean to AWS, orchestrating transition of EC2, RDS, S3, CloudFront, and VPC components using Terraform for infrastructure-as-code, achieving zero-downtime deployment.",
+      technologies: ["Next.js", "ReactJS", "Node.js", "MongoDB", "AngularJS", "Express", "SAML 2.0", "OAuth 2.0", "PKCE", "Microsoft Identity", "Docker", "AWS", "CI/CD", "Terraform"],
       startYear: "2017-10-01",
       endYear: "2024-07-01",
     },
@@ -63,6 +66,7 @@ const DefaultResumeData = {
         "Brilliant Rewards: Complete hospitality software suite—dashboard, mobile and web apps—featuring loyalty programs, marketing automation, booking integration, and analytics.",
       keyAchievements:
         "Collaborated with stakeholders to gather requirements, create user stories, design wireframes, and develop functional prototypes.\nManaged sprint planning, daily standups, backlog prioritization, and blocker resolution to ensure continuous delivery.\nDesigned normalized database schemas, optimized SQL queries and indexing strategies, and implemented stored procedures with comprehensive test coverage.\nLed development of scalable microservices architecture with containerized, discoverable APIs following OpenAPI specifications.\nDelivered multiple client applications including AngularJS web platforms and cross-platform mobile solutions.\nIntroduced development standards encompassing coding conventions, linting, code reviews, documentation, and incident management processes, reducing production incidents by 65%.",
+      technologies: ["AngularJS", "Node.js", "Express", "MySQL", "MongoDB", "Docker", "Microservices", "OpenAPI", "Ionic", "React Native"],
       startYear: "2016-04-01",
       endYear: "2017-08-01",
     },
@@ -74,6 +78,7 @@ const DefaultResumeData = {
         "RM Integris: School MIS system featuring student management, grade tracking, attendance monitoring, parent portals, and performance analytics.",
       keyAchievements:
         "Implemented OpenAPI/Swagger bridging layer to modernize legacy SOAP APIs for RESTful client consumption.\nPrototyped AngularJS interface to decouple presentation layer from legacy Struts JSP architecture.\nMaintained load-balanced Linux VM clusters hosting distributed web, application, and database tiers.\nMentored interns and onboarded new team members through technical guidance and knowledge transfer.",
+      technologies: ["Java", "Struts", "JSP", "AngularJS", "SOAP", "REST", "OpenAPI", "MySQL", "Linux", "Tomcat", "Apache"],
       startYear: "2011-06-01",
       endYear: "2016-03-01",
     },
@@ -85,6 +90,7 @@ const DefaultResumeData = {
         "Posibolt: Adaptable cloud ERP solution serving key retail businesses across global industry segments.",
       keyAchievements:
         "Created UI mockups based on SRS specifications and converted approved designs into responsive HTML/CSS templates.\nDeveloped integration test cases and implemented browser automation using Selenium WebDriver.\nAuthored user documentation including help articles, user guides, FAQs, and product website content.",
+      technologies: ["HTML", "CSS", "JavaScript", "jQuery", "Selenium WebDriver", "Java", "JSP"],
       startYear: "2010-07-01",
       endYear: "2011-01-01",
     },
