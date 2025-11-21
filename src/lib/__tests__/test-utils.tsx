@@ -44,6 +44,7 @@ export const createMockResumeData = (
     languages: [],
     showLanguages: true,
     certifications: [],
+    content: '',
     ...overrides,
   };
 };

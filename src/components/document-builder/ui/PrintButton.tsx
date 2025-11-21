@@ -1,8 +1,36 @@
 import { MdPictureAsPdf } from "react-icons/md";
 
-export default function PrintButton() {
+interface PrintButtonProps {
+  name?: string;
+  documentType?: "Resume" | "CoverLetter";
+}
+
+export default function PrintButton({ name, documentType = "Resume" }: PrintButtonProps) {
   const handlePrint = () => {
-    window.print();
+    // Convert name to ProperCase without spaces or underscores
+    const formatName = (name: string) => {
+      return name
+        .split(/[\s_-]+/) // Split by spaces, underscores, or hyphens
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join("");
+    };
+
+    // Set document title for PDF filename
+    if (name) {
+      const originalTitle = document.title;
+      const formattedName = formatName(name);
+      document.title = `${formattedName}-${documentType}`;
+
+      // Print
+      window.print();
+
+      // Restore original title after print dialog closes
+      setTimeout(() => {
+        document.title = originalTitle;
+      }, 100);
+    } else {
+      window.print();
+    }
   };
 
   return (

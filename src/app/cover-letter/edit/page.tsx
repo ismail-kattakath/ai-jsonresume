@@ -15,11 +15,12 @@ import { ResumeContext } from "@/lib/contexts/DocumentContext";
 import { Toaster } from "sonner";
 import { useDocumentHandlers } from "@/lib/hooks/useDocumentHandlers";
 import type { CoverLetterData } from "@/types";
+import PasswordProtection from "@/components/auth/PasswordProtection";
 
 // Default cover letter content
 const DEFAULT_COVER_LETTER_CONTENT = "I'm a Toronto-based Principal Software Engineer with 7+ years delivering production-ready full-stack applications using React, React Native, Node.js, and MongoDB—the exact stack you're seeking. At Homewood Health, I transformed an abandoned MEAN application into a nationally-deployed platform serving 100,000+ users with 99.5% uptime, implemented enterprise OAuth/SAML authentication, and led the AngularJS-to-Next.js migration while reducing deployment time by 92%. My experience architecting REST APIs with Express.js, integrating external SDKs, implementing security protocols, and managing agile sprints directly aligns with your requirements. Having built FDA-compliant healthcare systems and worked with cross-functional teams across multiple countries, I understand the rigorous standards and fast-paced environment of innovative startups like Speer. I'm excited to leverage my proven track record in building scalable, testable code to help deliver your groundbreaking technologies—let's discuss how I can contribute to your mission this week.";
 
-export default function CoverLetterEditPage() {
+function CoverLetterEditor() {
   // Use resume data as base, just add content and hide unwanted sections
   const [coverLetterData, setCoverLetterData] = useState<CoverLetterData>({
     ...defaultResumeData,
@@ -64,7 +65,7 @@ export default function CoverLetterEditPage() {
         <div className="flex flex-col md:flex-row md:h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-x-hidden relative">
           {/* Floating Print Button - Hidden on print */}
           <div className="exclude-print fixed bottom-8 right-8 z-50">
-            <PrintButton />
+            <PrintButton name={coverLetterData.name} documentType="CoverLetter" />
           </div>
 
           <form onSubmit={(e) => e.preventDefault()} className="flex-1 p-4 md:p-6 lg:p-8 exclude-print md:h-screen md:overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/5 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30 space-y-6 md:space-y-8">
@@ -88,5 +89,13 @@ export default function CoverLetterEditPage() {
         </div>
       </ResumeContext.Provider>
     </>
+  );
+}
+
+export default function CoverLetterEditPage() {
+  return (
+    <PasswordProtection>
+      <CoverLetterEditor />
+    </PasswordProtection>
   );
 }

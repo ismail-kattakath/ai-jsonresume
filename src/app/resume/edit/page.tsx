@@ -20,8 +20,9 @@ import PrintButton from "@/components/document-builder/ui/PrintButton";
 import { ResumeContext } from "@/lib/contexts/DocumentContext";
 import { Toaster } from "sonner";
 import { useDocumentHandlers } from "@/lib/hooks/useDocumentHandlers";
+import PasswordProtection from '@/components/auth/PasswordProtection';
 
-export default function ResumeEditPage() {
+function ResumeEditor() {
   // Resume data
   const [resumeData, setResumeData] = useState(defaultResumeData);
   const { handleProfilePicture, handleChange } = useDocumentHandlers(resumeData, setResumeData);
@@ -80,7 +81,7 @@ export default function ResumeEditPage() {
         <div className="flex flex-col md:flex-row md:h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-x-hidden relative">
           {/* Floating Print Button - Hidden on print */}
           <div className="exclude-print fixed bottom-8 right-8 z-50">
-            <PrintButton />
+            <PrintButton name={resumeData.name} documentType="Resume" />
           </div>
 
           <form onSubmit={(e) => e.preventDefault()} className="flex-1 p-4 md:p-6 lg:p-8 exclude-print md:h-screen md:overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/5 [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30 space-y-6 md:space-y-8">
@@ -111,5 +112,13 @@ export default function ResumeEditPage() {
         </div>
       </ResumeContext.Provider>
     </>
+  );
+}
+
+export default function ResumeEditPage() {
+  return (
+    <PasswordProtection>
+      <ResumeEditor />
+    </PasswordProtection>
   );
 }

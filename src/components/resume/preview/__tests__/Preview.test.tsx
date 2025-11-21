@@ -1,0 +1,442 @@
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import Preview from "../Preview";
+import { renderWithContext, createMockResumeData } from "@/lib/__tests__/test-utils";
+
+// Mock dynamic imports
+jest.mock("@hello-pangea/dnd", () => ({
+  DragDropContext: ({ children }: { children: React.ReactNode }) => <div data-testid="drag-drop-context">{children}</div>,
+  Droppable: ({ children }: { children: (provided: any, snapshot: any) => React.ReactNode }) => (
+    <div data-testid="droppable">
+      {children(
+        {
+          droppableProps: {},
+          innerRef: jest.fn(),
+          placeholder: null,
+        },
+        {
+          isDraggingOver: false,
+          draggingOverWith: null,
+          draggingFromThisWith: null,
+          isUsingPlaceholder: false,
+        }
+      )}
+    </div>
+  ),
+  Draggable: ({ children }: { children: (provided: any, snapshot: any) => React.ReactNode }) => (
+    <div data-testid="draggable">
+      {children(
+        {
+          draggableProps: {},
+          dragHandleProps: {},
+          innerRef: jest.fn(),
+        },
+        {
+          isDragging: false,
+          isDropAnimating: false,
+        }
+      )}
+    </div>
+  ),
+}));
+
+jest.mock("react-highlight-menu", () => ({
+  HighlightMenu: ({ children }: { children: React.ReactNode }) => <div data-testid="highlight-menu">{children}</div>,
+}));
+
+jest.mock("next/image", () => ({
+  __esModule: true,
+  default: (props: any) => {
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img {...props} />;
+  },
+}));
+
+jest.mock("next/link", () => ({
+  __esModule: true,
+  default: ({ children, ...props }: any) => <a {...props}>{children}</a>,
+}));
+
+jest.mock("@/hooks/useKeyboardShortcut", () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
+describe("Preview Component", () => {
+  describe("Basic Rendering", () => {
+    it("should render name from resume data", async () => {
+      const mockData = createMockResumeData({
+        name: "John Doe",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(await screen.findByText("John Doe")).toBeInTheDocument();
+    });
+
+    it("should render position from resume data", () => {
+      const mockData = createMockResumeData({
+        position: "Software Engineer",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Software Engineer")).toBeInTheDocument();
+    });
+
+    it("should render contact information", () => {
+      const mockData = createMockResumeData({
+        contactInformation: "+1 (555) 123-4567",
+        email: "john@example.com",
+        address: "123 Main St, City, State",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("+1 (555) 123-4567")).toBeInTheDocument();
+      expect(screen.getByText("john@example.com")).toBeInTheDocument();
+      expect(screen.getByText("123 Main St, City, State")).toBeInTheDocument();
+    });
+  });
+
+  describe("Profile Picture", () => {
+    it("should render profile picture when provided", () => {
+      const mockData = createMockResumeData({
+        profilePicture: "/images/profile.jpg",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      const img = screen.getByAltText("profile");
+      expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute("src", "/images/profile.jpg");
+    });
+
+    it("should not render profile picture when not provided", () => {
+      const mockData = createMockResumeData({
+        profilePicture: "",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByAltText("profile")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Social Media", () => {
+    it("should render social media links", () => {
+      const mockData = createMockResumeData({
+        socialMedia: [
+          { socialMedia: "Github", link: "github.com/johndoe" },
+          { socialMedia: "LinkedIn", link: "linkedin.com/in/johndoe" },
+        ],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("github.com/johndoe")).toBeInTheDocument();
+      expect(screen.getByText("linkedin.com/in/johndoe")).toBeInTheDocument();
+    });
+
+    it("should not render social media section when empty", () => {
+      const mockData = createMockResumeData({
+        socialMedia: [],
+      });
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      const socialMediaGrid = container.querySelector(".grid.grid-cols-3");
+      expect(socialMediaGrid).toBeInTheDocument();
+      expect(socialMediaGrid?.children).toHaveLength(0);
+    });
+  });
+
+  describe("Summary Section", () => {
+    it("should render summary when showSummary is true and summary exists", () => {
+      const mockData = createMockResumeData({
+        showSummary: true,
+        summary: "Experienced software engineer with 5 years of expertise",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Summary")).toBeInTheDocument();
+      expect(screen.getByText("Experienced software engineer with 5 years of expertise")).toBeInTheDocument();
+    });
+
+    it("should not render summary when showSummary is false", () => {
+      const mockData = createMockResumeData({
+        showSummary: false,
+        summary: "Experienced software engineer",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Summary")).not.toBeInTheDocument();
+    });
+
+    it("should not render summary when summary is empty", () => {
+      const mockData = createMockResumeData({
+        showSummary: true,
+        summary: "",
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Summary")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Education Section", () => {
+    it("should render education section when education data exists", () => {
+      const mockData = createMockResumeData({
+        education: [
+          {
+            degree: "Bachelor of Science in Computer Science",
+            school: "University of Example",
+            url: "university.edu",
+            startYear: "2015-09-01",
+            endYear: "2019-06-01",
+          },
+        ],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Education")).toBeInTheDocument();
+      expect(screen.getByText("Bachelor of Science in Computer Science")).toBeInTheDocument();
+      expect(screen.getByText("University of Example")).toBeInTheDocument();
+    });
+
+    it("should not render education section when empty", () => {
+      const mockData = createMockResumeData({
+        education: [],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Education")).not.toBeInTheDocument();
+    });
+
+    it("should render multiple education entries", () => {
+      const mockData = createMockResumeData({
+        education: [
+          {
+            degree: "Bachelor of Science",
+            school: "University A",
+            url: "",
+            startYear: "2015",
+            endYear: "2019",
+          },
+          {
+            degree: "Master of Science",
+            school: "University B",
+            url: "",
+            startYear: "2019",
+            endYear: "2021",
+          },
+        ],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Bachelor of Science")).toBeInTheDocument();
+      expect(screen.getByText("Master of Science")).toBeInTheDocument();
+      expect(screen.getByText("University A")).toBeInTheDocument();
+      expect(screen.getByText("University B")).toBeInTheDocument();
+    });
+  });
+
+  describe("Work Experience Section", () => {
+    it("should render work experience section when data exists", () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: "Tech Corp",
+            position: "Senior Developer",
+            url: "techcorp.com",
+            description: "Led development of key features",
+            keyAchievements: "Increased performance by 50%",
+            startYear: "2020-01-01",
+            endYear: "Present",
+            technologies: ["React", "Node.js"],
+          },
+        ],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Work Experience")).toBeInTheDocument();
+      expect(screen.getByText("Senior Developer")).toBeInTheDocument();
+      expect(screen.getByText("Tech Corp")).toBeInTheDocument();
+    });
+
+    it("should not render work experience section when empty", () => {
+      const mockData = createMockResumeData({
+        workExperience: [],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Work Experience")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Skills Section", () => {
+    it("should render skills section when skills exist", async () => {
+      const mockData = createMockResumeData({
+        skills: [
+          {
+            title: "Programming Languages",
+            skills: [
+              { text: "JavaScript", highlight: true },
+              { text: "Python", highlight: false },
+            ],
+          },
+        ],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(await screen.findByText("Programming Languages")).toBeInTheDocument();
+      expect(screen.getByText("JavaScript")).toBeInTheDocument();
+      expect(screen.getByText("Python")).toBeInTheDocument();
+    });
+  });
+
+  describe("Editable vs Non-Editable States", () => {
+    it("should set contentEditable to true when editable is true", () => {
+      const mockData = createMockResumeData({
+        name: "John Doe",
+      });
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData, editable: true },
+      });
+
+      const nameElement = container.querySelector(".name");
+      expect(nameElement).toHaveAttribute("contenteditable", "true");
+    });
+
+    it("should set contentEditable to false when editable is false", () => {
+      const mockData = createMockResumeData({
+        name: "John Doe",
+      });
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData, editable: false },
+      });
+
+      const nameElement = container.querySelector(".name");
+      expect(nameElement).toHaveAttribute("contenteditable", "false");
+    });
+
+    it("should default to editable true when not specified", () => {
+      const mockData = createMockResumeData({
+        name: "John Doe",
+      });
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      const nameElement = container.querySelector(".name");
+      expect(nameElement).toHaveAttribute("contenteditable", "true");
+    });
+
+    it("should apply editable class to editable elements", () => {
+      const mockData = createMockResumeData({
+        name: "John Doe",
+        position: "Software Engineer",
+      });
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      const editableElements = container.querySelectorAll(".editable");
+      expect(editableElements.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Languages Section", () => {
+    it("should render languages when showLanguages is true", () => {
+      const mockData = createMockResumeData({
+        showLanguages: true,
+        languages: ["English", "Spanish"],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Languages")).toBeInTheDocument();
+    });
+
+    it("should not render languages when showLanguages is false", () => {
+      const mockData = createMockResumeData({
+        showLanguages: false,
+        languages: ["English", "Spanish"],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Languages")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Certifications Section", () => {
+    it("should render certifications when data exists", () => {
+      const mockData = createMockResumeData({
+        certifications: ["AWS Certified Solutions Architect"],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.getByText("Certifications")).toBeInTheDocument();
+    });
+
+    it("should not render certifications section when empty", () => {
+      const mockData = createMockResumeData({
+        certifications: [],
+      });
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      expect(screen.queryByText("Certifications")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Layout Structure", () => {
+    it("should render drag-drop context", () => {
+      renderWithContext(<Preview />);
+      expect(screen.getByTestId("drag-drop-context")).toBeInTheDocument();
+    });
+
+    it("should render highlight menu", () => {
+      renderWithContext(<Preview />);
+      expect(screen.getByTestId("highlight-menu")).toBeInTheDocument();
+    });
+
+    it("should use grid layout for two-column design", () => {
+      const { container } = renderWithContext(<Preview />);
+      const gridLayout = container.querySelector(".grid.grid-cols-3");
+      expect(gridLayout).toBeInTheDocument();
+    });
+  });
+});

@@ -76,4 +76,5 @@ export interface ResumeData {
   showLanguages: boolean;
   certifications: Certification[];
   projects?: Project[];
+  content?: string; // Cover letter content
 }

@@ -14,8 +14,22 @@ export default function ResumeDownloadPage() {
   useEffect(() => {
     // Load resume data from localStorage if available
     const storedData = localStorage.getItem("resumeData");
+    let loadedData = defaultResumeData;
     if (storedData) {
-      setResumeData(JSON.parse(storedData));
+      loadedData = JSON.parse(storedData);
+      setResumeData(loadedData);
+    }
+
+    // Set document title for PDF filename
+    const formatName = (name: string) => {
+      return name
+        .split(/[\s_-]+/)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join("");
+    };
+
+    if (loadedData.name) {
+      document.title = `${formatName(loadedData.name)}-Resume`;
     }
 
     // Auto-trigger print dialog after a short delay
@@ -39,7 +53,7 @@ export default function ResumeDownloadPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 print:bg-white">
         {/* Floating Print Button - Hidden on print */}
         <div className="exclude-print fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 md:top-auto md:left-auto md:bottom-8 md:right-8 md:translate-x-0 md:translate-y-0 z-50">
-          <PrintButton />
+          <PrintButton name={resumeData.name} documentType="Resume" />
         </div>
 
         {/* Resume Content */}
