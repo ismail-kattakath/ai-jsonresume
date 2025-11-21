@@ -6,7 +6,7 @@ import { convertToJSONResume, convertFromJSONResume } from "@/lib/jsonResume";
 import { validateJSONResume } from "@/lib/jsonResumeSchema";
 import { toast } from "sonner";
 
-const LoadUnload = () => {
+const LoadUnload = ({ hideSaveButton = false }) => {
   const { resumeData, setResumeData } = useContext(ResumeContext);
 
   // migrate old skills format to new format
@@ -145,7 +145,7 @@ const LoadUnload = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 max-w-3xl mx-auto">
+    <div className={`grid gap-3 mb-4 max-w-3xl mx-auto ${hideSaveButton ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
       <label className="group inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all text-sm font-medium">
         <VscJson className="text-lg group-hover:rotate-12 transition-transform" />
         <span>Load Json Resume</span>
@@ -157,16 +157,18 @@ const LoadUnload = () => {
           accept=".json"
         />
       </label>
-      <button
-        aria-label="Save"
-        className="group inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all text-sm font-medium cursor-pointer"
-        onClick={(event) =>
-          handleDownload(resumeData, generateFilename(), event)
-        }
-      >
-        <VscJson className="text-lg group-hover:rotate-12 transition-transform" />
-        <span>Save Json Resume</span>
-      </button>
+      {!hideSaveButton && (
+        <button
+          aria-label="Save"
+          className="group inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all text-sm font-medium cursor-pointer"
+          onClick={(event) =>
+            handleDownload(resumeData, generateFilename(), event)
+          }
+        >
+          <VscJson className="text-lg group-hover:rotate-12 transition-transform" />
+          <span>Save Json Resume</span>
+        </button>
+      )}
       <button
         aria-label="Print"
         className="group inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all text-sm font-medium cursor-pointer"
