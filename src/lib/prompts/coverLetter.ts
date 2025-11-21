@@ -61,7 +61,7 @@ CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
 6. Use ONLY the specific metrics, achievements, and details provided in the candidate's experience
 
 WRITING INSTRUCTIONS:
-1. Write a professional summary as a SINGLE PARAGRAPH (approximately 150-200 words, 600-900 characters)
+1. Write a professional summary as a SINGLE PARAGRAPH (approximately 100-150 words, 450-675 characters)
 2. Start with role/expertise, then current focus, then key achievements, then proven abilities
 3. Use semicolons to separate major sections within the paragraph (NOT multiple paragraphs)
 4. Highlight 2-3 key achievements from the candidate's ACTUAL experience with specific metrics
@@ -95,9 +95,9 @@ export function validateSummary(content: string): {
     errors.push("Summary is too short (minimum 100 characters)");
   }
 
-  // Check maximum length (matching default summary style: ~900 chars)
-  if (content.length > 900) {
-    errors.push("Summary is too long (maximum 900 characters for single paragraph)");
+  // Check maximum length (matching default summary style: ~675 chars)
+  if (content.length > 675) {
+    errors.push("Summary is too long (maximum 675 characters for single paragraph)");
   }
 
   // Check for multiple paragraphs (should be single paragraph)
