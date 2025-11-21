@@ -318,6 +318,38 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({
           </div>
         )}
 
+        {/* Streaming content display - Fixed height above button */}
+        {isGenerating && (
+          <div className="space-y-2">
+            <p className="text-xs text-center text-blue-300">
+              ✨ AI is crafting your cover letter...
+            </p>
+            <div
+              ref={streamContainerRef}
+              className="bg-white/5 border border-white/10 rounded-lg p-3 h-32 overflow-y-auto scroll-smooth"
+            >
+              {streamedContent ? (
+                <>
+                  <p className="text-[10px] text-white/80 whitespace-pre-wrap leading-relaxed">
+                    {streamedContent}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-2 text-[10px] text-blue-400">
+                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                    <span>Generating...</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="flex items-center gap-2 text-[10px] text-white/40">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Waiting for response...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Generate button with progress indicator */}
         <div className="space-y-3 pt-2">
           <button
@@ -347,32 +379,6 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({
                 ? "⚠️ Job description required"
                 : "Fill all fields to continue"}
             </p>
-          )}
-
-          {isGenerating && (
-            <div className="space-y-3">
-              <div className="text-center space-y-2">
-                <p className="text-xs text-blue-300">
-                  ✨ AI is crafting your cover letter...
-                </p>
-              </div>
-
-              {/* Streaming content display */}
-              {streamedContent && (
-                <div
-                  ref={streamContainerRef}
-                  className="bg-white/5 border border-white/10 rounded-lg p-4 max-h-64 overflow-y-auto scroll-smooth"
-                >
-                  <p className="text-xs text-white/90 whitespace-pre-wrap leading-relaxed">
-                    {streamedContent}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-blue-400">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    <span>Generating...</span>
-                  </div>
-                </div>
-              )}
-            </div>
           )}
         </div>
       </div>
