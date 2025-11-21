@@ -103,7 +103,7 @@ const LoadUnload = () => {
         }
       >
         <VscJson className="text-lg group-hover:rotate-12 transition-transform" />
-        <span>Save Data</span>
+        <span>Save Json Resume</span>
       </button>
       <button
         aria-label="Print"
