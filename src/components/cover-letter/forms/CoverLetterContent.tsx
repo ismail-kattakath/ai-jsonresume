@@ -28,25 +28,25 @@ const CoverLetterContent = () => {
 Tip: Highlight your relevant experience, explain why you're excited about this opportunity, and show how your skills align with the role."
           name="content"
           rows={18}
-          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-y min-h-[300px] placeholder:text-white/30 leading-relaxed"
+          className="w-full px-4 pt-3 pb-16 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-y min-h-[300px] placeholder:text-white/30 leading-relaxed"
           value={resumeData.content || ""}
           onChange={handleContentChange}
         />
         <label className="floating-label">Cover Letter Content</label>
-        <div className="absolute bottom-3 right-3 px-3 py-1 bg-white/5 rounded-lg text-xs text-white/50 pointer-events-none">
+        <div className="absolute top-3 right-3 px-3 py-1 bg-white/5 rounded-lg text-xs text-white/50 pointer-events-none">
           {(resumeData.content || "").length} characters
         </div>
-      </div>
 
-      {/* Generate with AI Button */}
-      <button
-        type="button"
-        onClick={() => setIsModalOpen(true)}
-        className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group"
-      >
-        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-        <span>Generate with AI</span>
-      </button>
+        {/* Generate with AI Button - Inside textarea at bottom */}
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          className="absolute bottom-3 left-3 right-3 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group"
+        >
+          <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+          <span>Generate with AI</span>
+        </button>
+      </div>
 
       {/* AI Generation Modal */}
       <AIGenerateModal
