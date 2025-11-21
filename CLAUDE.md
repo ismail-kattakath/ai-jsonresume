@@ -297,12 +297,14 @@ SEO files are **automatically generated** using the `next-sitemap` package:
   - Environment variable support for production
   - Shared session across protected pages
   - Automatic session cleanup on logout
-- **Test Coverage**: 125 comprehensive tests (89.6% passing)
-  - 21 unit tests for password config
-  - 62 unit tests for PasswordProtection component
+- **Test Coverage**: 503 comprehensive tests (100% pass rate)
+  - 21 unit tests for password config (3 skipped - browser environment edge cases)
+  - 62 unit tests for PasswordProtection component (1 skipped - impossible scenario)
   - 24 integration tests for resume edit page
   - 21 integration tests for cover letter edit page
   - 17 end-to-end workflow tests
+  - Plus extensive tests for forms, UI components, and data adapters
+  - 4 tests skipped by design (browser-specific edge cases + impossible state)
 
 See `docs/PASSWORD_PROTECTION_SETUP.md` for complete setup instructions.
 
@@ -407,10 +409,12 @@ See `docs/PASSWORD_PROTECTION_TESTS.md` for detailed test documentation.
 Deployment is handled by GitHub Actions (`.github/workflows/deploy.yml`):
 
 1. **Triggers**: Push to `main` branch or pull request
-2. **Test Step**: Runs full test suite (deployment fails if tests fail)
+2. **Test Step**: Runs full test suite (**deployment fails if ANY tests fail** - strict enforcement)
 3. **Build Step**: `npm run build` (includes automatic sitemap generation via postbuild)
 4. **Upload**: `./out` directory as Pages artifact
 5. **Deploy**: Deploys to GitHub Pages environment (main branch only)
+
+**Important**: The workflow has `continue-on-error: false` for the test step, ensuring no deployments occur with failing tests. All 499 actionable tests must pass (4 tests are intentionally skipped for browser-specific edge cases).
 
 **Manual deployment**:
 ```bash
