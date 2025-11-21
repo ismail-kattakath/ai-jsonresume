@@ -347,37 +347,30 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
           </div>
         )}
 
-        {/* Generate button with progress indicator */}
-        <div className="space-y-3 pt-2">
-          <button
-            onClick={handleGenerate}
-            disabled={!isFormValid || isGenerating}
-            className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 group"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Generating your professional summary...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                <span>Generate Professional Summary</span>
-              </>
-            )}
-          </button>
+        {/* Generate button - only show when not generating */}
+        {!isGenerating && (
+          <div className="space-y-3 pt-2">
+            <button
+              onClick={handleGenerate}
+              disabled={!isFormValid}
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 group"
+            >
+              <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              <span>Generate Professional Summary</span>
+            </button>
 
-          {/* Helper text */}
-          {!isFormValid && !isGenerating && (
-            <p className="text-xs text-center text-white/50">
-              {!apiKey
-                ? "⚠️ API key required"
-                : !jobDescription
-                ? "⚠️ Job description required"
-                : "Fill all fields to continue"}
-            </p>
-          )}
-        </div>
+            {/* Helper text */}
+            {!isFormValid && (
+              <p className="text-xs text-center text-white/50">
+                {!apiKey
+                  ? "⚠️ API key required"
+                  : !jobDescription
+                  ? "⚠️ Job description required"
+                  : "Fill all fields to continue"}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </Modal>
   );
