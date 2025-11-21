@@ -36,20 +36,23 @@ input:focus {
 /* Floating label container */
 .floating-label-group {
   position: relative;
+  display: block;
 }
 
 /* Label styling - always visible */
 .floating-label {
   position: absolute;
   right: 0.75rem;
-  top: -0.625rem;
+  top: -0.5rem;
   background: linear-gradient(135deg, #1f2937 0%, #000000 100%);
-  padding: 0 0.5rem;
-  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.6);
   pointer-events: none;
   transition: all 0.2s ease;
   z-index: 10;
+  border-radius: 0.25rem;
+  white-space: nowrap;
 }
 
 /* When input has focus or value, label stays in place */

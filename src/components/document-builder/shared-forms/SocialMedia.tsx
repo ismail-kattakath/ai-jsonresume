@@ -161,7 +161,7 @@ const SocialMedia = () => {
                     type="text"
                     placeholder="Platform Name"
                     name="socialMedia"
-                    className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 outline-none transition-all placeholder:text-white/40"
+                    className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 outline-none transition-all placeholder:text-white/40"
                     value={socialMedia.socialMedia}
                     onChange={(e) => handleSocialMedia(e, index)}
                   />
@@ -174,7 +174,7 @@ const SocialMedia = () => {
                     type="text"
                     placeholder="URL"
                     name="link"
-                    className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 outline-none transition-all placeholder:text-white/40"
+                    className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 outline-none transition-all placeholder:text-white/40"
                     value={socialMedia.link}
                     onChange={(e) => handleSocialMedia(e, index)}
                   />
