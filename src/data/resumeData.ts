@@ -1,10 +1,63 @@
 import jsonResumeData from './resume.json';
 
+// JSON Resume types
+interface JSONResume {
+  basics?: {
+    name?: string;
+    label?: string;
+    image?: string;
+    email?: string;
+    phone?: string;
+    url?: string;
+    summary?: string;
+    location?: {
+      address?: string;
+      postalCode?: string;
+      city?: string;
+      countryCode?: string;
+      region?: string;
+    };
+    profiles?: Array<{
+      network?: string;
+      username?: string;
+      url?: string;
+    }>;
+  };
+  work?: Array<{
+    name?: string;
+    position?: string;
+    url?: string;
+    startDate?: string;
+    endDate?: string;
+    summary?: string;
+    highlights?: string[];
+    keywords?: string[];
+  }>;
+  education?: Array<{
+    institution?: string;
+    url?: string;
+    area?: string;
+    studyType?: string;
+    startDate?: string;
+    endDate?: string;
+  }>;
+  skills?: Array<{
+    name?: string;
+    level?: string;
+    keywords?: string[];
+  }>;
+  languages?: Array<{
+    language?: string;
+    fluency?: string;
+  }>;
+  certificates?: any[];
+}
+
 /**
  * Converts JSON Resume format to internal resume data format
  * This allows the project to use a standard JSON Resume file as the source of truth
  */
-function convertFromJSONResume(jsonResume) {
+function convertFromJSONResume(jsonResume: JSONResume) {
   const basics = jsonResume.basics || {};
 
   // Convert profiles back to social media format
