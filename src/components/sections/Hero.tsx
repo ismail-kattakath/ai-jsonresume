@@ -37,7 +37,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="min-h-screen flex items-center relative overflow-hidden">
+    <section className="min-h-screen flex items-center relative backdrop-blur-sm overflow-hidden">
       {/* Floating gradient orbs for depth */}
       <div className="absolute top-1/4 -left-20 w-72 h-72 bg-[var(--md-sys-color-primary)]/10 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[var(--md-sys-color-tertiary)]/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>

@@ -18,7 +18,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="relative bg-[var(--md-sys-color-surface-container)]/60 border-t border-[var(--md-sys-color-outline-variant)]/30 overflow-hidden">
+    <footer className="relative backdrop-blur-md bg-[var(--md-sys-color-surface-container)]/60 border-t border-[var(--md-sys-color-outline-variant)]/30 overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--md-sys-color-primary)]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[var(--md-sys-color-tertiary)]/5 rounded-full blur-3xl"></div>

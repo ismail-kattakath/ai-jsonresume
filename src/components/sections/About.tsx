@@ -38,7 +38,7 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="py-24 relative overflow-hidden">
+    <section id="about" className="py-24 backdrop-blur-sm relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-1/4 w-64 h-64 bg-[var(--md-sys-color-secondary)]/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[var(--md-sys-color-primary)]/5 rounded-full blur-3xl"></div>
