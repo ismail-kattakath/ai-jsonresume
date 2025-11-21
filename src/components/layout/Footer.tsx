@@ -3,15 +3,21 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Zap, Globe } from 'lucide-react'
 import { contactInfo } from '@/lib/data/portfolio'
+import DefaultResumeData from '@/components/resume-builder/utility/DefaultResumeData'
+import { Logo } from '@/components/Logo'
+import { navItems } from '@/config/navigation'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+
+  // Extract first sentence from summary
+  const firstSentence = DefaultResumeData.summary.split('.')[0] + '.'
 
   return (
     <footer className="backdrop-blur-md bg-[var(--md-sys-color-surface-container)]/60 border-t border-[var(--md-sys-color-outline-variant)]/30">
       <div className="max-w-6xl mx-auto px-6 py-16">
         {/* Main Footer Content */}
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
+        <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Brand Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -20,20 +26,14 @@ export default function Footer() {
             viewport={{ once: true }}
             className="md:col-span-2"
           >
-            <div className="flex items-center gap-2 mb-4">
-              <img 
-              src="./images/profile.jpg" 
-              alt="Ismail Kattakath"
-              className="w-12 h-12 rounded-full object-cover"
-              style={{
-                border: '2px solid var(--md-sys-color-primary)',
-              }}
-            />
-              <h3 className="md3-title-large">{contactInfo.name}</h3>
+            <div className="mb-4">
+              <div className="w-48 h-27 mb-2">
+                <Logo width={192} height={108} fill="var(--md-sys-color-primary)" />
+              </div>
+              <h3 className="md3-title-large">{DefaultResumeData.position}</h3>
             </div>
             <p className="md3-body-medium text-[var(--md-sys-color-on-surface-variant)] mb-6 max-w-md leading-relaxed">
-              {contactInfo.title} passionate about building innovative AI solutions
-              and scalable architectures. Based in {contactInfo.location}
+              {firstSentence}
             </p>
 
             {/* Social Links */}
@@ -94,19 +94,19 @@ export default function Footer() {
           >
             <h4 className="md3-title-medium mb-4 text-[var(--md-sys-color-primary)]">Navigate</h4>
             <ul className="space-y-3">
-              {[
-                { name: 'About', href: '#about' },
-                { name: 'Skills', href: '#skills' },
-                { name: 'Experience', href: '#experience' },
-                { name: 'Projects', href: '#projects' },
-                { name: 'Contact', href: '#contact' },
-              ].map((item) => (
+              {navItems.map((item) => (
                 <li key={item.name}>
                   <button
                     onClick={() => {
-                      const element = document.querySelector(item.href)
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' })
+                      if (item.href.startsWith('#')) {
+                        // Anchor link - scroll to section
+                        const element = document.querySelector(item.href)
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth' })
+                        }
+                      } else {
+                        // Full page navigation
+                        window.location.href = item.href
                       }
                     }}
                     className="md3-body-medium text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-primary)] transition-colors flex items-center gap-2 group"
@@ -117,26 +117,6 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </motion.div>
-
-          {/* Specializations */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <h4 className="md3-title-medium mb-4 text-[var(--md-sys-color-primary)]">Expertise</h4>
-            <div className="flex flex-wrap gap-2">
-              {['AI/ML', 'Full-Stack', 'Cloud', 'DevOps'].map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1.5 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] rounded-lg md3-label-medium hover:bg-[var(--md-sys-color-primary-container)] hover:text-[var(--md-sys-color-primary)] transition-all cursor-default"
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
           </motion.div>
         </div>
 

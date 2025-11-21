@@ -3,15 +3,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
-
-const navItems = [
-  { name: 'About', href: '#about' },
-  { name: 'Skills', href: '#skills' },
-  { name: 'Experience', href: '#experience' },
-  { name: 'Contact', href: '#contact' },
-  { name: 'Resume', href: '/resume' },
-  { name: 'Calendar', href: '/book' },
-]
+import { navItems } from '@/config/navigation'
+import { Logo } from '@/components/Logo'
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -51,7 +44,7 @@ export default function Header() {
           : 'bg-transparent'
       }`}
     >
-      <nav className="max-w-6xl mx-auto px-6 py-3">
+      <nav className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           {/* Logo/Brand */}
           <motion.button
@@ -60,15 +53,9 @@ export default function Header() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img 
-              src="./images/profile.jpg" 
-              alt="Ismail Kattakath"
-              className="w-10 h-10 rounded-full object-cover"
-              style={{
-                border: '2px solid var(--md-sys-color-primary)',
-              }}
-            />
-
+            <div className="w-24 h-14">
+              <Logo width={96} height={54} fill="#ffffff" />
+            </div>
           </motion.button>
 
           {/* Desktop Navigation */}
@@ -77,7 +64,7 @@ export default function Header() {
               <motion.button
                 key={item.name}
                 onClick={() => handleNavigation(item.href)}
-                className="relative px-4 py-2 text-[var(--md-sys-color-on-surface)] md3-label-large transition-colors group cursor-pointer"
+                className="relative px-5 py-3 text-[var(--md-sys-color-on-surface)] md3-label-large transition-colors group cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
