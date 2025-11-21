@@ -127,7 +127,7 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
       onGenerate(content);
       onClose();
     } catch (err) {
-      console.error("Cover letter generation error:", err);
+      console.error("Professional summary generation error:", err);
 
       let errorMessage = "Failed to generate professional summary";
 
@@ -321,7 +321,7 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
             autoFocus
           />
           <div className="flex items-center justify-between text-xs text-white/50">
-            <span>💡 Tip: More details = better cover letter</span>
+            <span>💡 Tip: More details = better professional summary</span>
             <kbd className="px-2 py-1 bg-white/10 rounded text-white/60 font-mono">
               {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Enter to generate
             </kbd>
@@ -349,7 +349,7 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
             {isGenerating ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Generating your cover letter...</span>
+                <span>Generating your professional summary...</span>
               </>
             ) : (
               <>
