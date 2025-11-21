@@ -1,10 +1,18 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ResumeContext } from "@/lib/contexts/DocumentContext";
+import { Sparkles } from "lucide-react";
+import AIGenerateSummaryModal from "./AIGenerateSummaryModal";
+
 const Summary = () => {
   const { resumeData, setResumeData, handleChange } = useContext(ResumeContext);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleToggleSummary = (e) => {
     setResumeData({ ...resumeData, showSummary: e.target.checked });
+  };
+
+  const handleGenerate = (generatedSummary: string) => {
+    setResumeData({ ...resumeData, summary: generatedSummary });
   };
 
   return (
@@ -39,6 +47,23 @@ const Summary = () => {
           {resumeData.summary.length}/2000
         </div>
       </div>
+
+      {/* Generate with AI Button */}
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+        className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group"
+      >
+        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+        <span>Generate with AI</span>
+      </button>
+
+      <AIGenerateSummaryModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onGenerate={handleGenerate}
+        resumeData={resumeData}
+      />
     </div>
   );
 };

@@ -12,6 +12,8 @@ import {
   buildCoverLetterPrompt,
   validateCoverLetter,
   postProcessCoverLetter,
+  buildSummaryPrompt,
+  validateSummary,
 } from "@/lib/prompts/coverLetter";
 
 const STORAGE_KEY = "ai_cover_letter_credentials";
@@ -281,6 +283,77 @@ export async function generateCoverLetter(
   const validation = validateCoverLetter(processedContent);
   if (!validation.isValid) {
     console.warn("Cover letter validation warnings:", validation.errors);
+    // Still return the content, but log warnings
+  }
+
+  return processedContent;
+}
+
+/**
+ * Generates a professional summary using OpenAI API with streaming support
+ */
+export async function generateSummary(
+  config: OpenAIConfig,
+  resumeData: ResumeData,
+  jobDescription: string,
+  onProgress?: StreamCallback
+): Promise<string> {
+  // Build the prompt
+  const prompt = buildSummaryPrompt(resumeData, jobDescription);
+
+  // Prepare the request
+  const request: OpenAIRequest = {
+    model: config.model,
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a professional resume writer with expertise in crafting compelling professional summaries that highlight candidate strengths and align with job requirements. You write concise, impactful, achievement-focused summaries.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 600, // Slightly lower than cover letter since summaries are shorter
+    top_p: 0.9,
+  };
+
+  // Use streaming if callback provided, otherwise use regular request
+  let generatedContent: string;
+
+  if (onProgress) {
+    generatedContent = await makeOpenAIStreamRequest(config, request, onProgress);
+  } else {
+    // Make the API request (non-streaming for backward compatibility)
+    const response = await makeOpenAIRequest(config, request);
+
+    // Extract the generated text
+    if (!response.choices || response.choices.length === 0) {
+      throw new OpenAIAPIError(
+        "AI generated an empty response. Please try again.",
+        "empty_response"
+      );
+    }
+
+    generatedContent = response.choices[0].message.content;
+
+    if (!generatedContent || generatedContent.trim().length === 0) {
+      throw new OpenAIAPIError(
+        "AI generated an empty response. Please try rephrasing the job description.",
+        "empty_content"
+      );
+    }
+  }
+
+  // Post-process the content
+  const processedContent = postProcessCoverLetter(generatedContent); // Reuse same post-processing
+
+  // Validate the content
+  const validation = validateSummary(processedContent);
+  if (!validation.isValid) {
+    console.warn("Summary validation warnings:", validation.errors);
     // Still return the content, but log warnings
   }
 
