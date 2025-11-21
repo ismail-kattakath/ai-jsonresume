@@ -83,6 +83,7 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     email: basics.email || '',
     address: address || '',
     profilePicture: basics.image || '',
+    calendarLink: (basics as any).calendar || '',
     socialMedia,
     summary: basics.summary || '',
     showSummary: true,

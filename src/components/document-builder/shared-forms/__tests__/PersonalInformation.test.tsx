@@ -1,0 +1,286 @@
+import React from 'react';
+import { axe } from 'jest-axe';
+import PersonalInformation from '../PersonalInformation';
+import {
+  renderWithContext,
+  createMockResumeData,
+  screen,
+  fireEvent,
+} from '@/lib/__tests__/test-utils';
+
+describe('PersonalInformation Component', () => {
+  describe('Rendering', () => {
+    it('should render all form fields with floating labels', () => {
+      renderWithContext(<PersonalInformation />);
+
+      // Check for floating labels
+      expect(screen.getByText('Full Name')).toBeInTheDocument();
+      expect(screen.getByText('Job Title')).toBeInTheDocument();
+      expect(screen.getByText('Phone')).toBeInTheDocument();
+      expect(screen.getByText('Email')).toBeInTheDocument();
+      expect(screen.getByText('Address')).toBeInTheDocument();
+      expect(screen.getByText('Photo')).toBeInTheDocument();
+    });
+
+    it('should render section heading', () => {
+      renderWithContext(<PersonalInformation />);
+
+      expect(screen.getByText('Personal Information')).toBeInTheDocument();
+    });
+
+    it('should render inputs with correct types', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const nameInput = container.querySelector('input[name="name"]');
+      const emailInput = container.querySelector('input[name="email"]');
+      const fileInput = container.querySelector('input[type="file"]');
+
+      expect(nameInput).toHaveAttribute('type', 'text');
+      expect(emailInput).toHaveAttribute('type', 'email');
+      expect(fileInput).toHaveAttribute('type', 'file');
+      expect(fileInput).toHaveAttribute('accept', 'image/*');
+    });
+
+    it('should display resume data values in inputs', () => {
+      const mockData = createMockResumeData({
+        name: 'John Doe',
+        position: 'Software Engineer',
+        contactInformation: '+1 (555) 123-4567',
+        email: 'john@example.com',
+        address: '123 Main St, Toronto',
+      });
+
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { resumeData: mockData },
+      });
+
+      const nameInput = container.querySelector(
+        'input[name="name"]'
+      ) as HTMLInputElement;
+      const positionInput = container.querySelector(
+        'input[name="position"]'
+      ) as HTMLInputElement;
+      const phoneInput = container.querySelector(
+        'input[name="contactInformation"]'
+      ) as HTMLInputElement;
+      const emailInput = container.querySelector(
+        'input[name="email"]'
+      ) as HTMLInputElement;
+      const addressInput = container.querySelector(
+        'input[name="address"]'
+      ) as HTMLInputElement;
+
+      expect(nameInput?.value).toBe('John Doe');
+      expect(positionInput?.value).toBe('Software Engineer');
+      expect(phoneInput?.value).toBe('+1 (555) 123-4567');
+      expect(emailInput?.value).toBe('john@example.com');
+      expect(addressInput?.value).toBe('123 Main St, Toronto');
+    });
+  });
+
+  describe('User Interactions', () => {
+    it('should call handleChange when text inputs are changed', () => {
+      const mockHandleChange = jest.fn();
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { handleChange: mockHandleChange },
+      });
+
+      const nameInput = container.querySelector('input[name="name"]');
+
+      if (nameInput) {
+        fireEvent.change(nameInput, { target: { value: 'Jane Doe', name: 'name' } });
+        expect(mockHandleChange).toHaveBeenCalled();
+      }
+    });
+
+    it('should call handleChange for all text fields', () => {
+      const mockHandleChange = jest.fn();
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { handleChange: mockHandleChange },
+      });
+
+      const fields = [
+        { name: 'name', value: 'John Doe' },
+        { name: 'position', value: 'Developer' },
+        { name: 'contactInformation', value: '+1 555 1234' },
+        { name: 'email', value: 'test@example.com' },
+        { name: 'address', value: '123 Test St' },
+      ];
+
+      fields.forEach(({ name, value }) => {
+        const input = container.querySelector(`input[name="${name}"]`);
+        if (input) {
+          fireEvent.change(input, { target: { value, name } });
+        }
+      });
+
+      expect(mockHandleChange).toHaveBeenCalledTimes(fields.length);
+    });
+
+    it('should call handleProfilePicture when file input changes', () => {
+      const mockHandleProfilePicture = jest.fn();
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { handleProfilePicture: mockHandleProfilePicture },
+      });
+
+      const fileInput = container.querySelector('input[type="file"]');
+      const file = new File(['profile'], 'profile.jpg', { type: 'image/jpeg' });
+
+      if (fileInput) {
+        fireEvent.change(fileInput, { target: { files: [file] } });
+        expect(mockHandleProfilePicture).toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe('Floating Labels', () => {
+    it('should have floating-label-group class on all input containers', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const floatingLabelGroups = container.querySelectorAll('.floating-label-group');
+
+      // Should have 6 floating label groups (name, position, phone, email, address, photo)
+      expect(floatingLabelGroups.length).toBe(6);
+    });
+
+    it('should have floating-label class on all labels', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const floatingLabels = container.querySelectorAll('.floating-label');
+
+      // Should have 6 floating labels
+      expect(floatingLabels.length).toBe(6);
+    });
+
+    it('should position labels correctly with expected text', () => {
+      renderWithContext(<PersonalInformation />);
+
+      const expectedLabels = ['Full Name', 'Job Title', 'Phone', 'Email', 'Address', 'Photo'];
+
+      expectedLabels.forEach((labelText) => {
+        const label = screen.getByText(labelText);
+        expect(label).toHaveClass('floating-label');
+      });
+    });
+  });
+
+  describe('Form Layout', () => {
+    it('should use grid layout for responsive design', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const gridContainer = container.querySelector('.grid');
+
+      expect(gridContainer).toBeInTheDocument();
+      expect(gridContainer).toHaveClass('grid-cols-1', 'md:grid-cols-2');
+    });
+
+    it('should span address and photo fields across full width on medium screens', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const addressGroup = container.querySelector(
+        'input[name="address"]'
+      )?.parentElement;
+      const photoGroup = container.querySelector('input[type="file"]')?.parentElement;
+
+      expect(addressGroup).toHaveClass('md:col-span-2');
+      expect(photoGroup).toHaveClass('md:col-span-2');
+    });
+  });
+
+  describe('Input Styling', () => {
+    it('should apply consistent styling to all text inputs', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const textInputs = container.querySelectorAll(
+        'input[type="text"], input[type="email"]'
+      );
+
+      textInputs.forEach((input) => {
+        expect(input).toHaveClass('w-full', 'px-4', 'py-3', 'bg-white/10', 'text-white', 'rounded-lg');
+      });
+    });
+
+    it('should have focus styles defined', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const nameInput = container.querySelector('input[name="name"]');
+
+      expect(nameInput).toHaveClass('focus:border-blue-400', 'focus:ring-2');
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const results = await axe(container);
+
+      expect(results).toHaveNoViolations();
+    });
+
+    it('should have proper input attributes', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const emailInput = container.querySelector('input[name="email"]');
+
+      expect(emailInput).toHaveAttribute('type', 'email');
+      expect(emailInput).toHaveAttribute('name', 'email');
+    });
+
+    it('should accept image files only for profile picture', () => {
+      const { container } = renderWithContext(<PersonalInformation />);
+
+      const fileInput = container.querySelector('input[type="file"]');
+
+      expect(fileInput).toHaveAttribute('accept', 'image/*');
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle empty resume data', () => {
+      const emptyData = createMockResumeData({
+        name: '',
+        position: '',
+        contactInformation: '',
+        email: '',
+        address: '',
+      });
+
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { resumeData: emptyData },
+      });
+
+      const nameInput = container.querySelector(
+        'input[name="name"]'
+      ) as HTMLInputElement;
+
+      expect(nameInput?.value).toBe('');
+    });
+
+    it('should handle special characters in input values', () => {
+      const specialData = createMockResumeData({
+        name: "O'Brien-Smith",
+        email: 'test+tag@example.com',
+        address: '123 "Main" St., Apt #4-B',
+      });
+
+      const { container } = renderWithContext(<PersonalInformation />, {
+        contextValue: { resumeData: specialData },
+      });
+
+      const nameInput = container.querySelector(
+        'input[name="name"]'
+      ) as HTMLInputElement;
+      const emailInput = container.querySelector(
+        'input[name="email"]'
+      ) as HTMLInputElement;
+      const addressInput = container.querySelector(
+        'input[name="address"]'
+      ) as HTMLInputElement;
+
+      expect(nameInput?.value).toBe("O'Brien-Smith");
+      expect(emailInput?.value).toBe('test+tag@example.com');
+      expect(addressInput?.value).toBe('123 "Main" St., Apt #4-B');
+    });
+  });
+});

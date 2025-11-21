@@ -184,9 +184,14 @@ export default function Footer() {
               </span>
               <span className="text-[var(--md-sys-color-on-surface-variant)]">•</span>
               <span>Hosted on</span>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)] rounded-full md3-label-small font-medium">
+              <a
+                href="https://github.com/ismail-kattakath/ismail-portfolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)] rounded-full md3-label-small font-medium hover:opacity-80 transition-opacity"
+              >
                 GitHub Pages
-              </span>
+              </a>
             </p>
           </div>
         </motion.div>
