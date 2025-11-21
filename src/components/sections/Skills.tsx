@@ -30,7 +30,7 @@ const colorMap: { [key: string]: string } = {
 
 export default function Skills() {
   return (
-    <section id="skills" className="py-24 backdrop-blur-sm relative overflow-hidden">
+    <section id="skills" className="py-24 relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-[var(--md-sys-color-primary)]/5 rounded-full blur-3xl"></div>
       <div className="absolute top-1/3 right-0 w-80 h-80 bg-[var(--md-sys-color-tertiary)]/5 rounded-full blur-3xl"></div>
