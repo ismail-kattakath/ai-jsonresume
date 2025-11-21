@@ -11,7 +11,7 @@ const PersonalInformation = ({}) => {
         <h2 className="text-lg text-white font-semibold">Personal Information</h2>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="relative group">
+        <div className="floating-label-group">
           <input
             type="text"
             placeholder="Full Name"
@@ -20,8 +20,9 @@ const PersonalInformation = ({}) => {
             value={resumeData.name}
             onChange={handleChange}
           />
+          <label className="floating-label">Full Name</label>
         </div>
-        <div className="relative group">
+        <div className="floating-label-group">
           <input
             type="text"
             placeholder="Job Title"
@@ -30,8 +31,9 @@ const PersonalInformation = ({}) => {
             value={resumeData.position}
             onChange={handleChange}
           />
+          <label className="floating-label">Job Title</label>
         </div>
-        <div className="relative group">
+        <div className="floating-label-group">
           <input
             type="text"
             placeholder="Phone (e.g., +1 (647) 225-2878)"
@@ -40,8 +42,9 @@ const PersonalInformation = ({}) => {
             value={resumeData.contactInformation}
             onChange={handleChange}
           />
+          <label className="floating-label">Phone</label>
         </div>
-        <div className="relative group">
+        <div className="floating-label-group">
           <input
             type="email"
             placeholder="Email"
@@ -50,8 +53,9 @@ const PersonalInformation = ({}) => {
             value={resumeData.email}
             onChange={handleChange}
           />
+          <label className="floating-label">Email</label>
         </div>
-        <div className="relative group md:col-span-2">
+        <div className="floating-label-group md:col-span-2">
           <input
             type="text"
             placeholder="Address"
@@ -60,6 +64,7 @@ const PersonalInformation = ({}) => {
             value={resumeData.address}
             onChange={handleChange}
           />
+          <label className="floating-label">Address</label>
         </div>
         <div className="relative group md:col-span-2">
           <input

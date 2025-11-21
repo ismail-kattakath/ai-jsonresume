@@ -110,14 +110,17 @@ const Skill = ({ title }) => {
               className="w-4 h-4 accent-pink-500 cursor-pointer flex-shrink-0 rounded"
               title="Highlight this skill"
             />
-            <input
-              type="text"
-              placeholder={`Enter ${title.toLowerCase()}`}
-              name={title}
-              className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 outline-none transition-all placeholder:text-white/40"
-              value={skill.text}
-              onChange={(e) => handleSkill(e, index, title)}
-            />
+            <div className="floating-label-group flex-1">
+              <input
+                type="text"
+                placeholder={`Enter ${title.toLowerCase()}`}
+                name={title}
+                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 outline-none transition-all placeholder:text-white/40"
+                value={skill.text}
+                onChange={(e) => handleSkill(e, index, title)}
+              />
+              <label className="floating-label">{title}</label>
+            </div>
             <button
               type="button"
               onClick={() => deleteSkill(title, index)}

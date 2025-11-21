@@ -14,7 +14,7 @@ const CoverLetterContent = () => {
         <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
         <h2 className="text-lg text-white font-semibold">Cover Letter Content</h2>
       </div>
-      <div className="relative group">
+      <div className="floating-label-group">
         <textarea
           placeholder="Write your compelling cover letter here...
 
@@ -25,6 +25,7 @@ Tip: Highlight your relevant experience, explain why you're excited about this o
           value={resumeData.content || ""}
           onChange={handleContentChange}
         />
+        <label className="floating-label">Cover Letter Content</label>
         <div className="absolute bottom-3 right-3 px-3 py-1 bg-white/5 rounded-lg text-xs text-white/50 pointer-events-none">
           {(resumeData.content || "").length} characters
         </div>

@@ -25,7 +25,7 @@ const Summary = () => {
           <span className="text-sm text-white/90">Display Section</span>
         </label>
       </div>
-      <div className="relative group">
+      <div className="floating-label-group">
         <textarea
           placeholder="Write a compelling professional summary highlighting your key strengths, experience, and career objectives..."
           name="summary"
@@ -34,6 +34,7 @@ const Summary = () => {
           onChange={handleChange}
           maxLength="2000"
         />
+        <label className="floating-label">Professional Summary</label>
         <div className="absolute bottom-3 right-3 px-3 py-1 bg-white/5 rounded-lg text-xs text-white/50 pointer-events-none">
           {resumeData.summary.length}/2000
         </div>

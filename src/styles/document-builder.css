@@ -33,19 +33,50 @@ input:focus {
   outline: none;
 }
 
+/* Floating label container */
+.floating-label-group {
+  position: relative;
+}
+
+/* Label styling - always visible */
+.floating-label {
+  position: absolute;
+  right: 0.75rem;
+  top: -0.625rem;
+  background: linear-gradient(135deg, #1f2937 0%, #000000 100%);
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+/* When input has focus or value, label stays in place */
+.floating-label-group input:focus ~ .floating-label,
+.floating-label-group textarea:focus ~ .floating-label,
+.floating-label-group input:not(:placeholder-shown) ~ .floating-label,
+.floating-label-group textarea:not(:placeholder-shown) ~ .floating-label {
+  color: rgba(96, 165, 250, 0.9);
+  font-weight: 500;
+}
+
 input::placeholder,
 textarea::placeholder {
   text-align: right;
+  opacity: 0;
 }
 
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   text-align: right;
+  opacity: 0;
 }
 
 input::-moz-placeholder,
 textarea::-moz-placeholder {
   text-align: right;
+  opacity: 0;
 }
 
 .list-disc li::marker {

@@ -72,47 +72,62 @@ const Education = () => {
             key={index}
             className="group flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:border-white/20 hover:bg-white/10 transition-all"
           >
-            <input
-              type="text"
-              placeholder="Institution Name"
-              name="school"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
-              value={education.school}
-              onChange={(e) => handleEducation(e, index)}
-            />
-            <input
-              type="url"
-              placeholder="Website URL (optional)"
-              name="url"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
-              value={education.url}
-              onChange={(e) => handleEducation(e, index)}
-            />
-            <input
-              type="text"
-              placeholder="Degree / Program"
-              name="degree"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
-              value={education.degree}
-              onChange={(e) => handleEducation(e, index)}
-            />
+            <div className="floating-label-group">
+              <input
+                type="text"
+                placeholder="Institution Name"
+                name="school"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
+                value={education.school}
+                onChange={(e) => handleEducation(e, index)}
+              />
+              <label className="floating-label">Institution Name</label>
+            </div>
+            <div className="floating-label-group">
+              <input
+                type="url"
+                placeholder="Website URL (optional)"
+                name="url"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
+                value={education.url}
+                onChange={(e) => handleEducation(e, index)}
+              />
+              <label className="floating-label">Website URL</label>
+            </div>
+            <div className="floating-label-group">
+              <input
+                type="text"
+                placeholder="Degree / Program"
+                name="degree"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all placeholder:text-white/40"
+                value={education.degree}
+                onChange={(e) => handleEducation(e, index)}
+              />
+              <label className="floating-label">Degree / Program</label>
+            </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input
-                type="date"
-                placeholder="Start Date"
-                name="startYear"
-                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
-                value={education.startYear}
-                onChange={(e) => handleEducation(e, index)}
-              />
-              <input
-                type="date"
-                placeholder="End Date"
-                name="endYear"
-                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
-                value={education.endYear}
-                onChange={(e) => handleEducation(e, index)}
-              />
+              <div className="floating-label-group flex-1">
+                <input
+                  type="date"
+                  placeholder="Start Date"
+                  name="startYear"
+                  className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
+                  value={education.startYear}
+                  onChange={(e) => handleEducation(e, index)}
+                />
+                <label className="floating-label">Start Date</label>
+              </div>
+              <div className="floating-label-group flex-1">
+                <input
+                  type="date"
+                  placeholder="End Date"
+                  name="endYear"
+                  className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
+                  value={education.endYear}
+                  onChange={(e) => handleEducation(e, index)}
+                />
+                <label className="floating-label">End Date</label>
+              </div>
               <button
                 type="button"
                 onClick={() => deleteEducation(index)}

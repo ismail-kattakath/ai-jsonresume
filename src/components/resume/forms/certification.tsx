@@ -44,14 +44,17 @@ const Certification = () => {
             key={index}
             className="group flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg hover:border-white/20 hover:bg-white/10 transition-all"
           >
-            <input
-              type="text"
-              placeholder="Enter certification name"
-              name={title}
-              className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 outline-none transition-all placeholder:text-white/40"
-              value={skill}
-              onChange={(e) => handleSkills(e, index, skillType)}
-            />
+            <div className="floating-label-group flex-1">
+              <input
+                type="text"
+                placeholder="Enter certification name"
+                name={title}
+                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20 outline-none transition-all placeholder:text-white/40"
+                value={skill}
+                onChange={(e) => handleSkills(e, index, skillType)}
+              />
+              <label className="floating-label">Certification Name</label>
+            </div>
             <button
               type="button"
               onClick={() => deleteSkill(index)}

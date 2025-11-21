@@ -66,31 +66,40 @@ const WorkExperience = () => {
             key={index}
             className="group flex flex-col gap-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:border-white/20 hover:bg-white/10 transition-all"
           >
-            <input
-              type="text"
-              placeholder="Company Name"
-              name="company"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
-              value={workExperience.company}
-              onChange={(e) => handleWorkExperience(e, index)}
-            />
-            <input
-              type="url"
-              placeholder="Company Website URL"
-              name="url"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
-              value={workExperience.url}
-              onChange={(e) => handleWorkExperience(e, index)}
-            />
-            <input
-              type="text"
-              placeholder="Job Title"
-              name="position"
-              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
-              value={workExperience.position}
-              onChange={(e) => handleWorkExperience(e, index)}
-            />
-            <div className="relative">
+            <div className="floating-label-group">
+              <input
+                type="text"
+                placeholder="Company Name"
+                name="company"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
+                value={workExperience.company}
+                onChange={(e) => handleWorkExperience(e, index)}
+              />
+              <label className="floating-label">Company Name</label>
+            </div>
+            <div className="floating-label-group">
+              <input
+                type="url"
+                placeholder="Company Website URL"
+                name="url"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
+                value={workExperience.url}
+                onChange={(e) => handleWorkExperience(e, index)}
+              />
+              <label className="floating-label">Company Website URL</label>
+            </div>
+            <div className="floating-label-group">
+              <input
+                type="text"
+                placeholder="Job Title"
+                name="position"
+                className="w-full px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all placeholder:text-white/40"
+                value={workExperience.position}
+                onChange={(e) => handleWorkExperience(e, index)}
+              />
+              <label className="floating-label">Job Title</label>
+            </div>
+            <div className="floating-label-group">
               <textarea
                 type="text"
                 placeholder="Brief company/role description..."
@@ -100,11 +109,12 @@ const WorkExperience = () => {
                 maxLength="250"
                 onChange={(e) => handleWorkExperience(e, index)}
               />
+              <label className="floating-label">Description</label>
               <div className="absolute bottom-2 right-2 px-2 py-1 bg-white/5 rounded text-xs text-white/50 pointer-events-none">
                 {workExperience.description.length}/250
               </div>
             </div>
-            <div className="relative">
+            <div className="floating-label-group">
               <textarea
                 type="text"
                 placeholder="Key achievements and responsibilities..."
@@ -113,27 +123,34 @@ const WorkExperience = () => {
                 value={workExperience.keyAchievements}
                 onChange={(e) => handleWorkExperience(e, index)}
               />
+              <label className="floating-label">Key Achievements</label>
               <div className="absolute bottom-2 right-2 px-2 py-1 bg-white/5 rounded text-xs text-white/50 pointer-events-none">
                 {workExperience.keyAchievements.length} chars
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <input
-                type="date"
-                placeholder="Start Date"
-                name="startYear"
-                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all"
-                value={workExperience.startYear}
-                onChange={(e) => handleWorkExperience(e, index)}
-              />
-              <input
-                type="date"
-                placeholder="End Date"
-                name="endYear"
-                className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all"
-                value={workExperience.endYear}
-                onChange={(e) => handleWorkExperience(e, index)}
-              />
+              <div className="floating-label-group flex-1">
+                <input
+                  type="date"
+                  placeholder="Start Date"
+                  name="startYear"
+                  className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all"
+                  value={workExperience.startYear}
+                  onChange={(e) => handleWorkExperience(e, index)}
+                />
+                <label className="floating-label">Start Date</label>
+              </div>
+              <div className="floating-label-group flex-1">
+                <input
+                  type="date"
+                  placeholder="End Date"
+                  name="endYear"
+                  className="flex-1 px-3 py-2 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 outline-none transition-all"
+                  value={workExperience.endYear}
+                  onChange={(e) => handleWorkExperience(e, index)}
+                />
+                <label className="floating-label">End Date</label>
+              </div>
               <button
                 type="button"
                 onClick={() => deleteWorkExperience(index)}
