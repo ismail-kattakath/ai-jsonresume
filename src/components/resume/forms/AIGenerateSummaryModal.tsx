@@ -163,13 +163,16 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
     >
       <div className="space-y-5">
         {/* Collapsible API Settings */}
-        <details className="group" open={!rememberCredentials || !apiKey}>
+        <details className="group" open={!apiKey}>
           <summary className="cursor-pointer list-none">
             <div className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
               <div className="flex items-center gap-2">
                 <div className="text-white/80 text-sm font-medium">
                   🔑 API Configuration
                 </div>
+                <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full">
+                  Required
+                </span>
                 {apiKey && rememberCredentials && (
                   <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
                     Saved
@@ -273,39 +276,63 @@ const AIGenerateSummaryModal: React.FC<AIGenerateSummaryModalProps> = ({
           </div>
         </details>
 
-        {/* Job Description - Primary focus */}
-        <div className="space-y-2">
-          <label
-            htmlFor="job-description"
-            className="block text-sm font-medium text-white flex items-center justify-between"
-          >
-            <span className="flex items-center gap-2">
-              📄 Job Description
-              <span className="text-xs font-normal text-white/50">(required)</span>
-            </span>
-            {jobDescription && (
-              <span className="text-xs text-green-400">
-                {jobDescription.length} characters
-              </span>
-            )}
-          </label>
-          <textarea
-            id="job-description"
-            value={jobDescription}
-            onChange={(e) => setJobDescription(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Paste the job posting here...
+        {/* Collapsible Job Description */}
+        <details className="group" open={!jobDescription}>
+          <summary className="cursor-pointer list-none">
+            <div className="flex items-center justify-between p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10">
+              <div className="flex items-center gap-2">
+                <div className="text-white/80 text-sm font-medium">
+                  📄 Job Description
+                </div>
+                <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-300 rounded-full">
+                  Required
+                </span>
+                {jobDescription && (
+                  <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-300 rounded-full">
+                    {jobDescription.length} characters
+                  </span>
+                )}
+              </div>
+              <svg
+                className="w-5 h-5 text-white/60 transition-transform group-open:rotate-180"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
+          </summary>
+
+          <div className="mt-4 space-y-2 p-4 bg-white/5 rounded-lg border border-white/10">
+            <label
+              htmlFor="job-description"
+              className="block text-sm font-medium text-white"
+            >
+              Job Description
+            </label>
+            <textarea
+              id="job-description"
+              value={jobDescription}
+              onChange={(e) => setJobDescription(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Paste the job posting here...
 
 ✓ Job title and requirements
 ✓ Responsibilities and qualifications
 ✓ Company info and benefits
 ✓ Any specific skills or experience needed"
-            rows={12}
-            className="w-full px-4 py-3 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 outline-none transition-all resize-y min-h-[240px] placeholder:text-white/30 leading-relaxed"
-            disabled={isGenerating}
-            autoFocus
-          />
-        </div>
+              rows={12}
+              className="w-full px-4 py-3 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 outline-none transition-all resize-y min-h-[240px] placeholder:text-white/30 leading-relaxed"
+              disabled={isGenerating}
+            />
+          </div>
+        </details>
 
         {/* Error message */}
         {error && (
