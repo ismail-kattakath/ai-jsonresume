@@ -2,6 +2,7 @@ import { MdPictureAsPdf } from "react-icons/md";
 import { VscJson } from "react-icons/vsc";
 import React, { useContext } from "react";
 import { ResumeContext } from "@/app/resume/edit/ResumeContext";
+import { convertToJSONResume } from "@/lib/jsonResume";
 
 const LoadUnload = () => {
   const { resumeData, setResumeData } = useContext(ResumeContext);
@@ -39,10 +40,11 @@ const LoadUnload = () => {
     reader.readAsText(file);
   };
 
-  // download resume data
+  // download resume data in JSON Resume format
   const handleDownload = (data, filename, event) => {
     event.preventDefault();
-    const jsonData = JSON.stringify(data);
+    const jsonResumeData = convertToJSONResume(data);
+    const jsonData = JSON.stringify(jsonResumeData, null, 2);
     const blob = new Blob([jsonData], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);

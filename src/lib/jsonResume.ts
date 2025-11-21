@@ -4,8 +4,8 @@ import DefaultResumeData from "@/components/resume-builder/utility/DefaultResume
  * Converts our DefaultResumeData format to JSON Resume standard format
  * Schema: https://jsonresume.org/schema/
  */
-export function convertToJSONResume() {
-  const data = DefaultResumeData;
+export function convertToJSONResume(customData?: any) {
+  const data = customData || DefaultResumeData;
 
   // Parse social media links
   const profiles = data.socialMedia.map((social) => ({
