@@ -305,12 +305,6 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({
             disabled={isGenerating}
             autoFocus
           />
-          <div className="flex items-center justify-between text-xs text-white/50">
-            <span>💡 Tip: More details = better cover letter</span>
-            <kbd className="px-2 py-1 bg-white/10 rounded text-white/60 font-mono">
-              {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Enter to generate
-            </kbd>
-          </div>
         </div>
 
         {/* Error message */}
