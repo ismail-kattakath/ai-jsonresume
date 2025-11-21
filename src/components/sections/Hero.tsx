@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ChevronDown, Linkedin, Github, Mail, Calendar, Download, Sparkles } from 'lucide-react'
-import resumeData from '@/data/resumeData'
+import resumeData from "@/lib/resumeAdapter"
 import { contactInfo } from '@/lib/data/portfolio'
 
 export default function Hero() {

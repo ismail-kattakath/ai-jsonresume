@@ -7,7 +7,7 @@ import "./resume-builder.css";
 import Language from "@/components/resume-builder/form/Language";
 import LoadUnload from "@/components/resume-builder/form/LoadUnload";
 import Preview from "@/components/resume-builder/preview/Preview";
-import defaultResumeData from "@/data/resumeData";
+import defaultResumeData from "@/lib/resumeAdapter";
 import SocialMedia from "@/components/resume-builder/form/SocialMedia";
 import WorkExperience from "@/components/resume-builder/form/WorkExperience";
 import Skill from "@/components/resume-builder/form/Skill";

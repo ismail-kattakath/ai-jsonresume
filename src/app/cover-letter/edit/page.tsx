@@ -6,7 +6,7 @@ import "./cover-letter-builder.css";
 // Import ORIGINAL resume components
 import LoadUnload from "@/components/resume-builder/form/LoadUnload";
 import CoverLetterPreview from "@/components/resume-builder/preview/CoverLetterPreview";
-import defaultResumeData from "@/data/resumeData";
+import defaultResumeData from "@/lib/resumeAdapter";
 import SocialMedia from "@/components/resume-builder/form/SocialMedia";
 import PersonalInformation from "@/components/resume-builder/form/PersonalInformation";
 import CoverLetterContent from "@/components/resume-builder/form/CoverLetterContent";

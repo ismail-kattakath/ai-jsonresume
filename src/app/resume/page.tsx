@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Preview from "@/components/resume-builder/preview/Preview";
 import { ResumeContext } from "@/app/resume/edit/ResumeContext";
-import resumeData from "@/data/resumeData";
+import resumeData from "@/lib/resumeAdapter";
 import "@/app/resume/edit/resume-builder.css";
 
 export default function ResumeDownloadPage() {

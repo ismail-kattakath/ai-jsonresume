@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext } from "react";
-import resumeData from "@/data/resumeData";
+import resumeData from "@/lib/resumeAdapter";
 
 type ResumeContextType = {
   resumeData: typeof resumeData;

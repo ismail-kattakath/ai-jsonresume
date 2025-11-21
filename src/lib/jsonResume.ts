@@ -1,4 +1,4 @@
-import resumeData from "@/data/resumeData";
+import resumeData from "@/lib/resumeAdapter";
 import { validateJSONResume } from "./jsonResumeSchema";
 
 /**

@@ -1,4 +1,4 @@
-import jsonResumeData from './resume.json';
+import jsonResumeData from '@/data/resume.json';
 
 // JSON Resume types
 interface JSONResume {

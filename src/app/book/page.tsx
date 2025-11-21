@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import resumeData from "@/data/resumeData";
+import resumeData from "@/lib/resumeAdapter";
 
 export default function BookPage() {
   const calendarLink = resumeData.calendarLink;

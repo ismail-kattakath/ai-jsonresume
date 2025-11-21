@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Globe, Heart, Sparkles, ArrowUp } from 'lucide-react'
 import { contactInfo } from '@/lib/data/portfolio'
-import resumeData from '@/data/resumeData'
+import resumeData from "@/lib/resumeAdapter"
 import { Logo } from '@/components/Logo'
 import { navItems } from '@/config/navigation'
 
