@@ -18,7 +18,7 @@ const CoverLetterContent = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
+        <div className="w-1 h-6 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
         <h2 className="text-lg text-white font-semibold">Cover Letter Content</h2>
       </div>
       <div className="floating-label-group">
@@ -28,7 +28,7 @@ const CoverLetterContent = () => {
 Tip: Highlight your relevant experience, explain why you're excited about this opportunity, and show how your skills align with the role."
           name="content"
           rows={18}
-          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-green-400 focus:ring-2 focus:ring-green-400/20 outline-none transition-all resize-y min-h-[300px] placeholder:text-white/30 leading-relaxed"
+          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg text-sm border border-white/20 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 outline-none transition-all resize-y min-h-[300px] placeholder:text-white/30 leading-relaxed"
           value={resumeData.content || ""}
           onChange={handleContentChange}
         />
@@ -42,11 +42,10 @@ Tip: Highlight your relevant experience, explain why you're excited about this o
       <button
         type="button"
         onClick={() => setIsModalOpen(true)}
-        className="w-full px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl group"
+        className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl group"
       >
         <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
         <span>Generate with AI</span>
-        <span className="text-xs opacity-75">Let AI craft your cover letter</span>
       </button>
 
       {/* AI Generation Modal */}
