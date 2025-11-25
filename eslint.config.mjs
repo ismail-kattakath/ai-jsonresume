@@ -22,11 +22,13 @@ const eslintConfig = [
   },
   {
     rules: {
+      // Critical rules - enforce strictly
+      '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-unused-expressions': 'error',
+      'react/no-unescaped-entities': 'error',
+      // Code quality rules - keep as warnings for gradual improvement
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/no-require-imports': 'error',
-      '@typescript-eslint/no-unused-expressions': 'warn',
-      'react/no-unescaped-entities': 'error',
     },
   },
 ]
