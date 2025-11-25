@@ -1,8 +1,11 @@
-# AI Cover Letter Generator
+# AI Content Generator
 
 ## Overview
 
-The AI Cover Letter Generator is a client-side feature that allows users to automatically generate tailored cover letters using AI. It integrates with OpenAI-compatible APIs to create professional, customized cover letters based on resume data and job descriptions.
+The AI Content Generator is a client-side feature that allows users to automatically generate AI-powered content for their portfolio. It integrates with OpenAI-compatible APIs to create professional, tailored content including:
+
+- **Cover Letters**: Customized cover letters based on resume data and job descriptions
+- **Professional Summaries**: Compelling resume summaries highlighting key strengths and experience
 
 **Requirements:**
 - OpenAI API credentials (API key)
@@ -11,27 +14,37 @@ The AI Cover Letter Generator is a client-side feature that allows users to auto
 
 ## Features
 
-- ✨ **AI-Powered Generation**: Leverages OpenAI-compatible APIs to generate tailored cover letters
+- ✨ **AI-Powered Generation**: Leverages OpenAI-compatible APIs to generate tailored content (cover letters, summaries)
 - 🔒 **Client-Side Processing**: All API calls happen in the browser - no backend required
 - 💾 **Credential Persistence**: Optionally save API credentials locally for convenience
-- 🎯 **Smart Prompting**: Intelligent prompt engineering that combines resume data with job requirements
+- 🎯 **Smart Prompting**: Intelligent prompt engineering that combines resume data with context-specific requirements
 - ✅ **Accuracy Guarantee**: AI is strictly instructed to ONLY use qualifications and experiences from your actual resume data - no fabrication allowed
 - 🛡️ **Validation**: Built-in checks to detect and warn about potential unverified claims
-- 🌊 **Real-Time Streaming**: See AI generate your cover letter in real-time with live content streaming
+- 🌊 **Real-Time Streaming**: See AI generate your content in real-time with live streaming
 - ⚡ **No Timeouts**: Streaming eliminates arbitrary timeouts - works with thinking models that need minutes
 - 🔐 **Secure**: Credentials stored locally in browser, never sent to external servers (except your configured API)
 - ♿ **Accessible**: Full keyboard support and screen reader compatibility
+- 🔄 **Multiple Use Cases**: Reusable across different content types (cover letters, professional summaries)
 
 ## User Interface
 
 ### Generate with AI Button
 
-Located at the bottom of the cover letter content textarea on the `/cover-letter/edit` page:
+The AI generation feature is available in multiple locations:
 
+**1. Cover Letter Editor (`/cover-letter/edit`)** - Bottom of content textarea:
 ```
 ┌─────────────────────────────────────────────┐
 │  ✨ Generate with AI                        │
 │  Let AI craft your cover letter             │
+└─────────────────────────────────────────────┘
+```
+
+**2. Resume Editor (`/resume/edit`)** - Professional Summary section:
+```
+┌─────────────────────────────────────────────┐
+│  ✨ Generate with AI                        │
+│  Let AI craft your summary                  │
 └─────────────────────────────────────────────┘
 ```
 
@@ -47,7 +60,9 @@ When clicked, opens a modal with:
    - Get from: https://platform.openai.com/api-keys (for OpenAI)
    - Or your local server's configuration
 3. **Remember Credentials** - Checkbox to save credentials locally
-4. **Job Description** - Large textarea for pasting job posting
+4. **Context Input** - Large textarea for providing context:
+   - **Cover Letter**: Paste job description
+   - **Professional Summary**: Additional career highlights or focus areas (optional)
 5. **Generate Button** - Triggers the AI generation
 
 ## How It Works
@@ -59,21 +74,21 @@ When clicked, opens a modal with:
 3. User enters:
    - API URL (or uses default)
    - API Key
-   - Job Description
+   - Context input (job description for cover letters, or optional highlights for summaries)
 4. Optionally checks "Remember credentials"
-5. Clicks "Generate Cover Letter"
+5. Clicks "Generate" button
 6. AI streams response in real-time (you see content as it's generated!)
-7. Generated cover letter replaces textarea content
+7. Generated content replaces the textarea content
 8. Modal closes automatically
 
 ### 2. Technical Flow
 
 ```
-User Input (Job Description)
+User Input (Context: Job Description or Career Highlights)
     ↓
 Combine with Resume Data (resume.json)
     ↓
-Build Prompt (Prompt Engineering)
+Build Prompt (Content-Type Specific Prompt Engineering)
     ↓
 Send to OpenAI-Compatible API (stream: true)
     ↓
@@ -85,7 +100,7 @@ Complete Response Received
     ↓
 Post-Process & Validate
     ↓
-Insert into Cover Letter Textarea
+Insert into Textarea (Cover Letter or Summary)
 ```
 
 ### 3. Streaming Architecture
@@ -108,17 +123,27 @@ The application uses **Server-Sent Events (SSE)** for real-time streaming:
 
 ### 4. Prompt Engineering
 
-The system builds a comprehensive prompt that includes:
+The system builds content-specific prompts based on the generation type:
 
+#### Cover Letter Prompt
 - **Candidate Info**: Name, position, contact details
 - **Professional Summary**: From resume.json
 - **Work Experience**: Top 3 most recent positions with achievements
 - **Skills**: Relevant technical and soft skills
 - **Job Description**: User-provided job posting
 - **Generation Instructions**: Specific formatting and style guidelines
-- **CRITICAL ACCURACY RULES**: Explicit instructions to the AI to ONLY use information from the provided resume data and NEVER fabricate qualifications, skills, or experiences
+- **CRITICAL ACCURACY RULES**: Explicit instructions to ONLY use information from the provided resume data
 
-Example prompt structure:
+#### Professional Summary Prompt
+- **Candidate Info**: Name, current position
+- **Work Experience**: Complete work history with key achievements
+- **Skills**: All technical and professional skills
+- **Education & Certifications**: Academic and professional credentials
+- **Optional Context**: User-provided career highlights or focus areas
+- **Generation Instructions**: Concise, impactful summary style (150-200 words)
+- **CRITICAL ACCURACY RULES**: Explicit instructions to ONLY use information from the provided resume data
+
+Example prompt structure (Cover Letter):
 ```
 You are a professional cover letter writer. Write based STRICTLY on the
 candidate information provided below.
@@ -155,6 +180,32 @@ background is explicitly stated in the candidate information above.
 ```
 
 **This ensures the AI never fabricates qualifications or experiences not in your resume!**
+
+Example prompt structure (Professional Summary):
+```
+You are a professional resume writer specializing in impactful executive summaries.
+Write based STRICTLY on the candidate information provided below.
+
+CANDIDATE INFORMATION:
+Name: John Doe
+Current Role: Senior Software Engineer
+Work Experience: [Complete history with achievements]
+Skills: [All technical and professional skills]
+Education: [Degrees and certifications]
+
+CRITICAL REQUIREMENTS - YOU MUST FOLLOW THESE EXACTLY:
+1. ONLY mention qualifications, skills, and experiences explicitly listed above
+2. DO NOT invent, assume, or fabricate ANY qualifications not shown above
+3. Create a 150-200 word professional summary
+4. Highlight 3-4 key strengths from their ACTUAL experience
+5. Use specific metrics from their background provided above
+6. Write in third person, professional tone
+7. Focus on value proposition and unique qualifications
+
+ACCURACY VERIFICATION:
+Before writing each sentence, verify that ANY claim about the candidate's
+background is explicitly stated in the candidate information above.
+```
 
 ### 5. API Integration
 
@@ -262,19 +313,28 @@ data: [DONE]
 
 ### Using the Feature
 
+#### For Cover Letters
 1. Navigate to `/cover-letter/edit`
 2. Enter password (if protected)
-3. Click "Generate with AI"
+3. Click "Generate with AI" button at bottom of content textarea
 4. First time:
-   - Enter API URL:
-     - OpenAI: `https://api.openai.com`
-     - Local: `http://localhost:1234`
-     - Custom: Your endpoint
+   - Enter API URL (OpenAI: `https://api.openai.com`, Local: `http://localhost:1234`)
    - Enter API Key (required)
    - Check "Remember credentials" to save API credentials for next time
    - Paste job description (automatically saved)
 5. Click "Generate Cover Letter"
 6. Next time: Job description is pre-filled, just update if needed!
+
+#### For Professional Summaries
+1. Navigate to `/resume/edit`
+2. Enter password (if protected)
+3. Scroll to "Professional Summary" section
+4. Click "Generate with AI" button at bottom of summary textarea
+5. First time:
+   - Enter API URL and API Key (same as cover letter)
+   - Optionally add career highlights or focus areas
+6. Click "Generate Summary"
+7. AI generates a compelling 150-200 word professional summary based on your resume data
 
 ## Data Persistence
 
@@ -288,12 +348,15 @@ data: [DONE]
 ### What Gets Saved
 
 **Always Saved:**
-- ✅ Last job description (auto-saved every time you generate)
-- Purpose: Avoid re-pasting the same job description
+- ✅ Last job description for cover letters (auto-saved every time you generate)
+- ✅ Last context input for summaries (auto-saved every time you generate)
+- Purpose: Avoid re-entering the same context
 
 **Conditionally Saved (opt-in):**
 - 🔐 API URL (only if "Remember credentials" is checked)
 - 🔐 API Key (only if "Remember credentials" is checked)
+
+**Note**: Credentials are shared across all AI generation features (cover letters and summaries)
 
 ### Security Considerations
 
@@ -311,11 +374,11 @@ data: [DONE]
 - User unchecks "Remember credentials" and generates new letter
 - User clears browser data/localStorage
 
-**Job Description** persists until:
+**Context Input** (job description or career highlights) persists until:
 - User manually clears browser data/localStorage
-- User generates with an empty job description
+- User generates with empty context input
 
-**Note**: Even with "Remember credentials" unchecked, job description remains saved for your convenience.
+**Note**: Even with "Remember credentials" unchecked, context input remains saved for your convenience.
 
 ## Error Handling
 
@@ -334,8 +397,8 @@ data: [DONE]
    - **Solution**: Wait and retry, consider using faster model
 
 4. **"AI generated an empty response"**
-   - **Cause**: Model failed to generate content or job description unclear
-   - **Solution**: Rephrase job description, add more details
+   - **Cause**: Model failed to generate content or context input unclear
+   - **Solution**: Rephrase context input, add more details, or try without optional context
 
 5. **"Rate limit exceeded"**
    - **Cause**: Too many requests to API
@@ -357,15 +420,23 @@ src/
 ├── components/
 │   ├── ui/
 │   │   └── Modal.tsx                          # Reusable modal component
-│   └── cover-letter/
+│   ├── document-builder/
+│   │   └── shared-forms/
+│   │       └── AITextAreaWithButton.tsx       # Reusable textarea with AI button
+│   ├── cover-letter/
+│   │   └── forms/
+│   │       ├── CoverLetterContent.tsx         # Cover letter editor with AI button
+│   │       └── AIGenerateModal.tsx            # Cover letter AI modal
+│   └── resume/
 │       └── forms/
-│           ├── CoverLetterContent.tsx         # Main component with AI button
-│           └── AIGenerateModal.tsx            # AI generation modal
+│           ├── Summary.tsx                    # Summary editor with AI button
+│           └── AIGenerateSummaryModal.tsx     # Summary AI modal
 ├── lib/
 │   ├── services/
 │   │   └── openai.ts                          # OpenAI API client service
 │   └── prompts/
-│       └── coverLetter.ts                     # Prompt engineering logic
+│       ├── coverLetter.ts                     # Cover letter prompt engineering
+│       └── summary.ts                         # Summary prompt engineering
 └── types/
     └── openai.ts                              # TypeScript types
 ```
@@ -378,45 +449,68 @@ src/
 - Keyboard & accessibility support
 - Backdrop click-to-close
 
-**AIGenerateModal.tsx**
+**AITextAreaWithButton.tsx**
+- Reusable textarea component with integrated AI button
+- Used across multiple content types (cover letters, summaries)
+- Consistent UI pattern for AI generation
+
+**AIGenerateModal.tsx** (Cover Letter)
 - Form for API credentials & job description
 - State management for loading/errors
 - Credential persistence
-- API call orchestration
+- API call orchestration for cover letter generation
+
+**AIGenerateSummaryModal.tsx** (Professional Summary)
+- Form for API credentials & optional highlights
+- Specialized prompt for summary generation
+- Shares credential storage with cover letter modal
 
 **CoverLetterContent.tsx**
-- Main cover letter editor
-- "Generate with AI" button
+- Cover letter editor
+- Integrates AITextAreaWithButton
 - Modal integration
-- Content insertion
+
+**Summary.tsx**
+- Professional summary editor
+- Integrates AITextAreaWithButton
+- Modal integration
 
 ### Services
 
 **openai.ts**
 - API client for OpenAI-compatible endpoints
 - Request/response handling
-- Timeout management (30 seconds)
+- Streaming support (Server-Sent Events)
 - Error wrapping (OpenAIAPIError)
 - Credential storage (localStorage)
 
 **coverLetter.ts**
-- Prompt builder (resume + job → prompt)
+- Prompt builder (resume + job description → prompt)
 - Content validator (length, placeholders)
 - Post-processor (formatting, cleanup)
+
+**summary.ts**
+- Prompt builder (resume + optional highlights → prompt)
+- Summary-specific validation (150-200 words)
+- Professional tone optimization
 
 ## Testing
 
 Comprehensive test coverage:
 
+- ✅ **AITextAreaWithButton**: Component tests for reusable UI
 - ✅ **Modal**: 12 tests (accessibility, keyboard, animations)
-- ✅ **OpenAI Service**: 14 tests (API calls, errors, storage)
-- ✅ **Prompt Engineering**: 23 tests (prompt building, validation)
+- ✅ **OpenAI Service**: 14 tests (API calls, errors, storage, streaming)
+- ✅ **Cover Letter Prompts**: 23 tests (prompt building, validation)
+- ✅ **Summary Prompts**: Tests for summary-specific generation
 
 Run tests:
 ```bash
+npm test -- AITextAreaWithButton.test
 npm test -- Modal.test
 npm test -- openai.test
 npm test -- coverLetter.test
+npm test -- summary.test
 ```
 
 ## Performance
@@ -433,11 +527,15 @@ Potential improvements:
 
 1. **Multiple Model Support**: Allow switching between models
 2. **Tone Selection**: Professional, casual, enthusiastic presets
-3. **Length Control**: Short (200 words) vs Long (400 words)
-4. **Streaming Responses**: Show generation in real-time
-5. **History**: Save previously generated letters
-6. **Templates**: Pre-built cover letter structures
-7. **A/B Testing**: Generate multiple variations
+3. **Length Control**: Short vs Long versions
+4. **History**: Save previously generated content
+5. **Templates**: Pre-built structures for different content types
+6. **A/B Testing**: Generate multiple variations
+7. **Additional Content Types**:
+   - LinkedIn "About" sections
+   - Project descriptions
+   - Achievement highlights
+   - Email introductions
 
 ## Troubleshooting
 

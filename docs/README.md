@@ -31,14 +31,16 @@ This directory contains detailed guides for specific features:
 
 ## Features Documentation
 
-### AI Cover Letter Generator
-📄 **[AI_COVER_LETTER_GENERATOR.md](./AI_COVER_LETTER_GENERATOR.md)**
-- **NEW FEATURE** - AI-powered cover letter generation
+### AI Content Generator
+📄 **[AI_CONTENT_GENERATOR.md](./AI_CONTENT_GENERATOR.md)**
+- **NEW FEATURE** - AI-powered content generation for multiple use cases
 - **Requires**: OpenAI API key or compatible API endpoint
+- **Supports**: Cover letter generation, professional summary generation
 - Client-side integration with OpenAI-compatible APIs
 - Support for OpenAI, Azure OpenAI, or local LLM servers (LM Studio, etc.)
+- Real-time streaming with Server-Sent Events
 - Setup guide for OpenAI API and local AI servers
-- Prompt engineering details
+- Prompt engineering details for each content type
 - API configuration and troubleshooting
 - Credential storage and security
 
@@ -69,7 +71,7 @@ Documentation for the password protection system implemented for edit pages:
 ### First Time Setup
 1. **[Customize Your Data](./DEFAULT_DATA_SETUP.md)** - Update personal info, experience, skills
 2. **[Setup Password Protection](./PASSWORD_PROTECTION_SETUP.md)** - Secure your edit pages
-3. **[Configure AI Generator](./AI_COVER_LETTER_GENERATOR.md)** - Optional: Setup local AI for cover letters
+3. **[Configure AI Content Generator](./AI_CONTENT_GENERATOR.md)** - Optional: Setup AI for cover letters and summaries
 4. **Build & Deploy** - See main [README.md](../README.md)
 
 ### For Developers
@@ -82,7 +84,7 @@ Documentation for the password protection system implemented for edit pages:
 - **Access Protected Pages**: Navigate to `/resume/edit` or `/cover-letter/edit`
 - **Default Password**: Configured during setup (see SETUP guide)
 - **Session Duration**: 24 hours
-- **AI Cover Letters**: Click "Generate with AI" button in cover letter editor (requires OpenAI API key or compatible endpoint)
+- **AI Content Generation**: Click "Generate with AI" button in cover letter editor or resume summary section (requires OpenAI API key or compatible endpoint)
 
 ## Project Structure
 

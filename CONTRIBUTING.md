@@ -578,8 +578,9 @@ Mockups, examples, or references.
 
 **If modifying AI integration:**
 - Test with multiple providers (OpenAI, local)
-- Update `docs/AI_COVER_LETTER_GENERATOR.md`
-- Consider streaming vs non-streaming modes
+- Update `docs/AI_CONTENT_GENERATOR.md`
+- Test all content types (cover letters, summaries)
+- Verify streaming functionality (Server-Sent Events)
 - Test error handling (network, API errors)
 
 ### Static Export

@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - docs/DEFAULT_DATA_SETUP.md - Data customization guide
   - docs/PASSWORD_PROTECTION_SETUP.md - Auth setup guide
   - docs/PASSWORD_PROTECTION_TESTS.md - Test documentation
-  - docs/AI_COVER_LETTER_GENERATOR.md - AI feature guide
+  - docs/AI_CONTENT_GENERATOR.md - AI content generation guide (cover letters, summaries)
   - docs/README.md - Documentation index
 
 ### Technical Details
