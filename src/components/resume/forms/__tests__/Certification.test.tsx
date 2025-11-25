@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Certification from '@/components/resume/forms/Certification'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
@@ -8,6 +8,29 @@ import {
   createMockResumeData,
 } from '@/lib/__tests__/test-utils'
 
+// Mock @hello-pangea/dnd
+jest.mock('@hello-pangea/dnd', () => ({
+  DragDropContext: ({ children }: any) => <div>{children}</div>,
+  Droppable: ({ children }: any) =>
+    children(
+      {
+        draggableProps: {},
+        dragHandleProps: {},
+        innerRef: jest.fn(),
+      },
+      {}
+    ),
+  Draggable: ({ children }: any) =>
+    children(
+      {
+        draggableProps: {},
+        dragHandleProps: {},
+        innerRef: jest.fn(),
+      },
+      { isDragging: false }
+    ),
+}))
+
 describe('Certification Component', () => {
   describe('Rendering', () => {
     it('should render section heading', () => {
@@ -15,7 +38,7 @@ describe('Certification Component', () => {
       expect(screen.getByText('Certifications')).toBeInTheDocument()
     })
 
-    it('should render all certification inputs', () => {
+    it('should render all certification inputs', async () => {
       const mockData = createMockResumeData({
         certifications: [
           'AWS Solutions Architect',
@@ -26,10 +49,14 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const inputs = screen.getAllByPlaceholderText('Enter certification name')
-      expect(inputs).toHaveLength(2)
-      expect(inputs[0]).toHaveValue('AWS Solutions Architect')
-      expect(inputs[1]).toHaveValue('Google Cloud Professional')
+      await waitFor(() => {
+        const inputs = screen.getAllByPlaceholderText(
+          'Enter certification name'
+        )
+        expect(inputs).toHaveLength(2)
+        expect(inputs[0]).toHaveValue('AWS Solutions Architect')
+        expect(inputs[1]).toHaveValue('Google Cloud Professional')
+      })
     })
 
     it('should render floating labels for each certification input', () => {

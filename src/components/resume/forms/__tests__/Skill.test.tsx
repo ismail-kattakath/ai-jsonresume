@@ -7,6 +7,50 @@ import {
   fireEvent,
 } from '@/lib/__tests__/test-utils'
 
+// Mock drag-and-drop components
+jest.mock('@hello-pangea/dnd', () => ({
+  DragDropContext: ({ children, onDragEnd }: any) => (
+    <div data-testid="drag-drop-context" onDragEnd={onDragEnd}>
+      {children}
+    </div>
+  ),
+  Droppable: ({ children, droppableId }: any) => {
+    const provided = {
+      droppableProps: {
+        'data-droppable-id': droppableId,
+      },
+      innerRef: jest.fn(),
+      placeholder: null,
+    }
+    const snapshot = {
+      isDraggingOver: false,
+    }
+    return (
+      <div data-testid="droppable" {...provided.droppableProps}>
+        {children(provided, snapshot)}
+      </div>
+    )
+  },
+  Draggable: ({ children, draggableId, index }: any) => {
+    const provided = {
+      draggableProps: {
+        'data-draggable-id': draggableId,
+        'data-index': index,
+      },
+      dragHandleProps: {},
+      innerRef: jest.fn(),
+    }
+    const snapshot = {
+      isDragging: false,
+    }
+    return (
+      <div data-testid="draggable" {...provided.draggableProps}>
+        {children(provided, snapshot)}
+      </div>
+    )
+  },
+}))
+
 describe('Skill Component', () => {
   describe('Rendering', () => {
     it('should render section heading with title prop', () => {
@@ -21,7 +65,7 @@ describe('Skill Component', () => {
       expect(screen.getByText('Programming Languages')).toBeInTheDocument()
     })
 
-    it('should render skills with text and highlight checkbox', () => {
+    it('should render skills with text and highlight checkbox', async () => {
       const mockData = createMockResumeData({
         skills: [
           {
@@ -40,6 +84,9 @@ describe('Skill Component', () => {
           contextValue: { resumeData: mockData },
         }
       )
+
+      // Wait a tick for dynamic imports to resolve
+      await new Promise((resolve) => setTimeout(resolve, 0))
 
       const skillInputs = container.querySelectorAll('input[type="text"]')
       expect(skillInputs.length).toBe(2)

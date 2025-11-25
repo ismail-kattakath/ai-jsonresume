@@ -15,8 +15,12 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     link: profile.url?.replace(/^https?:\/\//, '') || '',
   }))
 
-  // Add website if present
-  if (basics.url) {
+  // Add website if present AND not already in profiles (for backward compatibility)
+  // New exports include Website in profiles array to preserve order
+  const hasWebsiteInProfiles = socialMedia.some(
+    (sm) => sm.socialMedia === 'Website'
+  )
+  if (basics.url && !hasWebsiteInProfiles) {
     socialMedia.unshift({
       socialMedia: 'Website',
       link: basics.url.replace(/^https?:\/\//, ''),

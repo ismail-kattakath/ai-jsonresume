@@ -79,11 +79,28 @@ export function useSkillsForm(title: string) {
     }))
   }
 
+  /**
+   * Reorder skills via drag and drop
+   */
+  const reorder = (startIndex: number, endIndex: number) => {
+    const newSkills = [...skillType.skills]
+    const [removed] = newSkills.splice(startIndex, 1)
+    newSkills.splice(endIndex, 0, removed)
+
+    setResumeData((prevData) => ({
+      ...prevData,
+      skills: prevData.skills.map((skill) =>
+        skill.title === title ? { ...skill, skills: newSkills } : skill
+      ),
+    }))
+  }
+
   return {
     skills: skillType.skills,
     handleChange,
     toggleHighlight,
     add,
     remove,
+    reorder,
   }
 }

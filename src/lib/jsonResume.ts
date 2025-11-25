@@ -82,6 +82,14 @@ export function convertToJSONResume(customData?: ResumeData) {
     region: addressParts[2]?.match(/[A-Z]{2}/)?.[0] || 'ON',
   }
 
+  // Keep Website in profiles array to preserve ordering
+  // The JSON Resume standard has basics.url but no ordering concept
+  // By keeping Website as a profile, we preserve drag-and-drop order
+  const websiteProfile = profiles.find(
+    (p: { network: string; username: string; url: string }) =>
+      p.network === 'Website'
+  )
+
   const jsonResume = {
     $schema:
       'https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json',
@@ -91,14 +99,10 @@ export function convertToJSONResume(customData?: ResumeData) {
       image: data.profilePicture || '',
       email: data.email,
       phone: data.contactInformation,
-      url:
-        profiles.find(
-          (p: { network: string; username: string; url: string }) =>
-            p.network === 'Website'
-        )?.url || '',
+      url: websiteProfile?.url || '',
       summary: data.summary,
       location,
-      profiles: profiles.filter((p) => p.network !== 'Website'),
+      profiles: profiles, // Keep all profiles including Website for order preservation
     },
     work,
     volunteer: [],

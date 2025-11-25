@@ -1,11 +1,34 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import dynamic from 'next/dynamic'
 import FormButton from '@/components/ui/FormButton'
 import { FormInput } from '@/components/ui/FormInput'
 import { FormTextarea } from '@/components/ui/FormTextarea'
-import { FormCard } from '@/components/ui/FormCard'
 import { SectionHeader } from '@/components/ui/SectionHeader'
 import { DeleteButton } from '@/components/ui/DeleteButton'
 import { useArrayForm } from '@/hooks/useArrayForm'
+import { ResumeContext } from '@/lib/contexts/DocumentContext'
+
+const DragDropContext = dynamic(
+  () =>
+    import('@hello-pangea/dnd').then((mod) => {
+      return mod.DragDropContext
+    }),
+  { ssr: false }
+)
+const Droppable = dynamic(
+  () =>
+    import('@hello-pangea/dnd').then((mod) => {
+      return mod.Droppable
+    }),
+  { ssr: false }
+)
+const Draggable = dynamic(
+  () =>
+    import('@hello-pangea/dnd').then((mod) => {
+      return mod.Draggable
+    }),
+  { ssr: false }
+)
 
 /**
  * Projects form component - REFACTORED
@@ -13,6 +36,7 @@ import { useArrayForm } from '@/hooks/useArrayForm'
  * Note: Old implementation had inconsistent styling - now fixed
  */
 const Projects = () => {
+  const { resumeData, setResumeData } = useContext(ResumeContext)
   const { data, handleChange, add, remove } = useArrayForm('projects', {
     name: '',
     link: '',
@@ -22,80 +46,125 @@ const Projects = () => {
     endYear: '',
   })
 
+  const onDragEnd = (result: any) => {
+    const { destination, source } = result
+
+    if (!destination) return
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    )
+      return
+
+    const newProjects = [...resumeData.projects]
+    const [removed] = newProjects.splice(source.index, 1)
+    newProjects.splice(destination.index, 0, removed)
+    setResumeData({ ...resumeData, projects: newProjects })
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <SectionHeader title="Projects" variant="purple" />
 
-      <div className="flex flex-col gap-3">
-        {data.map((project, index) => (
-          <FormCard key={index}>
-            <FormInput
-              label="Project Name"
-              name="name"
-              value={project.name}
-              onChange={(e) => handleChange(e, index)}
-              variant="purple"
-            />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="projects">
+          {(provided) => (
+            <div
+              className="flex flex-col gap-3"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {data.map((project, index) => (
+                <Draggable
+                  key={`PROJECT-${index}`}
+                  draggableId={`PROJECT-${index}`}
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className={`group flex cursor-grab flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-4 hover:border-white/20 hover:bg-white/10 active:cursor-grabbing ${
+                        snapshot.isDragging
+                          ? 'bg-white/20 outline-2 outline-purple-400 outline-dashed'
+                          : ''
+                      }`}
+                    >
+                      <FormInput
+                        label="Project Name"
+                        name="name"
+                        value={project.name}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="purple"
+                      />
 
-            <FormInput
-              label="Link"
-              name="link"
-              type="url"
-              value={project.link}
-              onChange={(e) => handleChange(e, index)}
-              variant="purple"
-            />
+                      <FormInput
+                        label="Link"
+                        name="link"
+                        type="url"
+                        value={project.link}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="purple"
+                      />
 
-            <FormTextarea
-              label="Description"
-              name="description"
-              value={project.description}
-              onChange={(e) => handleChange(e, index)}
-              variant="purple"
-              maxLength={250}
-              showCounter
-              minHeight="120px"
-            />
+                      <FormTextarea
+                        label="Description"
+                        name="description"
+                        value={project.description}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="purple"
+                        maxLength={250}
+                        showCounter
+                        minHeight="120px"
+                      />
 
-            <FormTextarea
-              label="Key Achievements"
-              name="keyAchievements"
-              value={project.keyAchievements}
-              onChange={(e) => handleChange(e, index)}
-              variant="purple"
-              showCounter
-              minHeight="150px"
-            />
+                      <FormTextarea
+                        label="Key Achievements"
+                        name="keyAchievements"
+                        value={project.keyAchievements}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="purple"
+                        showCounter
+                        minHeight="150px"
+                      />
 
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-              <FormInput
-                label="Start Year"
-                name="startYear"
-                type="date"
-                value={project.startYear}
-                onChange={(e) => handleChange(e, index)}
-                variant="purple"
-                className="flex-1"
-              />
+                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                        <FormInput
+                          label="Start Year"
+                          name="startYear"
+                          type="date"
+                          value={project.startYear}
+                          onChange={(e) => handleChange(e, index)}
+                          variant="purple"
+                          className="flex-1"
+                        />
 
-              <FormInput
-                label="End Year"
-                name="endYear"
-                type="date"
-                value={project.endYear}
-                onChange={(e) => handleChange(e, index)}
-                variant="purple"
-                className="flex-1"
-              />
+                        <FormInput
+                          label="End Year"
+                          name="endYear"
+                          type="date"
+                          value={project.endYear}
+                          onChange={(e) => handleChange(e, index)}
+                          variant="purple"
+                          className="flex-1"
+                        />
 
-              <DeleteButton
-                onClick={() => remove(index)}
-                label="Delete this project"
-              />
+                        <DeleteButton
+                          onClick={() => remove(index)}
+                          label="Delete this project"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
             </div>
-          </FormCard>
-        ))}
-      </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       <FormButton size={data.length} add={add} label="Project" />
     </div>
