@@ -430,29 +430,20 @@ export function useKeyboardShortcut(key: string, callback: () => void) {
 
 #### Architecture
 
-```
-┌────────────────────────────────────────────────────────────┐
-│ Environment Variables                                       │
-│ - NEXT_PUBLIC_EDIT_PASSWORD_HASH (bcrypt hash)            │
-│   - If SET → Password protection ENABLED                   │
-│   - If NOT SET → Public access (no password)               │
-└────────────────┬───────────────────────────────────────────┘
-                 │
-                 ▼
-┌────────────────────────────────────────────────────────────┐
-│ src/config/password.ts                                     │
-│ - getPasswordHash() → Returns hash or undefined           │
-│ - isPasswordProtectionEnabled() → boolean                 │
-└────────────────┬───────────────────────────────────────────┘
-                 │
-                 ▼
-┌────────────────────────────────────────────────────────────┐
-│ src/components/auth/PasswordProtection.tsx                │
-│ - Wraps edit pages                                         │
-│ - Checks sessionStorage for existing auth                  │
-│ - bcrypt.compare(password, hash) for validation           │
-│ - Session expires after 24 hours                           │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Environment Variables
+    NEXT_PUBLIC_EDIT_PASSWORD_HASH
+    - If SET: Password protection ENABLED
+    - If NOT SET: Public access"] --> B["src/config/password.ts
+    getPasswordHash
+    isPasswordProtectionEnabled"]
+
+    B --> C["src/components/auth/PasswordProtection.tsx
+    - Wraps edit pages
+    - Checks sessionStorage
+    - bcrypt password validation
+    - 24-hour session expiry"]
 ```
 
 #### Implementation Details
@@ -578,32 +569,24 @@ export function isPasswordProtectionEnabled(): boolean {
 
 #### Architecture
 
-```
-┌────────────────────────────────────────────────────────────┐
-│ Client Configuration (Modal Form)                          │
-│ - API URL (e.g., https://api.openai.com)                  │
-│ - API Key (stored in localStorage if "remember")          │
-│ - Model Name (e.g., gpt-4, claude-3-5-sonnet)             │
-│ - Job Description (for context)                            │
-└────────────────┬───────────────────────────────────────────┘
-                 │
-                 ▼
-┌────────────────────────────────────────────────────────────┐
-│ src/lib/ai/openai-client.ts                               │
-│ - makeOpenAIRequest() → Standard request                  │
-│ - makeOpenAIStreamRequest() → Streaming SSE               │
-│ - generateCoverLetter() → Full cover letter               │
-│ - generateSummary() → Professional summary                │
-└────────────────┬───────────────────────────────────────────┘
-                 │
-                 ▼
-┌────────────────────────────────────────────────────────────┐
-│ src/lib/ai/document-prompts.ts                            │
-│ - buildCoverLetterPrompt() → System + user prompts        │
-│ - buildSummaryPrompt() → Resume-tailored prompts          │
-│ - validateCoverLetter() → Length, greeting, signature     │
-│ - postProcessCoverLetter() → Clean up formatting          │
-└────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Client Configuration
+    Modal Form
+    - API URL
+    - API Key
+    - Model Name
+    - Job Description"] --> B["src/lib/ai/openai-client.ts
+    makeOpenAIRequest
+    makeOpenAIStreamRequest
+    generateCoverLetter
+    generateSummary"]
+
+    B --> C["src/lib/ai/document-prompts.ts
+    buildCoverLetterPrompt
+    buildSummaryPrompt
+    validateCoverLetter
+    postProcessCoverLetter"]
 ```
 
 #### API Client Implementation
