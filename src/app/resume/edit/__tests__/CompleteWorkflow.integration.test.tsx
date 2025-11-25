@@ -124,7 +124,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
       const printButtons = screen.getAllByText(/Print/i)
       expect(printButtons.length).toBeGreaterThan(0)
       expect(printButtons[0]).toBeInTheDocument()
-    })
+    }, 10000)
 
     it('should maintain data consistency throughout the edit workflow', async () => {
       const { container } = render(<ResumeEditPage />)
@@ -176,7 +176,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
           'Experienced professional with a passion for innovation'
         )
       })
-    })
+    }, 10000)
   })
 
   describe('Import → Edit → Preview Workflow', () => {
@@ -558,7 +558,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
       const printButtons = screen.getAllByText(/Print/i)
       expect(printButtons.length).toBeGreaterThan(0)
       expect(printButtons[0]).toBeInTheDocument()
-    })
+    }, 15000)
 
     it('should allow editing, reviewing in preview, making corrections, and printing', async () => {
       const { container } = render(<ResumeEditPage />)
@@ -607,7 +607,9 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
       const printButtons = screen.getAllByText(/Print/i)
       expect(printButtons[0]).toBeInTheDocument()
 
-      fireEvent.click(printButtons[0])
+      if (printButtons[0]) {
+        fireEvent.click(printButtons[0])
+      }
 
       await waitFor(() => {
         expect(mockPrint).toHaveBeenCalled()

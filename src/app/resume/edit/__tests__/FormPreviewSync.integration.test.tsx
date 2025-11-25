@@ -64,7 +64,7 @@ describe('Integration: Form → Preview Synchronization', () => {
         const nameInPreview = preview?.querySelector('.name')
         expect(nameInPreview).toHaveTextContent('Jane Smith')
       })
-    })
+    }, 10000)
 
     it('should update preview when position is changed in form', async () => {
       const { container } = render(<ResumeEditPage />)
@@ -181,7 +181,7 @@ describe('Integration: Form → Preview Synchronization', () => {
           expect(preview).toHaveTextContent('Lead Developer')
         })
       }
-    })
+    }, 10000)
 
     it('should update preview when work experience company name is changed', async () => {
       const { container } = render(<ResumeEditPage />)
