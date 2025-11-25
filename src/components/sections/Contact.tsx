@@ -81,14 +81,14 @@ export default function Contact() {
               className="text-[var(--md-sys-color-on-tertiary-container)]"
             />
             <span className="md3-label-medium font-medium text-[var(--md-sys-color-on-tertiary-container)]">
-              Let's Connect
+              Let&apos;s Connect
             </span>
           </motion.div>
 
           <h2 className="md3-headline-large mb-4">Get In Touch</h2>
           <p className="md3-body-large md3-on-surface-variant mx-auto max-w-2xl">
-            Have a project in mind or want to discuss opportunities? I'm always
-            open to interesting conversations and collaborations.
+            Have a project in mind or want to discuss opportunities? I&apos;m
+            always open to interesting conversations and collaborations.
           </p>
         </motion.div>
 

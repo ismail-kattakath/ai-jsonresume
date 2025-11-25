@@ -26,7 +26,7 @@ const eslintConfig = [
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-require-imports': 'error',
       '@typescript-eslint/no-unused-expressions': 'warn',
-      'react/no-unescaped-entities': 'warn',
+      'react/no-unescaped-entities': 'error',
     },
   },
 ]

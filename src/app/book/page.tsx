@@ -20,7 +20,7 @@ export default function BookPage() {
         <p className="text-gray-600">Redirecting to booking page...</p>
         {calendarLink && (
           <p className="mt-2 text-sm text-gray-400">
-            If you're not redirected,{' '}
+            If you&apos;re not redirected,{' '}
             <a href={calendarLink} className="text-blue-600 underline">
               click here
             </a>
