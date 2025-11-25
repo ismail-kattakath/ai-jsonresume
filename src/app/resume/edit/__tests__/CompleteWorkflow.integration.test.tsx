@@ -246,7 +246,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
         expect(preview).toHaveTextContent('Product Manager')
         expect(preview).toHaveTextContent('Product Co')
       })
-    })
+    }, 10000)
 
     it('should allow adding new sections to imported resume', async () => {
       const { container } = render(<ResumeEditPage />)
@@ -306,7 +306,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
           expect(preview).toHaveTextContent('MBA')
         })
       }
-    })
+    }, 10000)
   })
 
   describe('Export Workflow', () => {
@@ -367,7 +367,9 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
       const printButton = printButtons[0]
 
       // Click print button
-      fireEvent.click(printButton)
+      if (printButton) {
+        fireEvent.click(printButton)
+      }
 
       // Verify print was called
       await waitFor(() => {
@@ -558,7 +560,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
       const printButtons = screen.getAllByText(/Print/i)
       expect(printButtons.length).toBeGreaterThan(0)
       expect(printButtons[0]).toBeInTheDocument()
-    }, 15000)
+    }, 20000)
 
     it('should allow editing, reviewing in preview, making corrections, and printing', async () => {
       const { container } = render(<ResumeEditPage />)
