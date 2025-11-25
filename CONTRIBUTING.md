@@ -52,13 +52,13 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
 1. **Fork** the repository on GitHub
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/ismail-portfolio.git
-   cd ismail-portfolio
+   git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
+   cd jsonresume-to-everything
    ```
 
 3. **Add upstream** remote:
    ```bash
-   git remote add upstream https://github.com/ismail-kattakath/ismail-portfolio.git
+   git remote add upstream https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
    ```
 
 ### Install Dependencies
@@ -644,8 +644,8 @@ npm install                    # Reinstall dependencies
 - **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md)
 - **Quick Start**: See [QUICKSTART.md](./QUICKSTART.md)
 - **Development**: See [CLAUDE.md](./CLAUDE.md)
-- **Issues**: https://github.com/ismail-kattakath/ismail-portfolio/issues
-- **Discussions**: https://github.com/ismail-kattakath/ismail-portfolio/discussions
+- **Issues**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues
+- **Discussions**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/discussions
 
 ---
 
@@ -655,5 +655,12 @@ Contributors will be acknowledged in:
 - GitHub contributors page
 - CHANGELOG.md for significant contributions
 - Special thanks in README.md for major features
+
+## Credits
+
+This project was inspired by and builds upon:
+- **[sauravhathi/atsresume](https://github.com/sauravhathi/atsresume)** - JSON Resume to ATS Resume concepts
+- **[JSON Resume](https://jsonresume.org)** - Resume standard specification
+- Open source community and all dependency maintainers
 
 Thank you for contributing! 🎉

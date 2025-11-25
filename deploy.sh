@@ -44,4 +44,4 @@ fi
 
 echo "✅ GitHub Pages deployment initiated!"
 echo "📊 Monitor with: tail -f /tmp/github-pages-*.log"
-echo "🌐 Site will be available at: https://aloshy-ai.github.io/ismail-portfolio"
+echo "🌐 Site will be available at: https://YOUR-USERNAME.github.io/jsonresume-to-everything"

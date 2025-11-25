@@ -15,8 +15,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   // Remove basePath and assetPrefix for custom domain
-  // assetPrefix: process.env.NODE_ENV === 'production' ? '/ismail-portfolio' : '',
-  // basePath: process.env.NODE_ENV === 'production' ? '/ismail-portfolio' : '',
+  // If not using custom domain, uncomment these lines:
+  // assetPrefix: process.env.NODE_ENV === 'production' ? '/jsonresume-to-everything' : '',
+  // basePath: process.env.NODE_ENV === 'production' ? '/jsonresume-to-everything' : '',
 };
 
 export default nextConfig;

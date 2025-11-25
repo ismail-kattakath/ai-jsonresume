@@ -27,7 +27,7 @@
 3. **Source:** Select "GitHub Actions"
 4. **Done!** Your site will be live at:
    ```
-   https://YOUR-USERNAME.github.io/ismail-portfolio/
+   https://YOUR-USERNAME.github.io/jsonresume-to-everything/
    ```
 
 **Note:** First deployment takes 3-5 minutes
@@ -279,8 +279,8 @@ git push origin main
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/ismail-portfolio.git
-cd ismail-portfolio
+git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
+cd jsonresume-to-everything
 
 # Install dependencies
 npm install

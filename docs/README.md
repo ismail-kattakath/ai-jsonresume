@@ -87,7 +87,7 @@ For comprehensive testing information:
 ## Project Structure
 
 ```
-ismail-portfolio/
+jsonresume-to-everything/
 ├── docs/                              # Documentation
 │   ├── README.md                      # This file
 │   ├── PASSWORD_PROTECTION_SETUP.md   # Setup guide

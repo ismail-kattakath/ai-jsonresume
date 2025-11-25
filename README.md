@@ -464,6 +464,16 @@ Contributions welcome! Please:
 
 MIT License - feel free to use this template for your own portfolio!
 
+## 🙏 Credits & Acknowledgments
+
+This project builds upon and is inspired by the open-source community:
+
+- **JSON Resume to ATS Resume**: Inspired by [sauravhathi/atsresume](https://github.com/sauravhathi/atsresume) - The resume builder and JSON Resume integration concepts were influenced by this excellent project.
+- **JSON Resume Standard**: Built on the [JSON Resume](https://jsonresume.org) v1.0.0 specification
+- **Next.js Team**: For the amazing React framework
+- **Tailwind CSS**: For the utility-first CSS framework
+- **Open Source Contributors**: Everyone who has contributed to the libraries and tools that make this project possible
+
 ## 💬 Support
 
 - **Documentation**: Check [docs/](./docs) directory

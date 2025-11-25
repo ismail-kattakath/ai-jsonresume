@@ -235,8 +235,8 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on:
 ## Support
 
 - **Documentation**: [docs/](./docs/)
-- **Issues**: https://github.com/ismail-kattakath/ismail-portfolio/issues
-- **Discussions**: https://github.com/ismail-kattakath/ismail-portfolio/discussions
+- **Issues**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues
+- **Discussions**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/discussions
 
 ---
 
@@ -246,4 +246,4 @@ MIT License - See [LICENSE](./LICENSE) for details
 
 ---
 
-**Note**: This changelog is maintained manually. For a complete commit history, see the [GitHub commits page](https://github.com/ismail-kattakath/ismail-portfolio/commits/main).
+**Note**: This changelog is maintained manually. For a complete commit history, see the [GitHub commits page](https://github.com/YOUR-USERNAME/jsonresume-to-everything/commits/main).
