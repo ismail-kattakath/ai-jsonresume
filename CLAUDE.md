@@ -18,6 +18,271 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 🎯 Critical Context for Claude Code
+
+### The Golden Rules (Must Follow Always)
+
+1. **Data-Driven Architecture:** All content flows from `src/data/resume.json` (JSON Resume v1.0.0 standard)
+   - ✅ Edit JSON directly for content changes
+   - ❌ Never modify components for content
+   - Adapter automatically converts to internal format
+
+2. **Type-Safe Development:** Three-step update pattern for new fields
+   - Step 1: Define types in `src/types/resume.ts`
+   - Step 2: Update adapter in `src/lib/resumeAdapter.ts`
+   - Step 3: Update components to use new fields
+
+3. **Always Test Before Deploy:** `npm test` must pass
+   - GitHub Actions blocks deployment if tests fail
+   - Run `npm test:coverage` to check threshold (85% minimum)
+   - Never skip tests or disable coverage checks
+
+4. **Dev Server as Foundation:** `npm run dev` must run continuously on port 3000
+   - Force-kill conflicts: `kill -9 $(lsof -ti:3000)`
+   - Hard reset with `.next/` deletion if files added/removed
+
+### Quick File Reference (When Asked "Where Do I Edit?")
+
+| What to Change                      | Primary File                     | How to Verify                                  |
+| ----------------------------------- | -------------------------------- | ---------------------------------------------- |
+| Portfolio content (name, role, bio) | `src/data/resume.json`           | Dev server → http://localhost:3000             |
+| Homepage layout                     | `src/app/page.tsx`               | Dev server → http://localhost:3000             |
+| Resume editor                       | `src/app/resume/edit/page.tsx`   | Dev server → http://localhost:3000/resume/edit |
+| Component styling                   | `src/components/sections/*.tsx`  | Visual output on dev server                    |
+| Password protection                 | `src/config/password.ts`         | Test at /resume/edit                           |
+| AI generation prompts               | `src/lib/ai/document-prompts.ts` | Test in editor                                 |
+| Data types                          | `src/types/resume.ts`            | `npx tsc --noEmit`                             |
+| Adapter logic                       | `src/lib/resumeAdapter.ts`       | `npm test`                                     |
+
+### Absolute Paths for Bash Commands
+
+**⚠️ CRITICAL:** Claude Code agent threads reset working directory between bash calls.
+
+- ✅ Use absolute: `/Users/aloshy/aloshy-ai/ismail-portfolio/src/...`
+- ❌ Avoid relative: `./src/...` or `src/...` (may fail)
+
+All file paths in this CLAUDE.md are relative from project root for documentation purposes only.
+
+---
+
+## 🤖 For Claude Code Agents
+
+### Recommended Approaches
+
+**Use Claude Code for:**
+
+- ✅ Implementing features (code generation)
+- ✅ Fixing bugs (targeted debugging)
+- ✅ Adding tests (test generation)
+- ✅ Refactoring specific files (isolated changes)
+- ✅ Creating new components (file creation)
+- ✅ Updating documentation (markdown edits)
+
+**Escalate to Human Review for:**
+
+- ⚠️ Architecture changes affecting 3+ modules
+- ⚠️ Changes to `src/data/resume.json` structure (verify schema first)
+- ⚠️ Breaking changes to public APIs
+- ⚠️ Adding/removing npm dependencies
+- ⚠️ Modifying build configuration (Next.js, TypeScript, Jest)
+
+### Tool Usage Strategy
+
+**Pattern 1: Understanding Existing Code**
+
+```bash
+# Question: "How does password protection work?"
+# Strategy: Use Explore agent for cross-file analysis
+Task tool with subagent_type=Explore, thoroughness="medium"
+```
+
+**Pattern 2: Adding Features with Tests**
+
+```bash
+# 1. Read type definitions: Read → src/types/resume.ts
+# 2. Find related code: Grep → "resumeAdapter.ts"
+# 3. Find examples: Glob → src/components/sections/*.tsx
+# 4. Generate new component
+# 5. Add test file
+# 6. Verify: npm test -- path/to/component.test.tsx
+```
+
+**Pattern 3: Debugging Type Errors**
+
+```bash
+# 1. Build to see errors: npm run build
+# 2. Identify error location
+# 3. Read types: src/types/resume.ts
+# 4. Check usage: Grep → "fieldName"
+# 5. Fix order: types → adapter → components
+```
+
+---
+
+## 🧭 Decision Trees: Common Scenarios
+
+### Scenario 1: "I need to add a new field to the resume"
+
+```
+Is it a JSON Resume v1.0.0 standard field?
+├─ YES → Edit `src/data/resume.json` only
+│        └─ Adapter reads it automatically ✓
+│
+└─ NO → Is it custom data?
+         ├─ YES → Follow this order:
+         │        1. Add to `src/types/resume.ts` (define type)
+         │        2. Update `src/lib/resumeAdapter.ts` (parse it)
+         │        3. Update components (display it)
+         │        4. Add tests (verify it)
+         │
+         └─ UNSURE → Check JSON Resume standard:
+                     https://jsonresume.org/schema/
+                     or see ARCHITECTURE.md (Data Adapter Pattern section)
+```
+
+### Scenario 2: "Tests are failing after my changes"
+
+```
+What type of failure?
+├─ Type errors → Fix types first, then adapter, then components
+│
+├─ Component tests → Update snapshots or fix component logic
+│
+├─ Integration tests → Check data flow: JSON → adapter → component
+│
+└─ Coverage below 85% → Add missing test cases
+```
+
+### Scenario 3: "How do I add a new homepage section?"
+
+```
+Step 1: Add data to `src/data/resume.json`
+   └─ Use JSON Resume standard format if possible
+
+Step 2: Create component in `src/components/sections/`
+   └─ Use PascalCase filename (e.g., NewSection.tsx)
+
+Step 3: Update `src/lib/data/portfolio.ts` (if needed)
+   └─ Transform internal data to display format
+
+Step 4: Import in `src/app/page.tsx`
+   └─ Add <NewSection /> to page layout
+
+Step 5: Add tests
+   └─ Create `src/components/sections/__tests__/NewSection.test.tsx`
+
+Step 6: Verify
+   └─ npm run dev → check http://localhost:3000
+   └─ npm test → ensure tests pass
+```
+
+---
+
+## 📦 Context Management for Large Tasks
+
+### When File Context Gets Large (>100 lines)
+
+**Strategy: Read Incrementally**
+
+1. **Use Glob to find related files first**
+
+   ```typescript
+   Glob: '**/*resume*.test.tsx' // Find all resume-related tests
+   ```
+
+2. **Read file sections with offset/limit**
+
+   ```typescript
+   Read: 'src/components/resume/forms/WorkExperience.tsx'
+   limit: 100 // Read only first 100 lines
+   offset: 0 // Start from beginning
+   ```
+
+3. **Grep for specific patterns before reading whole files**
+   ```typescript
+   Grep: 'handlePasswordCheck'
+   output_mode: 'content' // See actual code
+   ```
+
+### When Starting a Multi-File Task
+
+**Efficient Approach:**
+
+1. Use `Glob` to find all related files
+2. Use `Grep` to identify key functions/exports
+3. Read only necessary sections (use `limit` + `offset`)
+4. Work file-by-file rather than reading entire codebase
+5. Use `TodoWrite` to track progress across files
+
+**Example Workflow:**
+
+```typescript
+// Task: "Update all form components to use new validation"
+// Step 1: Find forms
+Glob: "src/components/**/forms/*.tsx"
+
+// Step 2: Find validation usage
+Grep: "validateField" output_mode: "files_with_matches"
+
+// Step 3: Read each file individually
+Read: "src/components/resume/forms/WorkExperience.tsx" limit: 50
+
+// Step 4: Make changes file-by-file
+Edit: ...
+
+// Step 5: Test incrementally
+Bash: "npm test -- src/components/resume/forms/__tests__/WorkExperience.test.tsx"
+```
+
+---
+
+## 🤔 Claude Code Behavioral Notes
+
+### Expected Behavior
+
+- ✅ Takes 2-5 seconds to analyze file patterns
+- ✅ May ask clarifying questions when task is ambiguous
+- ✅ Suggests using Task tool with Explore agent for "How does X work?" questions
+- ✅ Maintains git history awareness (uses git log for context)
+- ✅ Runs formatters automatically via pre-commit hooks
+
+### When Claude Code Needs Clarification
+
+**"Cannot modify that file"**
+
+- Check file permissions
+- Verify file exists at specified path
+- Ensure no file locks (close editors)
+
+**"Unclear requirement"**
+
+- Be specific about input/output expectations
+- Provide examples of desired outcome
+- Reference similar existing code
+
+**"Too large a change"**
+
+- Break into smaller, atomic steps
+- Use TodoWrite to plan phases
+- Complete one phase before starting next
+
+**"Type error"**
+
+- Often means types need updating before code changes
+- Follow order: types → adapter → components
+- Run `npx tsc --noEmit` to verify types
+
+### Context Reset Between Operations
+
+**⚠️ Important for Bash Commands:**
+
+- Claude Code resets `cwd` between bash invocations
+- Always use **absolute file paths** in bash commands
+- Relative paths like `./file.txt` may fail
+- Use full paths: `/Users/aloshy/aloshy-ai/ismail-portfolio/src/...`
+
+---
+
 ## Quick Project Summary
 
 **Type:** Next.js 15 portfolio with static export
@@ -25,7 +290,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Data:** Single source of truth (`src/data/resume.json` - JSON Resume v1.0.0)
 **Auth:** Optional client-side password protection (bcrypt + sessionStorage)
 **AI:** OpenAI-compatible API for cover letter/summary generation
-**Tests:** Jest + RTL (25 test files, 500+ tests, 89.6% pass rate)
+**Tests:** Jest + RTL (comprehensive test coverage, 85%+ maintained)
 
 ---
 
@@ -356,9 +621,9 @@ git commit -m "feat: feature with tests and docs"
 
 **Stats:**
 
-- 25 test files
-- 500+ total tests
-- 89.6% pass rate (4 intentionally skipped)
+- Comprehensive test coverage across components, pages, and utilities
+- 85%+ coverage maintained (enforced by Jest threshold)
+- Some tests intentionally skipped for known testing limitations
 - Jest 30.2.0 + RTL 16.3.0
 
 **Test Types:**
@@ -777,34 +1042,36 @@ npm test -- --clearCache
 
 **ESLint Gradual Improvement Plan:** [docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md](./docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md)
 
-### Current Status (2025-01-25)
+### Current Status
+
+> **Note:** For current violation counts, run `npm run lint`. See [ESLINT_GRADUAL_IMPROVEMENT_PLAN.md](./docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md) for detailed tracking.
 
 **Enforced (Error - Blocks Commits):**
 
-- ✅ `@typescript-eslint/no-require-imports` - Zero violations
-- ✅ `react/no-unescaped-entities` - Zero violations
-- ✅ `no-relative-import-paths/no-relative-import-paths` - Zero violations (enforces @/ alias imports)
+- ✅ `@typescript-eslint/no-require-imports` - Fully enforced
+- ✅ `react/no-unescaped-entities` - Fully enforced
+- ✅ `no-relative-import-paths/no-relative-import-paths` - Enforces @/ alias imports
 - ✅ `check-file/filename-naming-convention` - Enforces PascalCase components, camelCase libs, kebab-case types
 - ✅ `check-file/folder-naming-convention` - Enforces kebab-case folder names
 - ✅ **Commit Message Linting** - Conventional commits enforced via commitlint
 - ✅ **Test Coverage Thresholds** - 85% minimum coverage (branches, functions, lines, statements)
-- ⚠️ `@typescript-eslint/no-unused-expressions` - 3 violations (fix in progress)
 
 **Code Quality (Warning - Gradual Improvement):**
 
-- ⚠️ `@typescript-eslint/no-explicit-any` - 72 violations
-- ⚠️ `@typescript-eslint/no-unused-vars` - 32 violations
+- ⚠️ `@typescript-eslint/no-unused-expressions` - Being actively fixed
+- ⚠️ `@typescript-eslint/no-explicit-any` - Gradual replacement in progress
+- ⚠️ `@typescript-eslint/no-unused-vars` - Gradual cleanup in progress
 - ⚠️ **JSDoc Documentation** - Public APIs should have JSDoc comments
 - ⚠️ **Security Rules** - 11 security patterns monitored
 
-### Improvement Phases
+### Improvement Approach
 
-1. **Phase 1 (URGENT):** Fix 3 unused expressions in test files
-2. **Phase 2:** Clean up 32 unused variables in tests (2-3 hours)
-3. **Phase 3:** Clean up unused variables in source code (1-2 hours)
-4. **Phase 4:** Replace 44 `any` types in test files (4-6 hours)
-5. **Phase 5:** Replace 28 `any` types in source files (6-8 hours)
-6. **Phase 6:** Final cleanup & enforce all rules as errors
+The project follows a gradual improvement strategy for code quality warnings:
+
+1. **Critical rules enforced immediately** (errors block commits)
+2. **Quality rules as warnings** (allow gradual improvement)
+3. **Systematic cleanup** (fix violations incrementally)
+4. **Promote to errors** (once violations reach zero)
 
 **See full plan:** [docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md](./docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md)
 
@@ -813,12 +1080,14 @@ npm test -- --clearCache
 **The following conventions are now enforced automatically (no Claude Code needed):**
 
 #### 1. Commit Message Format (commitlint)
+
 - **Tool:** `@commitlint/config-conventional`
 - **Enforced:** Conventional commit format (feat:, fix:, docs:, etc.)
 - **Trigger:** Git commit hook
 - **Config:** `commitlint.config.js`
 
 #### 2. File Naming Conventions (eslint-plugin-check-file)
+
 - **Components:** PascalCase (`PersonalInformation.tsx`)
 - **Utilities:** camelCase (`resumeAdapter.ts`)
 - **Types:** kebab-case (`json-resume.ts`)
@@ -826,16 +1095,19 @@ npm test -- --clearCache
 - **Config:** `eslint.config.mjs`
 
 #### 3. Import Path Enforcement (eslint-plugin-no-relative-import-paths)
+
 - **Rule:** All imports must use `@/` alias (no `../` or `./` except same folder)
 - **Enforced:** Error level (blocks commits)
 - **Config:** `eslint.config.mjs`
 
 #### 4. Test Coverage Thresholds (Jest)
+
 - **Minimum:** 85% coverage (branches, functions, lines, statements)
 - **Enforced:** `npm test:coverage` fails if below threshold
 - **Config:** `jest.config.js`
 
 #### 5. TypeScript Strict Mode
+
 - **Additional checks:**
   - `noUncheckedIndexedAccess` - Safer array/object access
   - `noImplicitOverride` - Explicit override keyword
@@ -844,11 +1116,13 @@ npm test -- --clearCache
 - **Config:** `tsconfig.json`
 
 #### 6. JSDoc Documentation (eslint-plugin-jsdoc)
+
 - **Enforced:** Public functions, classes, interfaces, type aliases
 - **Level:** Warning (gradual adoption)
 - **Config:** `eslint.config.mjs`
 
 #### 7. Security Patterns (eslint-plugin-security)
+
 - **Monitored:** 11 security patterns (unsafe regex, eval, timing attacks, etc.)
 - **Critical errors:** Unsafe regex, eval, pseudo-random bytes
 - **Warnings:** Object injection, non-literal require, child process
@@ -859,7 +1133,7 @@ npm test -- --clearCache
 ## Additional Resources
 
 - **Quick Start:** [QUICKSTART.md](./QUICKSTART.md) - Get started in 10 minutes
-- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) - Complete technical reference (1,300+ lines)
+- **Architecture:** [ARCHITECTURE.md](./ARCHITECTURE.md) - Complete technical reference
 - **Contributing:** [CONTRIBUTING.md](./CONTRIBUTING.md) - How to contribute
 - **Changelog:** [CHANGELOG.md](./CHANGELOG.md) - Version history
 - **Code Quality:** [docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md](./docs/ESLINT_GRADUAL_IMPROVEMENT_PLAN.md) - ESLint improvement roadmap
