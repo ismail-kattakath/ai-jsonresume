@@ -1,6 +1,13 @@
 import { MdAddCircle, MdRemoveCircle } from 'react-icons/md'
 
-const FormButton = ({ size, remove, add, label = 'Item' }) => {
+interface FormButtonProps {
+  size: number
+  remove?: () => void
+  add: () => void
+  label?: string
+}
+
+const FormButton = ({ size, remove, add, label = 'Item' }: FormButtonProps) => {
   return (
     <div className="my-2 flex flex-wrap gap-2">
       <button
