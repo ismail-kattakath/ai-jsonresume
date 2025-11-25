@@ -323,6 +323,8 @@ npm test:coverage
 
 ### Local Development
 
+**⚠️ CRITICAL: Always keep the dev server running in the background on port 3000**
+
 ```bash
 # Start dev server
 npm run dev
@@ -335,6 +337,40 @@ npx tsc --noEmit
 
 # Lint
 npm run lint
+```
+
+**Dev Server Management Rules:**
+
+1. **Always Running:** Keep `npm run dev` running in the background at all times during development
+2. **Default Port:** Use port 3000 (default). If occupied by another process, forcefully kill that process and rerun
+3. **When to Restart:** Stop the app, delete `.next/` folder, and restart when:
+   - New files are added
+   - Files are removed
+   - Fundamental changes occur (structure, configuration, dependencies)
+
+**Port 3000 Conflict Resolution:**
+
+```bash
+# Find process using port 3000
+lsof -ti:3000
+
+# Kill the process
+kill -9 $(lsof -ti:3000)
+
+# Restart dev server
+npm run dev
+```
+
+**Hard Reset Workflow:**
+
+```bash
+# Stop dev server (Ctrl+C)
+
+# Delete build cache
+rm -rf .next/
+
+# Restart dev server
+npm run dev
 ```
 
 ### Pre-Commit Checklist
@@ -490,6 +526,9 @@ setResumeData({ ...resumeData, name: "New Name" })
 2. **Avoid Redundant Commands** - Use specialized tools (Read, not cat)
 3. **Plan Before Execute** - TodoWrite for multi-step tasks
 4. **Search Strategy** - Glob for files, Grep for content, Explore for understanding
+5. **Dev Server Always Running** - Keep `npm run dev` running in background on port 3000
+   - Kill port conflicts forcefully: `kill -9 $(lsof -ti:3000)`
+   - Hard reset (new/removed files): Stop server → `rm -rf .next/` → Restart
 
 ---
 
