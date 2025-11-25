@@ -222,9 +222,6 @@ graph TD
     social sharing"]
     B --> H["Sitemap
     auto-generated"]
-
-    style A fill:#f9f,stroke:#333,stroke-width:4px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 **Key Point**: Edit `resume.json` once, changes appear everywhere!

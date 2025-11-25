@@ -100,13 +100,6 @@ flowchart TD
     G --> H["Post-Process & Validate"]
     H --> I["Insert into Textarea
     Cover Letter or Summary"]
-
-    style A fill:#e1f5ff,stroke:#333,stroke-width:2px
-    style C fill:#fff4e6,stroke:#333,stroke-width:2px
-    style D fill:#ffe6f0,stroke:#333,stroke-width:2px
-    style E fill:#e6f7ff,stroke:#333,stroke-width:2px
-    style F fill:#f0ffe6,stroke:#333,stroke-width:2px
-    style I fill:#e6ffe6,stroke:#333,stroke-width:3px
 ```
 
 ### 3. Streaming Architecture

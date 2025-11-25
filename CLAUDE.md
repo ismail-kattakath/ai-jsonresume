@@ -77,10 +77,6 @@ flowchart TD
     SEO Metadata"]
     C --> H["src/app/opengraph-image.tsx
     OG Images"]
-
-    style A fill:#f9f,stroke:#333,stroke-width:4px
-    style B fill:#bbf,stroke:#333,stroke-width:3px
-    style C fill:#bfb,stroke:#333,stroke-width:3px
 ```
 
 **⚠️ CRITICAL:** When updating content, ALWAYS edit `src/data/resume.json` only. Changes automatically propagate throughout the site.

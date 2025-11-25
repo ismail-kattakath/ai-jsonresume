@@ -34,12 +34,6 @@ graph TD
     PostCSS"]
     A --> E["Deployment
     GitHub Pages + GitHub Actions"]
-
-    style A fill:#0070f3,stroke:#333,stroke-width:3px,color:#fff
-    style B fill:#61dafb,stroke:#333,stroke-width:2px
-    style C fill:#3178c6,stroke:#333,stroke-width:2px,color:#fff
-    style D fill:#38bdf8,stroke:#333,stroke-width:2px
-    style E fill:#6cc644,stroke:#333,stroke-width:2px
 ```
 
 ### Core Dependencies
@@ -111,13 +105,6 @@ flowchart TD
     /resume/edit/page.tsx"]
     C --> F["Cover Letter Editor
     /cover-letter/edit"]
-
-    style A fill:#f9f,stroke:#333,stroke-width:4px
-    style B fill:#bbf,stroke:#333,stroke-width:3px
-    style C fill:#bfb,stroke:#333,stroke-width:3px
-    style D fill:#fdb,stroke:#333,stroke-width:2px
-    style E fill:#fdb,stroke:#333,stroke-width:2px
-    style F fill:#fdb,stroke:#333,stroke-width:2px
 ```
 
 ### Adapter Pattern Implementation
