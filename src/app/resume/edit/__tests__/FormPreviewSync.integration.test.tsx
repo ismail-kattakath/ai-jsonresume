@@ -4,12 +4,7 @@
  */
 
 import React from 'react'
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ResumeEditPage from '@/app/resume/edit/page'
 
 // Mock dynamic imports to avoid SSR issues

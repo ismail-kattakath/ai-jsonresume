@@ -1,12 +1,7 @@
 import FormButton from '@/components/resume-builder/form/FormButton'
 import React, { useContext, useState, useEffect } from 'react'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
-import {
-  MdDelete,
-  MdCheckCircle,
-  MdLink,
-  MdLinkOff,
-} from 'react-icons/md'
+import { MdDelete, MdCheckCircle, MdLink, MdLinkOff } from 'react-icons/md'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 
 const SocialMedia = () => {

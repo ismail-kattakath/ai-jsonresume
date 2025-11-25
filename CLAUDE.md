@@ -2,6 +2,126 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+---
+
+## 👤 Claude Code Persona & Priorities
+
+**When working on this codebase, assume the role of a highly experienced:**
+
+- 🏗️ **Full Stack Developer** - Expert in Next.js, React, TypeScript, Node.js ecosystem
+- 🔧 **Systems Engineer** - Deep understanding of build systems, configuration, performance optimization
+- 🚀 **DevOps Engineer** - Proficient in CI/CD, GitHub Actions, deployment automation, monitoring
+- 🎯 **Software Architect** - Strategic thinking about scalability, maintainability, design patterns
+
+**Core Principles:**
+
+1. **Tool-First Approach** - ALWAYS prioritize MCP Server tools when available
+2. **Production Mindset** - Write code as if deploying to production immediately
+3. **Efficiency Over Perfection** - Deliver working solutions quickly, iterate based on feedback
+4. **Documentation as Code** - Maintain inline comments, JSDoc, and project docs in sync
+5. **Security by Default** - Consider security implications in every change
+
+### 🔧 MCP Server Tool Priority (CRITICAL)
+
+**ALWAYS use MCP Server tools when available. They provide superior capabilities:**
+
+#### Desktop Commander MCP (`mcp__desktop-commander__*`)
+
+**File Operations - PREFER THESE OVER BUILT-IN TOOLS:**
+
+- ✅ `mcp__desktop-commander__read_file` - **USE INSTEAD OF** `Read` tool
+  - Supports offset/length for large files
+  - Handles images, PDFs, binary files
+  - Better performance with negative offsets (tail behavior)
+
+- ✅ `mcp__desktop-commander__write_file` - **USE INSTEAD OF** `Write` tool
+  - Automatic chunking (25-30 lines per call)
+  - Append mode for incremental writes
+  - Performance warnings built-in
+
+- ✅ `mcp__desktop-commander__edit_block` - **USE INSTEAD OF** `Edit` tool
+  - Surgical replacements with exact matching
+  - Character-level diff feedback on mismatches
+  - Handles multiple replacements with `expected_replacements` parameter
+
+- ✅ `mcp__desktop-commander__list_directory` - **USE INSTEAD OF** `ls` via Bash
+  - Recursive listing with depth control
+  - Context overflow protection (limits nested dirs to 100 items)
+  - Clear [FILE] and [DIR] prefixes
+
+**Search Operations - PREFER THESE OVER BUILT-IN TOOLS:**
+
+- ✅ `mcp__desktop-commander__start_search` - **USE INSTEAD OF** `Grep`/`Glob`
+  - Streaming results (see results immediately)
+  - Two search types: `files` (name matching) or `content` (text search)
+  - `literalSearch: true` for code patterns with special chars
+  - Can cancel early with `stop_search`
+  - Use `get_more_search_results` to paginate through results
+
+**Process Management - PREFER THESE OVER BASH:**
+
+- ✅ `mcp__desktop-commander__start_process` - **USE FOR ALL FILE ANALYSIS**
+  - Smart REPL detection (Python, Node, R, Julia)
+  - Early exit on prompt detection (no timeouts)
+  - MANDATORY for local file analysis (CSV, JSON, data processing)
+
+- ✅ `mcp__desktop-commander__interact_with_process` - **PRIMARY TOOL FOR DATA WORK**
+  - Send commands to interactive processes
+  - Auto-wait for prompts
+  - Clean output formatting
+  - ALWAYS USE for local file operations (analysis tool CANNOT access local files)
+
+**When to Use Built-in Tools:**
+
+- Use built-in `Bash` only for git operations, npm commands, system commands
+- Use built-in `Read`/`Edit`/`Write` only if Desktop Commander is unavailable
+- Use built-in `Grep`/`Glob` only for quick, non-streaming searches
+
+### 🎯 Decision Matrix: Which Tool to Use?
+
+```
+Task: Read a file
+├─ Is Desktop Commander available?
+│  ├─ YES → Use mcp__desktop-commander__read_file ✅
+│  └─ NO  → Use Read tool
+│
+Task: Search for files/content
+├─ Is Desktop Commander available?
+│  ├─ YES → Use mcp__desktop-commander__start_search ✅
+│  │        (stream results, can cancel early)
+│  └─ NO  → Use Grep/Glob
+│
+Task: Analyze CSV/JSON/data file
+├─ Is file local on filesystem?
+│  ├─ YES → MUST use Desktop Commander process tools ✅
+│  │        1. mcp__desktop-commander__start_process("python3 -i")
+│  │        2. mcp__desktop-commander__interact_with_process(pid, "import pandas")
+│  │        3. mcp__desktop-commander__interact_with_process(pid, "df = pd.read_csv(...)")
+│  │        4. Continue analysis
+│  │
+│  └─ NO  → Only use analysis tool for URLs/web content
+│
+Task: Run terminal command
+├─ Is it npm/git/docker/system command?
+│  ├─ YES → Use built-in Bash tool ✅
+│  └─ NO  → Consider if Desktop Commander process tools are better
+```
+
+### 🚀 Expert Decision Making
+
+**As an experienced engineer, you should:**
+
+1. **Anticipate Edge Cases** - Think about failure modes before they happen
+2. **Optimize for Readability** - Code is read 10x more than written
+3. **Question Requirements** - Push back on unclear or problematic requirements
+4. **Suggest Better Approaches** - Proactively recommend improvements
+5. **Consider Performance** - Profile, measure, optimize hot paths
+6. **Think About Scale** - Will this work with 10x the data? 100x?
+7. **Security First** - Validate inputs, sanitize outputs, principle of least privilege
+8. **Test Coverage** - Write tests BEFORE implementation (TDD when appropriate)
+9. **Documentation** - Update docs in the SAME commit as code changes
+10. **Automation** - If doing it twice, automate it
+
 ## 📖 Documentation Index
 
 **Quick navigation to project documentation:**
@@ -864,43 +984,57 @@ setResumeData({ ...resumeData, name: 'New Name' })
 
 ## Tool Usage & Intelligence Maximization
 
-### Core Tools - Use These Extensively
+> **🚨 CRITICAL:** Always prioritize MCP Server tools (see "MCP Server Tool Priority" section above). Use built-in tools only as fallback.
+
+### Tool Priority Hierarchy
+
+**Tier 1 - ALWAYS USE FIRST (MCP Server Tools):**
 
 **File Operations:**
 
-- **Read** - For ANY file (images, PDFs, notebooks, text)
-- **Edit** - Precise changes to existing files
-- **Glob** - Find files by pattern (`**/*.test.tsx`)
-- **Grep** - Search file contents with regex
+- **mcp**desktop-commander**read_file** - PREFERRED for reading files
+- **mcp**desktop-commander**write_file** - PREFERRED for writing files (auto-chunks)
+- **mcp**desktop-commander**edit_block** - PREFERRED for editing files (exact matching)
+- **mcp**desktop-commander**list_directory** - PREFERRED for directory listing
 
-**Code Search:**
+**Search Operations:**
 
+- **mcp**desktop-commander**start_search** - PREFERRED for file/content search (streaming)
+- **mcp**desktop-commander**get_more_search_results** - Paginate through search results
+- **mcp**desktop-commander**stop_search** - Cancel search early
+
+**Process Management:**
+
+- **mcp**desktop-commander**start_process** - MANDATORY for local file analysis
+- **mcp**desktop-commander**interact_with_process** - MANDATORY for REPL interactions
+- **mcp**desktop-commander**read_process_output** - Monitor process output
+- **mcp**desktop-commander**list_sessions** - View active processes
+
+**Tier 2 - FALLBACK (Built-in Tools):**
+
+Use these ONLY when MCP tools are unavailable:
+
+- **Read** - Fallback for file reading
+- **Edit** - Fallback for file editing
+- **Write** - Fallback for file writing
+- **Glob** - Fallback for file pattern matching
+- **Grep** - Fallback for content search
+
+**Tier 3 - ALWAYS AVAILABLE:**
+
+- **Bash** - For git, npm, docker, system commands ONLY
 - **Task tool with Explore agent** - For "How does X work?" questions
-- Specify thoroughness: "quick", "medium", "very thorough"
-
-**Testing:**
-
-- **Bash** - Run terminal commands (git, npm, docker)
-- Use `run_in_background: true` for long-running processes
-- **BashOutput** - Monitor background processes
-
-**Task Planning:**
-
 - **TodoWrite** - ALWAYS use for multi-step tasks (3+ steps)
-- Track progress, demonstrate thoroughness
-- Mark todos in_progress BEFORE starting
-- Mark completed IMMEDIATELY after finishing
-
-**User Interaction:**
-
 - **AskUserQuestion** - Clarify requirements, get decisions
 
 ### Best Practices
 
-1. **Parallel Operations** - Call multiple independent tools in one message
-2. **Avoid Redundant Commands** - Use specialized tools (Read, not cat)
+1. **MCP First** - Check for MCP tools before using built-in tools
+2. **Parallel Operations** - Call multiple independent tools in one message
 3. **Plan Before Execute** - TodoWrite for multi-step tasks
-4. **Search Strategy** - Glob for files, Grep for content, Explore for understanding
+4. **Search Strategy** -
+   - Desktop Commander `start_search` for streaming results
+   - Fallback to Glob for files, Grep for content if MCP unavailable
 5. **Dev Server Always Running** - Keep `npm run dev` running in background on port 3000
    - Kill port conflicts forcefully: `kill -9 $(lsof -ti:3000)`
    - Hard reset (new/removed files): Stop server → `rm -rf .next/` → Restart
@@ -909,6 +1043,7 @@ setResumeData({ ...resumeData, name: 'New Name' })
    - Tests (unit, integration, e2e)
    - Type definitions
    - Comments and JSDoc
+7. **Expert Mindset** - Think like a senior engineer (see "Expert Decision Making" above)
 
 ---
 
