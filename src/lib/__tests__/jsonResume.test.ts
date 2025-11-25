@@ -167,7 +167,7 @@ describe('JSON Resume Conversion', () => {
       const result = convertToJSONResume(mockResumeData)
 
       // Website is now kept in profiles array, not in basics.url
-      expect(result.basics.url).toBe('')
+      expect(result.basics.url).toBeUndefined()
       const websiteProfile = result.basics.profiles.find(
         (p) => p.network === 'Website'
       )

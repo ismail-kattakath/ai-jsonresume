@@ -90,20 +90,22 @@ export function convertToJSONResume(customData?: ResumeData) {
       p.network === 'Website'
   )
 
+  // Build basics object without url field (kept in profiles for order preservation)
+  const basics: any = {
+    name: data.name,
+    label: data.position,
+    image: data.profilePicture || '',
+    email: data.email,
+    phone: data.contactInformation,
+    summary: data.summary,
+    location,
+    profiles: profiles, // Keep all profiles including Website for order preservation
+  }
+
   const jsonResume = {
     $schema:
       'https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json',
-    basics: {
-      name: data.name,
-      label: data.position,
-      image: data.profilePicture || '',
-      email: data.email,
-      phone: data.contactInformation,
-      url: '', // Don't set url - Website is now kept in profiles array for order preservation
-      summary: data.summary,
-      location,
-      profiles: profiles, // Keep all profiles including Website for order preservation
-    },
+    basics,
     work,
     volunteer: [],
     education,
