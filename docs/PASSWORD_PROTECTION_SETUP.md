@@ -60,8 +60,6 @@ $2a$10$N9qo8uLOickgx2ZMRZoMye7T8h9/qRBSMy1Wz0C.OvQ1rPLbSLbsG
    - **Value**: Paste the hash from Step 1
 5. Click **Add secret**
 
-![GitHub Secrets Location](https://docs.github.com/assets/cb-48090/images/help/settings/actions-secrets-and-variables.png)
-
 ### Step 3: Local Development Setup
 
 Create a `.env.local` file in the project root:
