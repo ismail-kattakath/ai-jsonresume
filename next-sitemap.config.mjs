@@ -2,7 +2,7 @@
 
 const SITE_URL = 'https://ismail.kattakath.com'
 
-module.exports = {
+export default {
   siteUrl: SITE_URL,
   generateRobotsTxt: true,
   generateIndexSitemap: false, // Single sitemap (not index + multiple)
