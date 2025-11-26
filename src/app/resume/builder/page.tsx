@@ -151,7 +151,7 @@ function UnifiedEditor() {
               onSubmit={(e) => e.preventDefault()}
               className="exclude-print flex-1 space-y-6 overflow-y-auto p-4 md:h-screen md:space-y-8 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
             >
-              {/* Header with Tab Switcher */}
+              {/* Header */}
               <div className="space-y-4 border-b border-white/10 pb-6">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
@@ -164,39 +164,6 @@ function UnifiedEditor() {
                     <p className="text-sm text-white/60">
                       Edit once, preview as resume or cover letter
                     </p>
-                  </div>
-                </div>
-
-                {/* Preview Switcher */}
-                <div className="flex flex-col gap-2">
-                  <p className="text-xs font-medium tracking-wider text-white/40 uppercase">
-                    Preview Mode
-                  </p>
-                  <div className="flex gap-2 rounded-lg bg-white/5 p-1">
-                    <button
-                      type="button"
-                      onClick={() => setMode('resume')}
-                      className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
-                        mode === 'resume'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                          : 'text-white/60 hover:text-white/80'
-                      }`}
-                    >
-                      <span>📄</span>
-                      Resume
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMode('coverLetter')}
-                      className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
-                        mode === 'coverLetter'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                          : 'text-white/60 hover:text-white/80'
-                      }`}
-                    >
-                      <span>✉️</span>
-                      Cover Letter
-                    </button>
                   </div>
                 </div>
               </div>
@@ -271,8 +238,46 @@ function UnifiedEditor() {
               </CollapsibleSection>
             </form>
 
-            {/* Conditional Preview */}
-            {mode === 'resume' ? <Preview /> : <CoverLetterPreview />}
+            {/* Preview Section with Switcher */}
+            <div className="exclude-print flex flex-col md:w-[8.5in]">
+              {/* Preview Mode Switcher */}
+              <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 p-4">
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium tracking-wider text-white/40 uppercase">
+                    Preview Mode
+                  </p>
+                  <div className="flex gap-2 rounded-lg bg-white/5 p-1">
+                    <button
+                      type="button"
+                      onClick={() => setMode('resume')}
+                      className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
+                        mode === 'resume'
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                          : 'text-white/60 hover:text-white/80'
+                      }`}
+                    >
+                      <span>📄</span>
+                      Resume
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode('coverLetter')}
+                      className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-all ${
+                        mode === 'coverLetter'
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                          : 'text-white/60 hover:text-white/80'
+                      }`}
+                    >
+                      <span>✉️</span>
+                      Cover Letter
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Conditional Preview */}
+              {mode === 'resume' ? <Preview /> : <CoverLetterPreview />}
+            </div>
           </div>
 
           {/* Footer - Hidden on print */}
