@@ -8,10 +8,10 @@ module.exports = {
   generateIndexSitemap: false, // Single sitemap (not index + multiple)
   outDir: 'out', // Output to 'out' directory for static export
 
-  // Exclude edit pages, API endpoints, and image routes
+  // Exclude builder pages, API endpoints, and image routes
   exclude: [
-    '/resume/edit',
-    '/resume/edit/*',
+    '/resume/builder',
+    '/resume/builder/*',
     '/resume.json',
     '/opengraph-image',
     '/twitter-image',
@@ -23,7 +23,7 @@ module.exports = {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/resume/edit/', '/resume.json/'],
+        disallow: ['/resume/builder/', '/resume.json/'],
       },
     ],
   },

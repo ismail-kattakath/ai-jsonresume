@@ -85,7 +85,7 @@ Wrapped preload ternary expressions with void operator to explicitly discard ret
 
 ```
 src/__tests__/password-protection-e2e.test.tsx          1 unused
-src/app/resume/edit/__tests__/*.test.tsx                6 unused
+src/app/resume/builder/__tests__/*.test.tsx                6 unused
 src/components/auth/__tests__/*.test.tsx                2 unused
 src/components/*/__tests__/*.test.tsx                   4 unused
 ```
@@ -217,7 +217,7 @@ src/components/document-builder/shared-forms/__tests__/  2 any types
 
 ```
 src/lib/jsonResume.ts                                    7 any types
-src/app/resume/edit/page.tsx                             7 any types
+src/app/resume/builder/page.tsx                             7 any types
 src/app/cover-letter/edit/page.tsx                       4 any types
 src/config/password.ts                                   2 any types
 src/lib/jsonResumeSchema.ts                              1 any type

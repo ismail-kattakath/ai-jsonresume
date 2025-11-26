@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Framer Motion animations
   - Dark theme with gradient backgrounds
 
-- **Resume Builder** (`/resume/edit`)
+- **Resume Builder** (`/resume/builder`)
   - Interactive form with live preview
   - Drag-and-drop section reordering (@hello-pangea/dnd)
   - JSON Resume v1.0.0 import/export

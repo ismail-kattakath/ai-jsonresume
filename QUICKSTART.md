@@ -183,7 +183,7 @@ git push origin main
 
 ### Password Protection (Optional)
 
-**By default:** Edit pages (`/resume/edit`, `/cover-letter/edit`) are **publicly accessible**
+**By default:** Edit pages (`/resume/builder`, `/cover-letter/edit`) are **publicly accessible**
 
 **To enable password protection:**
 
@@ -460,7 +460,7 @@ After basic setup:
 - Work experience timeline
 - Contact information
 
-✅ **Resume Builder** (`/resume/edit`)
+✅ **Resume Builder** (`/resume/builder`)
 
 - Interactive form with live preview
 - Drag-and-drop section reordering

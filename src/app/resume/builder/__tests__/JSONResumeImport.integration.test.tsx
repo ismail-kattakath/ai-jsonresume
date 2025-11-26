@@ -5,7 +5,7 @@
 
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import ResumeEditPage from '@/app/resume/edit/page'
+import ResumeEditPage from '@/app/resume/builder/page'
 
 // Mock dynamic imports to avoid SSR issues
 jest.mock('next/dynamic', () => ({

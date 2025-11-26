@@ -103,7 +103,7 @@ flowchart TD
     C --> D["Portfolio Homepage
     page.tsx"]
     C --> E["Resume Editor
-    /resume/edit/page.tsx"]
+    /resume/builder/page.tsx"]
     C --> F["Cover Letter Editor
     /cover-letter/edit"]
 ```
@@ -275,7 +275,7 @@ src/app/
 
 **Data Source:** All sections pull from `src/lib/data/portfolio.ts`
 
-#### Resume Editor (`src/app/resume/edit/page.tsx`)
+#### Resume Editor (`src/app/resume/builder/page.tsx`)
 
 ```jsx
 <PasswordProtection>
@@ -432,7 +432,7 @@ export function useKeyboardShortcut(key: string, callback: () => void) {
 ### Password Protection System
 
 **Status:** Optional, disabled by default
-**Scope:** `/resume/edit` and `/cover-letter/edit` pages
+**Scope:** `/resume/builder` and `/cover-letter/edit` pages
 
 #### Architecture
 
@@ -1078,8 +1078,8 @@ module.exports = {
   outDir: 'out', // Static export directory
 
   exclude: [
-    '/resume/edit',
-    '/resume/edit/*',
+    '/resume/builder',
+    '/resume/builder/*',
     '/cover-letter/edit',
     '/cover-letter/edit/*',
     '/resume.json',
@@ -1092,7 +1092,7 @@ module.exports = {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/resume/edit/', '/cover-letter/edit/', '/resume.json/'],
+        disallow: ['/resume/builder/', '/cover-letter/edit/', '/resume.json/'],
       },
     ],
   },
@@ -1203,7 +1203,7 @@ src/lib/ai/__tests__/
 **2. Integration Tests (Page Level)**
 
 ```
-src/app/resume/edit/__tests__/
+src/app/resume/builder/__tests__/
 ├── PasswordProtectedPage.integration.test.tsx
 ├── FormPreviewSync.integration.test.tsx
 ├── CompleteWorkflow.integration.test.tsx
@@ -1360,7 +1360,7 @@ Route (app)                              Size     First Load JS
 ├ ○ /book                                142 B           85 kB
 ├ ○ /cover-letter/edit                   890 B          152 kB
 ├ ○ /resume                              456 B           91 kB
-└ ○ /resume/edit                         1.8 kB         185 kB
+└ ○ /resume/builder                         1.8 kB         185 kB
 ```
 
 ---
@@ -1485,7 +1485,7 @@ npx serve out
 | **Data Adapter**        | `src/lib/resumeAdapter.ts`                   |
 | **Type Definitions**    | `src/types/*.ts`                             |
 | **Homepage**            | `src/app/page.tsx`                           |
-| **Resume Editor**       | `src/app/resume/edit/page.tsx`               |
+| **Resume Editor**       | `src/app/resume/builder/page.tsx`            |
 | **Cover Letter Editor** | `src/app/cover-letter/edit/page.tsx`         |
 | **Password Config**     | `src/config/password.ts`                     |
 | **Auth Component**      | `src/components/auth/PasswordProtection.tsx` |

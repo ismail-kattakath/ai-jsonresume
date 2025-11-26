@@ -1,6 +1,6 @@
 # Password Protection Setup Guide
 
-This guide explains how to **optionally** set up password protection for the edit pages (`/resume/edit` and `/cover-letter/edit`).
+This guide explains how to **optionally** set up password protection for the edit pages (`/resume/builder` and `/cover-letter/edit`).
 
 ## 🔓 Password Protection is Optional!
 
@@ -22,7 +22,7 @@ This guide explains how to **optionally** set up password protection for the edi
 
 ## 🎯 What's Protected
 
-- `/resume/edit` - Resume editor page (when password protection is enabled)
+- `/resume/builder` - Resume editor page (when password protection is enabled)
 - `/cover-letter/edit` - Cover letter editor page (when password protection is enabled)
 
 ## 📋 Setup Instructions (Optional)
@@ -93,7 +93,7 @@ The GitHub Actions workflow will automatically use the secret during build.
 
 ### Accessing Protected Pages
 
-1. Navigate to `/resume/edit` or `/cover-letter/edit`
+1. Navigate to `/resume/builder` or `/cover-letter/edit`
 2. You'll see a password entry screen
 3. Enter your password (the plain text one, not the hash)
 4. Click "Unlock"
@@ -123,7 +123,7 @@ A "Logout" button appears in the top-right corner when authenticated. Click it t
 
 - `src/components/auth/PasswordProtection.tsx` - Password UI and logic
 - `src/config/password.ts` - Password hash configuration (reads from env var)
-- `src/app/resume/edit/page.tsx` - Wrapped with PasswordProtection
+- `src/app/resume/builder/page.tsx` - Wrapped with PasswordProtection
 - `src/app/cover-letter/edit/page.tsx` - Wrapped with PasswordProtection
 - `.github/workflows/deploy.yml` - Uses GitHub secret during build
 - `scripts/generate-password-hash.mjs` - Hash generation utility

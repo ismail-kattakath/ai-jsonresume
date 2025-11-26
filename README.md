@@ -199,7 +199,7 @@ echo "NEXT_PUBLIC_EDIT_PASSWORD_HASH=<your-hash>" > .env.local
 
 ### Special Features
 
-#### 📄 Resume Builder (`/resume/edit`)
+#### 📄 Resume Builder (`/resume/builder`)
 
 - **Interactive editor** with live preview
 - **Drag-and-drop** section reordering
@@ -231,7 +231,7 @@ graph TD
     B --> C["Homepage
     all sections"]
     B --> D["Unified Editor
-    /resume/edit
+    /resume/builder
     Resume & Cover Letter"]
     B --> E["SEO Metadata
     title, description"]
@@ -447,7 +447,7 @@ Edit `src/app/globals.css`:
 ### Change Layout
 
 - **Homepage sections**: `src/components/sections/`
-- **Unified editor** (resume & cover letter): `src/app/resume/edit/page.tsx`
+- **Unified editor** (resume & cover letter): `src/app/resume/builder/page.tsx`
 
 ### Add Sections
 

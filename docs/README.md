@@ -91,7 +91,7 @@ For comprehensive testing information:
 
 ### For Users
 
-- **Access Protected Pages**: Navigate to `/resume/edit` or `/cover-letter/edit`
+- **Access Protected Pages**: Navigate to `/resume/builder` or `/cover-letter/edit`
 - **Default Password**: Configured during setup (see SETUP guide)
 - **Session Duration**: 24 hours
 - **AI Content Generation**: Click "Generate with AI" button in cover letter editor or resume summary section (requires OpenAI API key or compatible endpoint)

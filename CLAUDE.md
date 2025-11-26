@@ -163,16 +163,16 @@ Task: Run terminal command
 
 ### Quick File Reference (When Asked "Where Do I Edit?")
 
-| What to Change                      | Primary File                     | How to Verify                                  |
-| ----------------------------------- | -------------------------------- | ---------------------------------------------- |
-| Portfolio content (name, role, bio) | `src/data/resume.json`           | Dev server → http://localhost:3000             |
-| Homepage layout                     | `src/app/page.tsx`               | Dev server → http://localhost:3000             |
-| Resume editor                       | `src/app/resume/edit/page.tsx`   | Dev server → http://localhost:3000/resume/edit |
-| Component styling                   | `src/components/sections/*.tsx`  | Visual output on dev server                    |
-| Password protection                 | `src/config/password.ts`         | Test at /resume/edit                           |
-| AI generation prompts               | `src/lib/ai/document-prompts.ts` | Test in editor                                 |
-| Data types                          | `src/types/resume.ts`            | `npx tsc --noEmit`                             |
-| Adapter logic                       | `src/lib/resumeAdapter.ts`       | `npm test`                                     |
+| What to Change                      | Primary File                      | How to Verify                                     |
+| ----------------------------------- | --------------------------------- | ------------------------------------------------- |
+| Portfolio content (name, role, bio) | `src/data/resume.json`            | Dev server → http://localhost:3000                |
+| Homepage layout                     | `src/app/page.tsx`                | Dev server → http://localhost:3000                |
+| Resume editor                       | `src/app/resume/builder/page.tsx` | Dev server → http://localhost:3000/resume/builder |
+| Component styling                   | `src/components/sections/*.tsx`   | Visual output on dev server                       |
+| Password protection                 | `src/config/password.ts`          | Test at /resume/builder                           |
+| AI generation prompts               | `src/lib/ai/document-prompts.ts`  | Test in editor                                    |
+| Data types                          | `src/types/resume.ts`             | `npx tsc --noEmit`                                |
+| Adapter logic                       | `src/lib/resumeAdapter.ts`        | `npm test`                                        |
 
 ### Absolute Paths for Bash Commands
 
@@ -457,7 +457,7 @@ flowchart TD
     TypeScript Interfaces"]
     C --> D["src/lib/data/portfolio.ts
     Homepage"]
-    C --> E["src/app/resume/edit/page.tsx
+    C --> E["src/app/resume/builder/page.tsx
     Resume Editor"]
     C --> F["src/app/cover-letter/edit/page.tsx
     Cover Letter"]
@@ -583,7 +583,7 @@ types/cover-letter.ts, types/openai.ts
 ```bash
 npm run dev
 # Check http://localhost:3000 (homepage)
-# Check http://localhost:3000/resume/edit (editor)
+# Check http://localhost:3000/resume/builder (editor)
 ```
 
 ### 2. Add New Homepage Section
@@ -700,7 +700,7 @@ git commit -m "feat: feature with tests and docs"
 ### Password Protection System
 
 **Status:** Optional, disabled by default
-**Scope:** `/resume/edit` and `/cover-letter/edit`
+**Scope:** `/resume/builder` and `/cover-letter/edit`
 
 **Architecture:**
 
@@ -1093,7 +1093,7 @@ NEXT_PUBLIC_EDIT_PASSWORD_HASH
 ### Common Queries
 
 **"Where is the homepage?"** → `src/app/page.tsx`
-**"Where is the resume editor?"** → `src/app/resume/edit/page.tsx`
+**"Where is the resume editor?"** → `src/app/resume/builder/page.tsx`
 **"Where is the data?"** → `src/data/resume.json`
 **"Where are tests?"** → `src/**/__tests__/`
 **"How to add password?"** → Generate hash, set `NEXT_PUBLIC_EDIT_PASSWORD_HASH`

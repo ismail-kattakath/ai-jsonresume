@@ -42,7 +42,7 @@ The AI generation feature is available in multiple locations:
 └─────────────────────────────────────────────┘
 ```
 
-**2. Resume Editor (`/resume/edit`)** - Professional Summary section:
+**2. Resume Editor (`/resume/builder`)** - Professional Summary section:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -339,7 +339,7 @@ data: [DONE]
 
 #### For Professional Summaries
 
-1. Navigate to `/resume/edit`
+1. Navigate to `/resume/builder`
 2. Enter password (if protected)
 3. Scroll to "Professional Summary" section
 4. Click "Generate with AI" button at bottom of summary textarea

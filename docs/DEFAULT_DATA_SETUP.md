@@ -59,7 +59,7 @@ src/lib/resumeAdapter.ts (Converts to internal format)
     │
     ├── Resume Pages
     │   ├── /resume (print view)
-    │   └── /resume/edit (password-protected editor)
+    │   └── /resume/builder (password-protected editor)
     │
     ├── Cover Letter Pages
     │   └── /cover-letter/edit (password-protected editor)
@@ -494,7 +494,7 @@ Internal ResumeData format
 
 2. **Resume Pages**
    - `/resume` - Print-optimized resume view
-   - `/resume/edit` - Interactive editor (password-protected)
+   - `/resume/builder` - Interactive editor (password-protected)
 
 3. **Cover Letter**
    - `/cover-letter/edit` - Personal info auto-populated
@@ -519,7 +519,7 @@ npm run dev
 # Check these pages:
 # 1. Homepage - http://localhost:3000
 # 2. Resume view - http://localhost:3000/resume
-# 3. Resume editor - http://localhost:3000/resume/edit
+# 3. Resume editor - http://localhost:3000/resume/builder
 # 4. Cover letter - http://localhost:3000/cover-letter/edit
 # 5. JSON API - http://localhost:3000/resume.json
 ```

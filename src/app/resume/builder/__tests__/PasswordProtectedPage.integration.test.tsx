@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import ResumeEditPage from '@/app/resume/edit/page'
+import ResumeEditPage from '@/app/resume/builder/page'
 import bcrypt from 'bcryptjs'
 
 // Mock the password config
@@ -396,7 +396,7 @@ describe('Resume Edit Page - Password Protection Integration', () => {
     it('should protect resume editor route', () => {
       render(<ResumeEditPage />)
 
-      // Direct access to /resume/edit should show password protection
+      // Direct access to /resume/builder should show password protection
       expect(screen.getByText('Protected Area')).toBeInTheDocument()
     })
 
