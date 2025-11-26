@@ -136,7 +136,7 @@ function UnifiedEditor() {
       <Toaster position="top-right" richColors closeButton />
       <ResumeContext.Provider value={currentContext}>
         <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900">
-          <div className="relative flex flex-1 flex-col overflow-x-hidden md:flex-row">
+          <div className="relative flex flex-1 flex-col overflow-hidden md:h-screen md:flex-row">
             {/* Floating Print Button - Hidden on print */}
             <div className="exclude-print fixed right-8 bottom-8 z-50">
               <PrintButton
@@ -149,7 +149,7 @@ function UnifiedEditor() {
 
             <form
               onSubmit={(e) => e.preventDefault()}
-              className="exclude-print flex-1 space-y-6 p-4 md:space-y-8 md:overflow-y-auto md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
+              className="exclude-print flex-1 space-y-6 overflow-y-auto p-4 md:h-screen md:space-y-8 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
             >
               {/* Header with Tab Switcher */}
               <div className="space-y-4 border-b border-white/10 pb-6">
