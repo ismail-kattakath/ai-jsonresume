@@ -473,8 +473,9 @@ describe('OpenAI Service', () => {
       const fetchCall = (global.fetch as jest.Mock).mock.calls[0]
       const requestBody = JSON.parse(fetchCall[1].body)
 
-      expect(requestBody.messages[1].content).toContain('John Doe')
-      expect(requestBody.messages[1].content).toContain('React expert')
+      // Resume data is now in system message (index 0), not user message
+      expect(requestBody.messages[0].content).toContain('John Doe')
+      expect(requestBody.messages[0].content).toContain('React expert')
     })
   })
 

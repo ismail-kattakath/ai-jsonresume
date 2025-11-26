@@ -302,8 +302,8 @@ export async function generateSummary(
   jobDescription: string,
   onProgress?: StreamCallback
 ): Promise<string> {
-  // Build the prompt
-  const prompt = buildSummaryPrompt(resumeData, jobDescription)
+  // Build the comprehensive system prompt with resume data and job description
+  const systemPrompt = buildSummaryPrompt(resumeData, jobDescription)
 
   // Prepare the request
   const request: OpenAIRequest = {
@@ -311,16 +311,15 @@ export async function generateSummary(
     messages: [
       {
         role: 'system',
-        content:
-          'You are a professional resume writer with expertise in crafting compelling professional summaries that highlight candidate strengths and align with job requirements. You write concise, impactful, achievement-focused summaries.',
+        content: systemPrompt,
       },
       {
         role: 'user',
-        content: prompt,
+        content: 'Generate the professional summary now.',
       },
     ],
     temperature: 0.7,
-    max_tokens: 600, // Slightly lower than cover letter since summaries are shorter
+    max_tokens: 600, // Summaries are typically shorter than cover letters
     top_p: 0.9,
   }
 

@@ -88,9 +88,11 @@ CRITICAL INSTRUCTIONS - READ CAREFULLY:
    • Emphasize soft skills mentioned in job description (e.g., "customer-obsessed", "pragmatic", "end-to-end ownership")
 
 3. CONTENT PRIORITIZATION:
-   • Lead with career span and strongest technical fit (e.g., "15+ years delivering full-stack React/Next.js solutions")
-   • Feature 2-3 narrative achievements with context: [company] → [challenge] → [solution] → [measurable impact]
-   • Include user-scale metrics (e.g., "100,000+ users") over internal metrics (e.g., "4h→20m deployments")
+   • Lead with career span and strongest technical fit matching the job (e.g., "15+ years delivering full-stack React/Next.js solutions")
+   • Feature 2-3 narrative achievements that DIRECTLY align with job requirements
+   • Prioritize achievements by relevance: Frontend/UI work > Full-stack projects > Backend/Infrastructure
+   • Use impressive user-scale metrics: "100,000+ users" or "hundreds of thousands" (never "thousands")
+   • De-emphasize or omit impressive but irrelevant work (e.g., GPU clusters for a frontend role)
    • End with forward-looking capabilities that directly address job needs
 
 4. WRITING STYLE:
@@ -100,15 +102,37 @@ CRITICAL INSTRUCTIONS - READ CAREFULLY:
    • Balance technical precision with human readability
    • Quality over arbitrary length—aim for ${summary?.length || 900} characters but prioritize impact
 
+4b. VOICE/TONE (CRITICAL - Resume Format):
+   • ALWAYS use third-person or implied third-person voice (professional resume style)
+   • NEVER use first-person pronouns: NO "I", "my", "me", "I'm"
+   • ✅ CORRECT: "Led team of 5 engineers", "Architected scalable systems", "Known for customer focus"
+   • ❌ WRONG: "I led a team", "I architect systems", "I'm known for customer focus"
+   • This is a RESUME summary, not a LinkedIn bio—maintain professional detachment
+
 5. WHAT TO AVOID:
+   ❌ First-person pronouns (I, my, me, I'm) - ALWAYS use third-person voice
    ❌ Opening with generic role titles without context
    ❌ Listing technologies in comma-separated lists at the end
-   ❌ Emphasizing irrelevant achievements (even if impressive)
+   ❌ Emphasizing irrelevant achievements (even if impressive—e.g., GPU/CUDA optimization for a UI role)
    ❌ Robotic, resume-speak tone ("proficient in", "skilled at")
-   ❌ Backend/infrastructure focus when job emphasizes frontend/UI
+   ❌ Backend/infrastructure focus when job emphasizes frontend/UI (de-prioritize vLLM, Kubernetes, CUDA)
+   ❌ Underselling user scale (say "100,000+" or "hundreds of thousands", not "thousands")
+   ❌ Over-emphasizing authentication complexity (OAuth 2.0 PKCE/SAML 2.0 technical details) unless job requires it
+   ❌ Using absolute metrics when percentage improvements are more impressive (use "92% faster" not "20 minutes")
 
 EXAMPLE STRUCTURE (adapt to candidate's actual data):
-"[Role] with [X]+ years [key specialty matching job]. Led [specific high-impact project] at [company], [transforming context] into [result] serving [user scale] with [reliability metric]. Expert at [job's core requirement]—[specific example with outcome]. [Additional relevant achievement with metric]. Currently [current role focus]. Deep expertise in [job-critical skills]. Known for [soft skills from job description that match resume evidence]."
+"[Role] with [X]+ years [key specialty matching job]. Led [specific high-impact project] at [company], [transforming context] into [result] serving [100,000+ users or hundreds of thousands] with [reliability metric]. Expert at [job's core requirement]—[specific example with outcome]. [Additional relevant achievement]. [Brief mention of current role if relevant to job]. Deep expertise in [job-critical frontend/full-stack skills]. Known for [soft skills from job description that match resume evidence]."
+
+CRITICAL REMINDERS FOR THIS SPECIFIC JOB:
+• Supademo is a frontend-focused role (React/Next.js) → Lead with frontend migration/UI work
+• Job emphasizes "greenfield", "polished UI", "customer-obsessed", "end-to-end ownership", "scope → design → build → launch"
+• De-emphasize backend infrastructure (GenAI, Kubernetes, vLLM, CUDA) even if recent/impressive
+• De-emphasize authentication complexity (OAuth/SAML) unless job explicitly requires it
+• Emphasize stakeholder collaboration, wireframing, prototyping (matches job's "Partner with customers")
+• Use percentage-based metrics when available (92% deployment reduction > 20-minute cycles)
+• Homewood Health experience is MOST relevant (Next.js migration, 100,000+ users, DevOps excellence)
+• Etuper experience adds value (stakeholder collaboration, wireframes, prototypes)
+• Current role (Silver Creek) should be mentioned briefly but not dominate
 
 OUTPUT:
 Return ONLY the professional summary as plain text (no formatting, no code blocks, no preamble).`
@@ -118,6 +142,7 @@ Return ONLY the professional summary as plain text (no formatting, no code block
 
 /**
  * Validates the generated summary content
+ * Updated to match new prompt guidelines: ~900 characters for quality summaries
  */
 export function validateSummary(content: string): {
   isValid: boolean
@@ -130,10 +155,11 @@ export function validateSummary(content: string): {
     errors.push('Summary is too short (minimum 100 characters)')
   }
 
-  // Check maximum length (matching default summary style: ~675 chars)
-  if (content.length > 675) {
+  // Check maximum length (increased to ~1000 chars to accommodate quality summaries)
+  // The prompt aims for ~900 chars, allowing some flexibility
+  if (content.length > 1200) {
     errors.push(
-      'Summary is too long (maximum 675 characters for single paragraph)'
+      'Summary is too long (maximum 1200 characters recommended for single paragraph)'
     )
   }
 
@@ -143,7 +169,25 @@ export function validateSummary(content: string): {
     errors.push('Summary should be a single paragraph (no line breaks)')
   }
 
-  // Check for suspicious patterns
+  // Check for first-person pronouns (should be third-person)
+  const firstPersonPatterns = [
+    /\bI\s/i,
+    /\bI'm\b/i,
+    /\bmy\b/i,
+    /\bme\b/i,
+    /\bmyself\b/i,
+  ]
+
+  for (const pattern of firstPersonPatterns) {
+    if (pattern.test(content)) {
+      errors.push(
+        'Summary contains first-person pronouns - should use third-person voice'
+      )
+      break // Only report once
+    }
+  }
+
+  // Check for suspicious patterns that might indicate fabrication
   const suspiciousPatterns = [
     /certified in/i,
     /degree in(?! Computer Science)/i,

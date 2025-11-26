@@ -780,6 +780,137 @@ export function validateCoverLetter(content: string): {
 }
 ```
 
+#### Professional Summary Generation
+
+**File:** `src/lib/ai/document-prompts.ts`
+
+The summary generation prompt was fine-tuned through iterative testing with Claude Desktop to produce high-quality, job-tailored professional summaries.
+
+```typescript
+export function buildSummaryPrompt(
+  resumeData: ResumeData,
+  jobDescription: string
+): string {
+  // Key features:
+  // - Comprehensive candidate data (all work history, skills, total years)
+  // - Job-specific tailoring instructions
+  // - Third-person voice enforcement (CRITICAL for resume format)
+  // - Content prioritization (Frontend > Full-stack > Backend based on job)
+  // - Soft skills emphasis (customer-obsessed, pragmatic, end-to-end ownership)
+  // - Metric selection guidance (user-scale over internal metrics)
+  // - Job language mirroring (uses exact phrases from job description)
+
+  return `You are an expert tech recruiter and senior engineer...
+  
+  VOICE/TONE (CRITICAL - Resume Format):
+  • ALWAYS use third-person or implied third-person voice
+  • NEVER use first-person pronouns: NO "I", "my", "me", "I'm"
+  • ✅ CORRECT: "Led team of 5 engineers"
+  • ❌ WRONG: "I led a team of 5 engineers"
+  
+  CONTENT PRIORITIZATION:
+  • Lead with career span and strongest technical fit matching job
+  • Feature 2-3 narrative achievements DIRECTLY aligning with job requirements
+  • Prioritize by relevance: Frontend/UI > Full-stack > Backend/Infrastructure
+  • Use impressive user-scale metrics: "100,000+ users" (never "thousands")
+  • De-emphasize impressive but irrelevant work
+  
+  WHAT TO AVOID:
+  ❌ First-person pronouns (I, my, me, I'm)
+  ❌ Listing technologies in comma-separated lists
+  ❌ Emphasizing irrelevant achievements
+  ❌ Underselling user scale
+  ...`
+}
+```
+
+**Validation:**
+
+```typescript
+export function validateSummary(content: string): {
+  isValid: boolean
+  errors: string[]
+} {
+  const errors: string[] = []
+
+  // Length validation (100-1200 characters)
+  if (content.length < 100) errors.push('Too short (min 100 chars)')
+  if (content.length > 1200) errors.push('Too long (max 1200 chars)')
+
+  // Single paragraph check
+  const paragraphs = content.trim().split(/\n\n+/)
+  if (paragraphs.length > 1) errors.push('Should be single paragraph')
+
+  // Third-person voice check (NEW)
+  const firstPersonPatterns = [/\bI\s/i, /\bI'm\b/i, /\bmy\b/i, /\bme\b/i]
+  for (const pattern of firstPersonPatterns) {
+    if (pattern.test(content)) {
+      errors.push('Contains first-person pronouns - use third-person voice')
+      break
+    }
+  }
+
+  // Fabrication detection
+  const suspiciousPatterns = [
+    /certified in/i,
+    /degree in(?! Computer Science)/i,
+    /licensed to/i,
+    /awarded (the|a)/i,
+  ]
+  // Warns but doesn't fail validation
+
+  return { isValid: errors.length === 0, errors }
+}
+```
+
+**API Integration:**
+
+```typescript
+export async function generateSummary(
+  config: OpenAIConfig,
+  resumeData: ResumeData,
+  jobDescription: string,
+  onProgress?: StreamCallback
+): Promise<string> {
+  // Build comprehensive system prompt
+  const systemPrompt = buildSummaryPrompt(resumeData, jobDescription)
+
+  const request = {
+    model: config.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: 'Generate the professional summary now.' },
+    ],
+    temperature: 0.7,
+    max_tokens: 600,
+  }
+
+  // Stream or standard request
+  let content = onProgress
+    ? await makeOpenAIStreamRequest(config, request, onProgress)
+    : await makeOpenAIRequest(config, request)
+
+  // Post-process and validate
+  const processed = postProcessCoverLetter(content)
+  const validation = validateSummary(processed)
+
+  if (!validation.isValid) {
+    console.warn('Summary validation warnings:', validation.errors)
+  }
+
+  return processed
+}
+```
+
+**Key Improvements (2025-01-26):**
+
+1. **Third-person voice enforcement** - Prevents "I/my/me" pronouns
+2. **Job-specific tailoring** - Mirrors exact job description language
+3. **Content prioritization** - Emphasizes relevant achievements over impressive but irrelevant ones
+4. **Better metrics** - Uses user-scale metrics (100,000+ users) and percentage improvements
+5. **Character limit update** - Increased from 675 to 1200 chars for quality summaries
+6. **Stakeholder collaboration** - Emphasizes customer-facing work when relevant
+
 #### Credential Storage
 
 ```typescript
