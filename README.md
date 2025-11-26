@@ -1,4 +1,4 @@
-# Modern Portfolio Website
+# JSONResume To Everything
 
 [![Deploy to GitHub Pages](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml/badge.svg)](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml)
 [![codecov](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything/graph/badge.svg?token=04e118ab-ec2a-4f3d-8819-fdbfff34f105)](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything)
