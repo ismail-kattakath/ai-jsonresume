@@ -14,7 +14,7 @@ const CollapsibleSection = ({
   title,
   icon,
   children,
-  defaultExpanded = true,
+  defaultExpanded = false,
 }: CollapsibleSectionProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
