@@ -911,6 +911,62 @@ export async function generateSummary(
 5. **Character limit update** - Increased from 675 to 1200 chars for quality summaries
 6. **Stakeholder collaboration** - Emphasizes customer-facing work when relevant
 
+#### Cover Letter Generation
+
+**File:** `src/lib/ai/document-prompts.ts`
+
+The cover letter generation prompt was enhanced with job-tailoring techniques from the summary optimization work.
+
+**Key Features:**
+
+```typescript
+export function buildCoverLetterPrompt(
+  resumeData: ResumeData,
+  jobDescription: string
+): string {
+  // Key features:
+  // - Job language mirroring (uses exact phrases from job description)
+  // - Content prioritization (lead with most relevant experience first)
+  // - Cultural fit emphasis (ties experience to company values)
+  // - Conciseness target (250-350 words, prioritize impact over length)
+  // - First-person voice (appropriate for cover letters, unlike summaries)
+
+  return `You are a professional cover letter writer with expertise in crafting 
+  concise, job-tailored cover letters that mirror target role language and 
+  prioritize relevant experience.
+  
+  CONTENT PRIORITIZATION:
+  • Analyze the job description to identify the TOP 3-4 requirements
+  • Lead with the candidate's experience that MOST directly matches these requirements
+  • De-emphasize impressive but less relevant work (even if recent or technically impressive)
+  • Use job-specific terminology and exact phrases from the job description
+  • Emphasize soft skills and cultural fit mentioned in the job description
+  
+  WRITING INSTRUCTIONS:
+  • 250-350 words target (prioritize conciseness)
+  • Mirror exact phrases and language from the job description
+  • Prioritize achievements by relevance to job requirements
+  • Explicitly tie experience to job values (e.g., "customer-obsessed", "greenfield")
+  • First-person voice is appropriate for cover letters
+  ...`
+}
+```
+
+**Key Improvements (2025-01-26):**
+
+1. **Job language mirroring** - Explicitly instructs to use exact phrases from job description
+2. **Content prioritization** - Lead with most relevant experience, de-emphasize less relevant work
+3. **Cultural fit emphasis** - Tie candidate's experience to company values and terminology
+4. **Conciseness target** - 250-350 words (33% reduction from previous outputs)
+5. **Relevance-first structure** - Organize by job alignment, not chronological order
+6. **Voice clarity** - Explicitly notes first-person is appropriate (unlike resume summaries)
+
+**Comparison to Previous Output:**
+
+- **Before:** 533 words, led with GenAI infrastructure (less relevant for frontend roles)
+- **After:** 357 words, leads with Next.js migration work (most relevant experience first)
+- **Improvement:** 33% more concise, better job alignment, stronger cultural fit signals
+
 #### Credential Storage
 
 ```typescript
