@@ -275,8 +275,34 @@ function UnifiedEditor() {
                 </button>
               </div>
 
-              {/* Conditional Preview */}
-              {mode === 'resume' ? <Preview /> : <CoverLetterPreview />}
+              {/* Both Previews - Toggle visibility with CSS */}
+              <ResumeContext.Provider
+                value={{
+                  resumeData,
+                  setResumeData,
+                  handleProfilePicture: resumeHandlers.handleProfilePicture,
+                  handleChange: resumeHandlers.handleChange,
+                }}
+              >
+                <div className={mode === 'resume' ? 'block' : 'hidden'}>
+                  <Preview />
+                </div>
+              </ResumeContext.Provider>
+              <ResumeContext.Provider
+                value={{
+                  resumeData: coverLetterData as ResumeData,
+                  setResumeData: setCoverLetterData as React.Dispatch<
+                    React.SetStateAction<ResumeData>
+                  >,
+                  handleProfilePicture:
+                    coverLetterHandlers.handleProfilePicture,
+                  handleChange: coverLetterHandlers.handleChange,
+                }}
+              >
+                <div className={mode === 'coverLetter' ? 'block' : 'hidden'}>
+                  <CoverLetterPreview />
+                </div>
+              </ResumeContext.Provider>
             </div>
           </div>
 
