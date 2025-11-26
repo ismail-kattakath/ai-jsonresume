@@ -124,13 +124,18 @@ function UnifiedEditor() {
     if (savedData) {
       try {
         const parsedData = JSON.parse(savedData)
-        // Ensure default content is preserved if saved data has empty content
-        const contentToUse = parsedData.content?.trim()
-          ? parsedData.content
-          : DEFAULT_COVER_LETTER_CONTENT
+        // Always merge with default data to ensure all fields exist
         setCoverLetterData({
+          ...defaultResumeData,
+          content: DEFAULT_COVER_LETTER_CONTENT,
+          showSummary: false,
+          showLanguages: false,
           ...parsedData,
-          content: contentToUse,
+          // Ensure content is never empty - use default if saved content is empty
+          content:
+            parsedData.content && parsedData.content.trim()
+              ? parsedData.content
+              : DEFAULT_COVER_LETTER_CONTENT,
         })
       } catch (error) {
         console.error('Error loading saved cover letter data:', error)
