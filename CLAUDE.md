@@ -405,7 +405,7 @@ Bash: "npm test -- src/components/resume/forms/__tests__/WorkExperience.test.tsx
 
 ## Quick Project Summary
 
-**Type:** Next.js 15 portfolio with static export
+**Type:** Next.js 16.0.4 portfolio with static export
 **Deploy:** GitHub Pages via GitHub Actions
 **Data:** Single source of truth (`src/data/resume.json` - JSON Resume v1.0.0)
 **Auth:** Optional client-side password protection (bcrypt + sessionStorage)
@@ -1157,10 +1157,10 @@ npm test -- --clearCache
 
 ## Tech Stack Summary
 
-- **Framework:** Next.js 15.5.2 (App Router, static export)
-- **React:** 19.1.0
-- **TypeScript:** 5 (strict mode)
-- **Styling:** Tailwind CSS v4
+- **Framework:** Next.js 16.0.4 (App Router, static export)
+- **React:** 19.2.0
+- **TypeScript:** 5.9.2 (strict mode)
+- **Styling:** Tailwind CSS 4.1.13
 - **Animations:** Framer Motion 12.23.12
 - **Forms/DnD:** @hello-pangea/dnd 18.0.1
 - **Validation:** AJV 8.17.1 (JSON Resume schema)

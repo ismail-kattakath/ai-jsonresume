@@ -24,13 +24,13 @@
 
 ```mermaid
 graph TD
-    A["Next.js 15.5.2
+    A["Next.js 16.0.4
     App Router, Static Export"]
-    A --> B["React 19.1.0
+    A --> B["React 19.2.0
     Client & Server Components"]
-    A --> C["TypeScript 5
+    A --> C["TypeScript 5.9.2
     Strict Mode"]
-    A --> D["Tailwind CSS v4
+    A --> D["Tailwind CSS 4.1.13
     PostCSS"]
     A --> E["Deployment
     GitHub Pages + GitHub Actions"]
@@ -40,8 +40,8 @@ graph TD
 
 | Category             | Library                   | Version        | Purpose                        |
 | -------------------- | ------------------------- | -------------- | ------------------------------ |
-| **UI Framework**     | Next.js                   | 15.5.2         | React framework with SSG       |
-| **Styling**          | Tailwind CSS              | v4             | Utility-first CSS              |
+| **UI Framework**     | Next.js                   | 16.0.4         | React framework with SSG       |
+| **Styling**          | Tailwind CSS              | 4.1.13         | Utility-first CSS              |
 | **Animations**       | Framer Motion             | 12.23.12       | Page transitions, scrolling    |
 | **Forms/DnD**        | @hello-pangea/dnd         | 18.0.1         | Drag-drop resume sections      |
 | **Validation**       | AJV + ajv-formats         | 8.17.1, 3.0.1  | JSON Resume schema validation  |
@@ -63,7 +63,6 @@ graph TD
   skipTrailingSlashRedirect: true,
   distDir: 'out',                // Output directory
   images: { unoptimized: true }, // GitHub Pages compatibility
-  eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true }
 }
 ```

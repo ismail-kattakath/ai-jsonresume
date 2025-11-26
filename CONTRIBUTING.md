@@ -42,7 +42,7 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
 
 ### Prerequisites
 
-- **Node.js**: 20.x or higher
+- **Node.js**: 20.x or higher (tested with v25.2.1)
 - **npm**: 10.x or higher
 - **Git**: 2.x or higher
 - **Code Editor**: VS Code recommended

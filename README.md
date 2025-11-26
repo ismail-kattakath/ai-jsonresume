@@ -252,9 +252,9 @@ graph TD
 
 ### Tech Stack
 
-- **Framework**: Next.js 15.5.2 (App Router, Static Export)
-- **Language**: TypeScript 5
-- **Styling**: Tailwind CSS v4
+- **Framework**: Next.js 16.0.4 (App Router, Static Export)
+- **Language**: TypeScript 5.9.2
+- **Styling**: Tailwind CSS 4.1.13
 - **Animations**: Framer Motion 12
 - **Icons**: Lucide React
 - **Forms**: @hello-pangea/dnd (drag-and-drop)
@@ -541,7 +541,7 @@ After setup, you can:
 
 ## Built With
 
-Next.js 16 • React 19 • TypeScript 5 • Tailwind CSS 4
+Next.js 16.0.4 • React 19.2.0 • TypeScript 5.9.2 • Tailwind CSS 4.1.13
 
 **Live Site**: [https://ismail.kattakath.com](https://ismail.kattakath.com)
 
