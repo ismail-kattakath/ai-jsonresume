@@ -6,7 +6,7 @@
 [![Uptime](https://img.shields.io/uptimerobot/ratio/7/m801867933-5facdf2dbeb3392754ea6a61)](https://stats.uptimerobot.com/dgusp6ainA)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0.4-black?logo=next.js)](https://nextjs.org/)
 
-A production-ready, customizable portfolio website built with Next.js 15, TypeScript, and Tailwind CSS. Perfect for developers, designers, and tech professionals who want a modern, responsive portfolio with resume builder and cover letter generator.
+Transform one JSON Resume into a complete portfolio ecosystem: responsive website, interactive resume builder, AI-powered cover letter generator, and more. Built with Next.js 16, TypeScript, Tailwind CSS. Deploy to GitHub Pages in 10 minutes. Fully tested, customizable, and SEO-optimized.
 
 ## 🌐 Live Demo
 
