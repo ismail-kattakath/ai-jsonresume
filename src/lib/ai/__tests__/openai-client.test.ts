@@ -1,5 +1,7 @@
 import {
   generateCoverLetter,
+  generateSummary,
+  testConnection,
   saveCredentials,
   loadCredentials,
   clearCredentials,
@@ -335,6 +337,198 @@ describe('OpenAI Service', () => {
       const error = new OpenAIAPIError('Test error', 'test_code', 'test_type')
       expect(error.code).toBe('test_code')
       expect(error.type).toBe('test_type')
+    })
+  })
+
+  describe('generateSummary', () => {
+    it('generates summary successfully without streaming', async () => {
+      const mockResponse = {
+        choices: [
+          {
+            message: {
+              content:
+                'Experienced Software Engineer with 5+ years building scalable systems.',
+            },
+          },
+        ],
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
+
+      const result = await generateSummary(
+        {
+          baseURL: 'http://localhost:1234',
+          apiKey: 'test-key',
+          model: 'test-model',
+        },
+        mockResumeData,
+        'Looking for a senior software engineer'
+      )
+
+      expect(result).toContain('Experienced Software Engineer')
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:1234/v1/chat/completions',
+        expect.objectContaining({
+          method: 'POST',
+        })
+      )
+    })
+
+    it('throws error on empty response', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [],
+        }),
+      })
+
+      await expect(
+        generateSummary(
+          {
+            baseURL: 'http://localhost:1234',
+            apiKey: 'test-key',
+            model: 'test-model',
+          },
+          mockResumeData,
+          'Job description'
+        )
+      ).rejects.toThrow('empty response')
+    })
+
+    it('throws error on empty content', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [
+            {
+              message: {
+                content: '',
+              },
+            },
+          ],
+        }),
+      })
+
+      await expect(
+        generateSummary(
+          {
+            baseURL: 'http://localhost:1234',
+            apiKey: 'test-key',
+            model: 'test-model',
+          },
+          mockResumeData,
+          'Job description'
+        )
+      ).rejects.toThrow('empty')
+    })
+
+    it('throws error on network failure', async () => {
+      ;(global.fetch as jest.Mock).mockRejectedValueOnce(
+        new Error('Network error')
+      )
+
+      await expect(
+        generateSummary(
+          {
+            baseURL: 'http://localhost:1234',
+            apiKey: 'test-key',
+            model: 'test-model',
+          },
+          mockResumeData,
+          'Job description'
+        )
+      ).rejects.toThrow(OpenAIAPIError)
+    })
+
+    it('includes resume data in summary prompt', async () => {
+      const mockResponse = {
+        choices: [
+          {
+            message: {
+              content:
+                'Senior Developer with expertise in React and Node.js, proven track record of success.',
+            },
+          },
+        ],
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      })
+
+      await generateSummary(
+        {
+          baseURL: 'http://localhost:1234',
+          apiKey: 'test-key',
+          model: 'test-model',
+        },
+        mockResumeData,
+        'Looking for React expert'
+      )
+
+      const fetchCall = (global.fetch as jest.Mock).mock.calls[0]
+      const requestBody = JSON.parse(fetchCall[1].body)
+
+      expect(requestBody.messages[1].content).toContain('John Doe')
+      expect(requestBody.messages[1].content).toContain('React expert')
+    })
+  })
+
+  describe('testConnection', () => {
+    it('returns true on successful connection', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: 'Hi' } }],
+        }),
+      })
+
+      const result = await testConnection({
+        baseURL: 'http://localhost:1234',
+        apiKey: 'test-key',
+        model: 'test-model',
+      })
+
+      expect(result).toBe(true)
+    })
+
+    it('returns false on connection failure', async () => {
+      ;(global.fetch as jest.Mock).mockRejectedValueOnce(
+        new Error('Connection failed')
+      )
+
+      const result = await testConnection({
+        baseURL: 'http://localhost:1234',
+        apiKey: 'bad-key',
+        model: 'test-model',
+      })
+
+      expect(result).toBe(false)
+    })
+
+    it('returns false on API error', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({
+          error: {
+            message: 'Invalid API key',
+            type: 'authentication_error',
+          },
+        }),
+      })
+
+      const result = await testConnection({
+        baseURL: 'http://localhost:1234',
+        apiKey: 'invalid-key',
+        model: 'test-model',
+      })
+
+      expect(result).toBe(false)
     })
   })
 })
