@@ -6,12 +6,6 @@ const PersonalInformation = ({}) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="h-6 w-1 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500"></div>
-        <h2 className="text-lg font-semibold text-white">
-          Personal Information
-        </h2>
-      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="floating-label-group">
           <input

@@ -808,8 +808,8 @@ npm run lint
 **⚠️ CRITICAL: Always keep the dev server running in the background on port 3000**
 
 ```bash
-# Start dev server
-npm run dev
+# Start dev server with automatic cleanup (RECOMMENDED)
+npm run dev:reload
 
 # Run tests in watch mode (in another terminal)
 npm test:watch
@@ -823,36 +823,40 @@ npm run lint
 
 **Dev Server Management Rules:**
 
-1. **Always Running:** Keep `npm run dev` running in the background at all times during development
-2. **Default Port:** Use port 3000 (default). If occupied by another process, forcefully kill that process and rerun
-3. **When to Restart:** Stop the app, delete `.next/` folder, and restart when:
-   - New files are added
-   - Files are removed
-   - Fundamental changes occur (structure, configuration, dependencies)
+1. **Always Running:** Use `npm run dev:reload` after each significant change to keep dev server running
+2. **Default Port:** Port 3000. The `dev:reload` script automatically handles port conflicts
+3. **When to Use `npm run dev:reload`:**
+   - After completing a feature or fix
+   - When new files are added
+   - When files are removed
+   - After fundamental changes (structure, configuration, dependencies)
+   - When you encounter stale build issues
 
-**Port 3000 Conflict Resolution:**
+**What `npm run dev:reload` Does:**
 
 ```bash
-# Find process using port 3000
-lsof -ti:3000
+# Automatically performs these steps:
+# 1. Kill any process on port 3000
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 
-# Kill the process
-kill -9 $(lsof -ti:3000)
+# 2. Remove stale build cache
+rm -rf .next
 
-# Restart dev server
+# 3. Start fresh dev server
 npm run dev
 ```
 
-**Hard Reset Workflow:**
+**Manual Dev Server Control (if needed):**
 
 ```bash
-# Stop dev server (Ctrl+C)
-
-# Delete build cache
-rm -rf .next/
-
-# Restart dev server
+# Start dev server normally (if no conflicts)
 npm run dev
+
+# Check what's using port 3000
+lsof -ti:3000
+
+# Manually kill port 3000
+kill -9 $(lsof -ti:3000)
 ```
 
 ### Pre-Commit Checklist
@@ -1035,9 +1039,10 @@ Use these ONLY when MCP tools are unavailable:
 4. **Search Strategy** -
    - Desktop Commander `start_search` for streaming results
    - Fallback to Glob for files, Grep for content if MCP unavailable
-5. **Dev Server Always Running** - Keep `npm run dev` running in background on port 3000
-   - Kill port conflicts forcefully: `kill -9 $(lsof -ti:3000)`
-   - Hard reset (new/removed files): Stop server → `rm -rf .next/` → Restart
+5. **Dev Server Always Running** - Use `npm run dev:reload` after each change
+   - Automatically kills port conflicts, clears `.next/` cache, and restarts server
+   - Run in background to keep development environment ready
+   - Essential for immediate feedback on code changes
 6. **Maintain Related Artifacts** - When making code changes, intelligently update:
    - Documentation (README.md, ARCHITECTURE.md, feature docs in `docs/`)
    - Tests (unit, integration, e2e)

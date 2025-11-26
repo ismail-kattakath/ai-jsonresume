@@ -27,13 +27,9 @@ describe('SocialMedia Component', () => {
   })
 
   describe('Rendering', () => {
-    it('should render section heading', () => {
-      renderWithContext(<SocialMedia />)
+    // Note: Section heading is now rendered by CollapsibleSection wrapper
 
-      expect(screen.getByText('Social Media')).toBeInTheDocument()
-    })
-
-    it('should render social media entries with floating labels', () => {
+    it('should render social media entries with inputs', async () => {
       const mockData = createMockResumeData({
         socialMedia: [
           { socialMedia: 'Github', link: 'github.com/test' },
@@ -45,13 +41,11 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const platformLabels = container.querySelectorAll(
-        '.floating-label:not(:has(+ input[name="link"]))'
-      )
-      expect(platformLabels.length).toBeGreaterThanOrEqual(2)
-
-      const urlLabels = screen.getAllByText('URL')
-      expect(urlLabels.length).toBe(2)
+      // Wait for dynamic imports to load
+      await waitFor(() => {
+        const entries = container.querySelectorAll('.group')
+        expect(entries.length).toBeGreaterThanOrEqual(2)
+      })
     })
 
     it('should display social media data in inputs', () => {
@@ -407,8 +401,7 @@ describe('SocialMedia Component', () => {
         await Promise.resolve()
       })
 
-      // Check for heading and inputs
-      expect(screen.getByText('Social Media')).toBeInTheDocument()
+      // Check for inputs (heading is now in CollapsibleSection wrapper)
       const inputs = container.querySelectorAll('input')
       expect(inputs.length).toBeGreaterThan(0)
     })
@@ -459,7 +452,7 @@ describe('SocialMedia Component', () => {
         ],
       })
 
-      renderWithContext(<SocialMedia />, {
+      const { container } = renderWithContext(<SocialMedia />, {
         contextValue: {
           resumeData: mockData,
           setResumeData: mockSetResumeData,
@@ -467,7 +460,8 @@ describe('SocialMedia Component', () => {
       })
 
       // Component should render with drag-drop context
-      expect(screen.getByText('Social Media')).toBeInTheDocument()
+      const entries = container.querySelectorAll('.group')
+      expect(entries.length).toBe(3)
     })
 
     it('should not reorder when dropped in same position', () => {
@@ -536,8 +530,8 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      // Should still render the section heading and add button
-      expect(screen.getByText('Social Media')).toBeInTheDocument()
+      // Should still render add button (heading is in CollapsibleSection wrapper)
+      expect(screen.getByText(/Add Social Media/i)).toBeInTheDocument()
     })
 
     it('should handle multiple social media entries', () => {

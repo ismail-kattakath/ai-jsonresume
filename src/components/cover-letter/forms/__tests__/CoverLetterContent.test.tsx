@@ -10,13 +10,7 @@ import {
 
 describe('CoverLetterContent Component', () => {
   describe('Rendering', () => {
-    it('should render section heading', () => {
-      renderWithContext(<CoverLetterContent />)
-      const heading = screen.getByRole('heading', {
-        name: 'Cover Letter Content',
-      })
-      expect(heading).toBeInTheDocument()
-    })
+    // Note: Section heading is now rendered by CollapsibleSection wrapper
 
     it('should render textarea with placeholder', () => {
       renderWithContext(<CoverLetterContent />)
@@ -223,13 +217,7 @@ describe('CoverLetterContent Component', () => {
   })
 
   describe('Layout and Styling', () => {
-    it('should have orange gradient accent on section heading', () => {
-      const { container } = renderWithContext(<CoverLetterContent />)
-      const gradient = container.querySelector(
-        '.bg-gradient-to-b.from-amber-500.to-orange-500'
-      )
-      expect(gradient).toBeInTheDocument()
-    })
+    // Note: Section gradient is now in CollapsibleSection wrapper
 
     it('should have focus styles with orange color', () => {
       const { container } = renderWithContext(<CoverLetterContent />)
@@ -264,14 +252,7 @@ describe('CoverLetterContent Component', () => {
   })
 
   describe('Accessibility', () => {
-    it('should use semantic heading structure', () => {
-      renderWithContext(<CoverLetterContent />)
-      const heading = screen.getByRole('heading', {
-        name: 'Cover Letter Content',
-      })
-      expect(heading).toBeInTheDocument()
-      expect(heading.tagName).toBe('H2')
-    })
+    // Note: Semantic heading is now in CollapsibleSection wrapper
 
     it('should have name attribute on textarea', () => {
       renderWithContext(<CoverLetterContent />)

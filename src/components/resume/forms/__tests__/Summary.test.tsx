@@ -98,10 +98,7 @@ describe('Summary Component', () => {
   })
 
   describe('Rendering', () => {
-    it('renders section header', () => {
-      renderWithContext()
-      expect(screen.getByText('Professional Summary')).toBeInTheDocument()
-    })
+    // Note: Section header is now rendered by CollapsibleSection wrapper
 
     it('renders display section toggle', () => {
       renderWithContext()

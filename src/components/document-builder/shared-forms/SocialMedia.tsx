@@ -149,10 +149,6 @@ const SocialMedia = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="h-6 w-1 rounded-full bg-gradient-to-b from-purple-500 to-pink-500"></div>
-        <h2 className="text-lg font-semibold text-white">Social Media</h2>
-      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="social-media">
           {(provided) => (

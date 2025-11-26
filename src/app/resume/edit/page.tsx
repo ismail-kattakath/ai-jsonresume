@@ -19,11 +19,23 @@ import Education from '@/components/resume/forms/Education'
 import Certification from '@/components/resume/forms/Certification'
 import CoverLetterContent from '@/components/cover-letter/forms/CoverLetterContent'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
+import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSection'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { Toaster } from 'sonner'
 import { useDocumentHandlers } from '@/hooks/useDocumentHandlers'
 import PasswordProtection from '@/components/auth/PasswordProtection'
 import type { CoverLetterData } from '@/types'
+import {
+  User,
+  Share2,
+  FileText,
+  Mail,
+  GraduationCap,
+  Briefcase,
+  Code,
+  Languages,
+  Award,
+} from 'lucide-react'
 
 // Default cover letter content
 const DEFAULT_COVER_LETTER_CONTENT =
@@ -187,17 +199,72 @@ function UnifiedEditor() {
 
             {/* All Form Sections - Always Visible */}
             <ImportExport preserveContent={mode === 'coverLetter'} />
-            <PersonalInformation />
-            <SocialMedia />
-            <Summary />
-            <CoverLetterContent />
-            <Education />
-            <WorkExperience />
+
+            <CollapsibleSection
+              title="Personal Information"
+              icon={<User className="h-5 w-5 text-blue-400" />}
+            >
+              <PersonalInformation />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Social Media"
+              icon={<Share2 className="h-5 w-5 text-blue-400" />}
+            >
+              <SocialMedia />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Professional Summary"
+              icon={<FileText className="h-5 w-5 text-blue-400" />}
+            >
+              <Summary />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Cover Letter"
+              icon={<Mail className="h-5 w-5 text-blue-400" />}
+            >
+              <CoverLetterContent />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Education"
+              icon={<GraduationCap className="h-5 w-5 text-blue-400" />}
+            >
+              <Education />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Work Experience"
+              icon={<Briefcase className="h-5 w-5 text-blue-400" />}
+            >
+              <WorkExperience />
+            </CollapsibleSection>
+
             {resumeData.skills.map((skill, index) => (
-              <Skill title={skill.title} key={index} />
+              <CollapsibleSection
+                key={index}
+                title={skill.title}
+                icon={<Code className="h-5 w-5 text-blue-400" />}
+              >
+                <Skill title={skill.title} />
+              </CollapsibleSection>
             ))}
-            <Language />
-            <Certification />
+
+            <CollapsibleSection
+              title="Languages"
+              icon={<Languages className="h-5 w-5 text-blue-400" />}
+            >
+              <Language />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Certifications"
+              icon={<Award className="h-5 w-5 text-blue-400" />}
+            >
+              <Certification />
+            </CollapsibleSection>
           </form>
 
           {/* Conditional Preview */}

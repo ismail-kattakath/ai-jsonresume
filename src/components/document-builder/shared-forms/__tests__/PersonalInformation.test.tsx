@@ -22,11 +22,7 @@ describe('PersonalInformation Component', () => {
       expect(screen.getByText('Photo')).toBeInTheDocument()
     })
 
-    it('should render section heading', () => {
-      renderWithContext(<PersonalInformation />)
-
-      expect(screen.getByText('Personal Information')).toBeInTheDocument()
-    })
+    // Note: Section heading is now rendered by CollapsibleSection wrapper
 
     it('should render inputs with correct types', () => {
       const { container } = renderWithContext(<PersonalInformation />)

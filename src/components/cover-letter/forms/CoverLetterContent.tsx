@@ -17,13 +17,6 @@ const CoverLetterContent = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="h-6 w-1 rounded-full bg-gradient-to-b from-amber-500 to-orange-500"></div>
-        <h2 className="text-lg font-semibold text-white">
-          Cover Letter Content
-        </h2>
-      </div>
-
       <AITextAreaWithButton
         value={resumeData.content || ''}
         onChange={handleContentChange}

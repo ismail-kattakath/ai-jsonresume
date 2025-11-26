@@ -17,13 +17,7 @@ const Summary = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div className="flex items-center gap-2">
-          <div className="h-6 w-1 rounded-full bg-gradient-to-b from-amber-500 to-orange-500"></div>
-          <h2 className="text-lg font-semibold text-white">
-            Professional Summary
-          </h2>
-        </div>
+      <div className="flex justify-end">
         <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 transition-colors hover:bg-white/10">
           <input
             type="checkbox"
