@@ -94,12 +94,12 @@ const Preview = () => {
     if (source.droppableId.includes('WORK_EXPERIENCE_KEY_ACHIEVEMENT')) {
       const newWorkExperience = [...resumeData.workExperience]
       const workExperienceIndex = parseInt(source.droppableId.split('-')[1])
-      const keyAchievements =
-        newWorkExperience[workExperienceIndex].keyAchievements.split('\n')
+      const keyAchievements = [
+        ...newWorkExperience[workExperienceIndex].keyAchievements,
+      ]
       const [removed] = keyAchievements.splice(source.index, 1)
       keyAchievements.splice(destination.index, 0, removed)
-      newWorkExperience[workExperienceIndex].keyAchievements =
-        keyAchievements.join('\n')
+      newWorkExperience[workExperienceIndex].keyAchievements = keyAchievements
       setResumeData({ ...resumeData, workExperience: newWorkExperience })
     }
 
@@ -120,11 +120,10 @@ const Preview = () => {
     if (source.droppableId.includes('PROJECTS_KEY_ACHIEVEMENT')) {
       const newProjects = [...resumeData.projects]
       const projectIndex = parseInt(source.droppableId.split('-')[1])
-      const keyAchievements =
-        newProjects[projectIndex].keyAchievements.split('\n')
+      const keyAchievements = [...newProjects[projectIndex].keyAchievements]
       const [removed] = keyAchievements.splice(source.index, 1)
       keyAchievements.splice(destination.index, 0, removed)
-      newProjects[projectIndex].keyAchievements = keyAchievements.join('\n')
+      newProjects[projectIndex].keyAchievements = keyAchievements
       setResumeData({ ...resumeData, projects: newProjects })
     }
   }
@@ -451,10 +450,9 @@ const Preview = () => {
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
                                   >
-                                    {typeof item.keyAchievements === 'string' &&
-                                      item.keyAchievements
-                                        .split('\n')
-                                        .map((achievement, subIndex) => (
+                                    {Array.isArray(item.keyAchievements) &&
+                                      item.keyAchievements.map(
+                                        (achievement, subIndex) => (
                                           <Draggable
                                             key={`${item.company}-${index}-${subIndex}`}
                                             draggableId={`WORK_EXPERIENCE_KEY_ACHIEVEMENT-${index}-${subIndex}`}
@@ -472,14 +470,15 @@ const Preview = () => {
                                               >
                                                 <div
                                                   dangerouslySetInnerHTML={{
-                                                    __html: achievement,
+                                                    __html: achievement.text,
                                                   }}
                                                   contentEditable={editable}
                                                 />
                                               </li>
                                             )}
                                           </Draggable>
-                                        ))}
+                                        )
+                                      )}
                                     {provided.placeholder}
                                   </ul>
                                 )}

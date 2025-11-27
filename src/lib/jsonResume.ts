@@ -7,6 +7,7 @@ import type {
   WorkExperience,
   Education,
   SkillGroup,
+  Project,
 } from '@/types'
 
 /**
@@ -36,7 +37,7 @@ export function convertToJSONResume(customData?: ResumeData) {
     startDate: job.startYear,
     endDate: job.endYear === 'Present' ? '' : job.endYear,
     summary: job.description,
-    highlights: job.keyAchievements.split('\n').filter((h: string) => h.trim()),
+    highlights: job.keyAchievements.map((achievement) => achievement.text),
     keywords: job.technologies || [],
   }))
 
@@ -107,6 +108,16 @@ export function convertToJSONResume(customData?: ResumeData) {
     return certObj
   })
 
+  // Convert projects
+  const projects = (data.projects || []).map((project: Project) => ({
+    name: project.name,
+    description: project.description,
+    highlights: project.keyAchievements.map((achievement) => achievement.text),
+    startDate: project.startYear,
+    endDate: project.endYear,
+    url: project.link ? ensureProtocol(project.link) : undefined,
+  }))
+
   const jsonResume = {
     $schema:
       'https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json',
@@ -121,7 +132,7 @@ export function convertToJSONResume(customData?: ResumeData) {
     languages,
     interests: [],
     references: [],
-    projects: [],
+    projects,
   }
 
   return jsonResume
@@ -165,7 +176,9 @@ export function convertFromJSONResume(
       url: job.url?.replace(/^https?:\/\//, '') || '',
       position: job.position || '',
       description: job.summary || '',
-      keyAchievements: (job.highlights || []).join('\n'),
+      keyAchievements: (job.highlights || []).map((highlight) => ({
+        text: highlight,
+      })),
       startYear: job.startDate || '',
       endYear: job.endDate || 'Present',
       technologies: job.keywords || [],
@@ -196,6 +209,18 @@ export function convertFromJSONResume(
     // Convert certifications back
     const certifications = jsonResume.certificates || []
 
+    // Convert projects back
+    const projects = (jsonResume.projects || []).map((project) => ({
+      name: project.name || '',
+      link: project.url?.replace(/^https?:\/\//, '') || '',
+      description: project.description || '',
+      keyAchievements: (project.highlights || []).map((highlight) => ({
+        text: highlight,
+      })),
+      startYear: project.startDate || '',
+      endYear: project.endDate || '',
+    }))
+
     // Reconstruct location
     const location = basics.location || {}
     const address = [
@@ -220,6 +245,7 @@ export function convertFromJSONResume(
       skills: skills.length > 0 ? skills : [{ title: 'Skills', skills: [] }],
       languages,
       certifications,
+      projects: projects.length > 0 ? projects : undefined,
     }
   } catch (error) {
     console.error('Error converting JSON Resume:', error)

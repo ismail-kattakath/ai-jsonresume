@@ -7,6 +7,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader'
 import { DeleteButton } from '@/components/ui/DeleteButton'
 import { useArrayForm } from '@/hooks/useArrayForm'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import ProjectAchievements from '@/components/resume/forms/ProjectAchievements'
 
 const DragDropContext = dynamic(
   () =>
@@ -41,7 +42,7 @@ const Projects = () => {
     name: '',
     link: '',
     description: '',
-    keyAchievements: '',
+    keyAchievements: [],
     startYear: '',
     endYear: '',
   })
@@ -120,15 +121,15 @@ const Projects = () => {
                         minHeight="120px"
                       />
 
-                      <FormTextarea
-                        label="Key Achievements"
-                        name="keyAchievements"
-                        value={project.keyAchievements}
-                        onChange={(e) => handleChange(e, index)}
-                        variant="purple"
-                        showCounter
-                        minHeight="150px"
-                      />
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-white">
+                          Key Achievements
+                        </label>
+                        <ProjectAchievements
+                          projectIndex={index}
+                          variant="purple"
+                        />
+                      </div>
 
                       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput

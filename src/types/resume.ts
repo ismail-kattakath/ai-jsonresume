@@ -9,12 +9,16 @@ export interface SocialMediaLink {
   link: string
 }
 
+export interface Achievement {
+  text: string
+}
+
 export interface WorkExperience {
   company: string
   url: string
   position: string
   description: string
-  keyAchievements: string
+  keyAchievements: Achievement[]
   startYear: string
   endYear: string
   technologies: string[]
@@ -41,7 +45,7 @@ export interface Project {
   name: string
   link: string
   description: string
-  keyAchievements: string
+  keyAchievements: Achievement[]
   startYear: string
   endYear: string
 }

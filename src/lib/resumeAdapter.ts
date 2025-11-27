@@ -34,7 +34,9 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     url: stripProtocol(job.url || ''),
     position: job.position || '',
     description: job.summary || '',
-    keyAchievements: (job.highlights || []).join('\n'),
+    keyAchievements: (job.highlights || []).map((highlight) => ({
+      text: highlight,
+    })),
     startYear: job.startDate || '',
     endYear: job.endDate || 'Present',
     technologies: job.keywords || [],
@@ -70,6 +72,18 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     url: cert.url || '',
   }))
 
+  // Convert projects back
+  const projects = (jsonResume.projects || []).map((project) => ({
+    name: project.name || '',
+    link: stripProtocol(project.url || ''),
+    description: project.description || '',
+    keyAchievements: (project.highlights || []).map((highlight) => ({
+      text: highlight,
+    })),
+    startYear: project.startDate || '',
+    endYear: project.endDate || '',
+  }))
+
   // Reconstruct location
   const location = basics.location || {}
   const address = [
@@ -96,6 +110,7 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     skills: skills.length > 0 ? skills : [{ title: 'Skills', skills: [] }],
     languages,
     certifications,
+    projects: projects.length > 0 ? projects : undefined,
   }
 }
 

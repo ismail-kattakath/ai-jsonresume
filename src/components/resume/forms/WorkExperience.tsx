@@ -11,6 +11,7 @@ import {
   DnDDroppable,
   DnDDraggable,
 } from '@/components/ui/DragAndDrop'
+import KeyAchievements from '@/components/resume/forms/KeyAchievements'
 import type { DropResult } from '@hello-pangea/dnd'
 
 /**
@@ -26,7 +27,7 @@ const WorkExperience = () => {
       url: '',
       position: '',
       description: '',
-      keyAchievements: '',
+      keyAchievements: [],
       startYear: '',
       endYear: '',
       technologies: [],
@@ -129,16 +130,15 @@ const WorkExperience = () => {
                         minHeight="100px"
                       />
 
-                      <FormTextarea
-                        label="Key Achievements"
-                        name="keyAchievements"
-                        placeholder="Key achievements and responsibilities..."
-                        value={workExperience.keyAchievements}
-                        onChange={(e) => handleChange(e, index)}
-                        variant="teal"
-                        showCounter
-                        minHeight="120px"
-                      />
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-white">
+                          Key Achievements
+                        </label>
+                        <KeyAchievements
+                          workExperienceIndex={index}
+                          variant="teal"
+                        />
+                      </div>
 
                       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput
