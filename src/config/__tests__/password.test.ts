@@ -60,18 +60,22 @@ describe('Password Configuration', () => {
       ;(global as TestGlobal).window = originalWindow
     })
 
-    // TODO: This test is hard to properly mock in jsdom environment
-    // The actual browser behavior works correctly - this is a testing limitation
-    it.skip('should return hash from window.__PASSWORD_HASH__ in browser', () => {
+    it('should return hash from window.__PASSWORD_HASH__ in browser', () => {
       const mockHash = '$2b$10$testHashFromWindow'
-      ;(global as TestGlobal).window = {
-        __PASSWORD_HASH__: mockHash,
-        document: {}, // Make it look like a browser environment
-      }
+
+      // Set up window object properly for jsdom
+      Object.defineProperty(window, '__PASSWORD_HASH__', {
+        value: mockHash,
+        writable: true,
+        configurable: true,
+      })
 
       const result = getPasswordHash()
 
       expect(result).toBe(mockHash)
+
+      // Cleanup
+      delete (window as any).__PASSWORD_HASH__
     })
 
     it('should return undefined in browser when no window hash exists and no env var', () => {
@@ -135,21 +139,24 @@ describe('Password Configuration', () => {
       }
     })
 
-    // TODO: This test is hard to properly mock in jsdom environment
-    // The actual browser behavior works correctly - this is a testing limitation
-    it.skip('should prioritize window.__PASSWORD_HASH__ over environment variable', () => {
+    it('should prioritize window.__PASSWORD_HASH__ over environment variable', () => {
       const windowHash = '$2b$10$windowHash'
       const envHash = '$2b$10$envHash'
 
-      ;(global as TestGlobal).window = {
-        __PASSWORD_HASH__: windowHash,
-        document: {}, // Make it look like a browser environment
-      }
+      // Set up window.__PASSWORD_HASH__ properly for jsdom
+      Object.defineProperty(window, '__PASSWORD_HASH__', {
+        value: windowHash,
+        writable: true,
+        configurable: true,
+      })
       process.env.NEXT_PUBLIC_EDIT_PASSWORD_HASH = envHash
 
       const result = getPasswordHash()
 
       expect(result).toBe(windowHash)
+
+      // Cleanup
+      delete (window as any).__PASSWORD_HASH__
     })
 
     it('should handle undefined window object gracefully', () => {
@@ -158,6 +165,22 @@ describe('Password Configuration', () => {
 
       expect(() => getPasswordHash()).not.toThrow()
       expect(getPasswordHash()).toBeUndefined()
+    })
+
+    it('should return hash from server environment without window', () => {
+      const mockHash = '$2b$10$serverSideHash'
+      const originalWindow = (global as TestGlobal).window
+
+      // Remove window to simulate server environment
+      delete (global as TestGlobal).window
+      process.env.NEXT_PUBLIC_EDIT_PASSWORD_HASH = mockHash
+
+      const result = getPasswordHash()
+
+      expect(result).toBe(mockHash)
+
+      // Restore
+      ;(global as TestGlobal).window = originalWindow
     })
   })
 
@@ -196,18 +219,22 @@ describe('Password Configuration', () => {
       ;(global as TestGlobal).window = originalWindow
     })
 
-    // TODO: This test is hard to properly mock in jsdom environment
-    // The actual browser behavior works correctly - this is a testing limitation
-    it.skip('should return true when password hash is configured via window object', () => {
+    it('should return true when password hash is configured via window object', () => {
       const mockHash = '$2b$10$testHashFromWindow'
-      ;(global as TestGlobal).window = {
-        __PASSWORD_HASH__: mockHash,
-        document: {}, // Make it look like a browser environment
-      }
+
+      // Set up window.__PASSWORD_HASH__ properly for jsdom
+      Object.defineProperty(window, '__PASSWORD_HASH__', {
+        value: mockHash,
+        writable: true,
+        configurable: true,
+      })
 
       const result = isPasswordProtectionEnabled()
 
       expect(result).toBe(true)
+
+      // Cleanup
+      delete (window as any).__PASSWORD_HASH__
     })
 
     it('should return false in browser when no hash is available', () => {

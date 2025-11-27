@@ -223,6 +223,48 @@ describe('Projects Form Component', () => {
     expect(endYearInput).toHaveAttribute('type', 'date')
   })
 
+  it('updates project start date on input change', () => {
+    const { container } = renderWithContext()
+    const startYearInput = container.querySelector('input[name="startYear"]')
+
+    if (startYearInput) {
+      fireEvent.change(startYearInput, {
+        target: { name: 'startYear', value: '2024-01-01' },
+      })
+
+      expect(mockSetResumeData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          projects: expect.arrayContaining([
+            expect.objectContaining({
+              startYear: '2024-01-01',
+            }),
+          ]),
+        })
+      )
+    }
+  })
+
+  it('updates project end date on input change', () => {
+    const { container } = renderWithContext()
+    const endYearInput = container.querySelector('input[name="endYear"]')
+
+    if (endYearInput) {
+      fireEvent.change(endYearInput, {
+        target: { name: 'endYear', value: '2024-12-31' },
+      })
+
+      expect(mockSetResumeData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          projects: expect.arrayContaining([
+            expect.objectContaining({
+              endYear: '2024-12-31',
+            }),
+          ]),
+        })
+      )
+    }
+  })
+
   it('adds a new project when add button is clicked', () => {
     renderWithContext()
     const addButton = screen.getByText(/add project/i)

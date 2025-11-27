@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Summary from '@/components/resume/forms/Summary'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { AISettingsContext } from '@/lib/contexts/AISettingsContext'
@@ -160,7 +160,11 @@ describe('Summary Component', () => {
     })
 
     it('shows enabled button when AI is configured', () => {
-      renderWithContext(mockResumeData, mockHandleChange, mockConfiguredAISettings)
+      renderWithContext(
+        mockResumeData,
+        mockHandleChange,
+        mockConfiguredAISettings
+      )
       const button = screen.getByRole('button')
       expect(button).not.toBeDisabled()
       expect(button).toHaveAttribute('title', 'Generate with AI')
@@ -190,6 +194,44 @@ describe('Summary Component', () => {
         /write a compelling professional summary/i
       )
       expect(textarea).toHaveAttribute('rows', '8')
+    })
+  })
+
+  describe('AI Generation Callback', () => {
+    it('updates summary when AI generation completes', async () => {
+      const { generateSummary } = require('@/lib/ai/openai-client')
+
+      // Mock successful AI generation
+      const generatedText =
+        'AI-generated professional summary with experience and skills'
+      generateSummary.mockImplementation(
+        async (config, data, jobDescription, onChunk) => {
+          // Simulate streaming by calling onChunk
+          onChunk({ content: generatedText })
+          return generatedText
+        }
+      )
+
+      renderWithContext(
+        mockResumeData,
+        mockHandleChange,
+        mockConfiguredAISettings
+      )
+
+      mockSetResumeData.mockClear()
+
+      // Click the AI generation button
+      const aiButton = screen.getByRole('button')
+      fireEvent.click(aiButton)
+
+      // Wait for AI generation to complete and setResumeData to be called
+      await waitFor(() => {
+        expect(mockSetResumeData).toHaveBeenCalledWith(
+          expect.objectContaining({
+            summary: generatedText,
+          })
+        )
+      })
     })
   })
 })

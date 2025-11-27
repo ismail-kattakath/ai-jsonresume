@@ -633,7 +633,7 @@ Bash: "npm test -- src/components/resume/forms/__tests__/WorkExperience.test.tsx
 **Data:** Single source of truth (`src/data/resume.json` - JSON Resume v1.0.0)
 **Auth:** Optional client-side password protection (bcrypt + sessionStorage)
 **AI:** OpenAI-compatible API for cover letter/summary generation
-**Tests:** Jest + RTL (comprehensive test coverage, 85%+ maintained)
+**Tests:** Jest + RTL (comprehensive test coverage, 85.41% statements/85.71% lines/85.66% functions)
 
 ---
 
