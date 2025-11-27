@@ -73,7 +73,7 @@ const mockResumeData: ResumeData = {
       name: 'Test Project',
       link: 'https://project.com',
       description: 'Test description',
-      keyAchievements: 'Achievement 1\nAchievement 2',
+      keyAchievements: [{ text: 'Achievement 1\nAchievement 2' }],
       startYear: '2023-01',
       endYear: '2023-12',
     },
@@ -124,7 +124,9 @@ describe('Projects Form Component', () => {
     expect(screen.getByPlaceholderText(/project name/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/^link$/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/key achievements/i)).toBeInTheDocument()
+    expect(
+      screen.getByPlaceholderText(/add key achievement/i)
+    ).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/start year/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/end year/i)).toBeInTheDocument()
   })
@@ -184,22 +186,29 @@ describe('Projects Form Component', () => {
     )
   })
 
-  it('updates key achievements on textarea change', () => {
+  it('adds key achievement when Enter is pressed', () => {
     renderWithContext()
-    const achievementsInput = screen.getByPlaceholderText(/key achievements/i)
+    const addInput = screen.getByPlaceholderText(/add key achievement/i)
 
-    fireEvent.change(achievementsInput, {
+    // Type achievement and press Enter
+    fireEvent.change(addInput, {
       target: { value: 'New achievement' },
     })
+    fireEvent.keyDown(addInput, { key: 'Enter', code: 'Enter' })
 
-    expect(mockSetResumeData).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projects: expect.arrayContaining([
-          expect.objectContaining({
-            keyAchievements: 'New achievement',
-          }),
-        ]),
-      })
+    expect(mockSetResumeData).toHaveBeenCalled()
+
+    // Get the function that was passed to setResumeData and call it
+    const updateFunction = mockSetResumeData.mock.calls[0][0]
+    const result =
+      typeof updateFunction === 'function'
+        ? updateFunction(mockResumeData)
+        : updateFunction
+
+    expect(result.projects[0].keyAchievements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'New achievement' }),
+      ])
     )
   })
 
@@ -228,7 +237,7 @@ describe('Projects Form Component', () => {
             name: '',
             link: '',
             description: '',
-            keyAchievements: '',
+            keyAchievements: [],
             startYear: '',
             endYear: '',
           }),
@@ -261,7 +270,7 @@ describe('Projects Form Component', () => {
           name: 'Second Project',
           link: 'https://second.com',
           description: 'Second description',
-          keyAchievements: 'Second achievements',
+          keyAchievements: [{ text: 'Second achievements' }],
           startYear: '2024-01',
           endYear: '2024-12',
         },
@@ -294,7 +303,7 @@ describe('Projects Form Component', () => {
       name: 'Project 1',
       link: 'https://project1.com',
       description: 'First project',
-      keyAchievements: 'Achievement 1',
+      keyAchievements: [{ text: 'Achievement 1' }],
       startYear: '2023-01',
       endYear: '2023-06',
     }
@@ -303,7 +312,7 @@ describe('Projects Form Component', () => {
       name: 'Project 2',
       link: 'https://project2.com',
       description: 'Second project',
-      keyAchievements: 'Achievement 2',
+      keyAchievements: [{ text: 'Achievement 2' }],
       startYear: '2023-07',
       endYear: '2023-12',
     }
@@ -312,7 +321,7 @@ describe('Projects Form Component', () => {
       name: 'Project 3',
       link: 'https://project3.com',
       description: 'Third project',
-      keyAchievements: 'Achievement 3',
+      keyAchievements: [{ text: 'Achievement 3' }],
       startYear: '2024-01',
       endYear: '2024-06',
     }

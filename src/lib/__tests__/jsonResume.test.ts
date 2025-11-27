@@ -34,7 +34,10 @@ describe('JSON Resume Conversion', () => {
           url: 'techcorp.com',
           position: 'Senior Developer',
           description: 'Led development of key features',
-          keyAchievements: 'Increased performance by 50%\nReduced bugs by 30%',
+          keyAchievements: [
+            { text: 'Increased performance by 50%' },
+            { text: 'Reduced bugs by 30%' },
+          ],
           startYear: '2020-01-01',
           endYear: 'Present',
           technologies: ['React', 'Node.js', 'TypeScript'],
@@ -294,7 +297,7 @@ describe('JSON Resume Conversion', () => {
         workExperience: [
           {
             ...mockResumeData.workExperience[0],
-            keyAchievements: '',
+            keyAchievements: [],
           },
         ],
       }
@@ -310,7 +313,7 @@ describe('JSON Resume Conversion', () => {
         workExperience: [
           {
             ...mockResumeData.workExperience[0],
-            keyAchievements: 'Single achievement',
+            keyAchievements: [{ text: 'Single achievement' }],
           },
         ],
       }
@@ -497,9 +500,10 @@ describe('JSON Resume Conversion', () => {
       expect(result.workExperience[0].description).toBe(
         'Managed product development'
       )
-      expect(result.workExperience[0].keyAchievements).toBe(
-        'Launched 3 major features\nGrew user base by 200%'
-      )
+      expect(result.workExperience[0].keyAchievements).toEqual([
+        { text: 'Launched 3 major features' },
+        { text: 'Grew user base by 200%' },
+      ])
       expect(result.workExperience[0].startYear).toBe('2019-01-01')
       expect(result.workExperience[0].endYear).toBe('2024-01-01')
       expect(result.workExperience[0].technologies).toEqual([
@@ -689,7 +693,7 @@ describe('JSON Resume Conversion', () => {
 
       const result = convertFromJSONResume(resumeWithNoHighlights)
 
-      expect(result.workExperience[0].keyAchievements).toBe('')
+      expect(result.workExperience[0].keyAchievements).toEqual([])
     })
 
     it('should handle work with single highlight', () => {
@@ -705,7 +709,9 @@ describe('JSON Resume Conversion', () => {
 
       const result = convertFromJSONResume(resumeWithSingleHighlight)
 
-      expect(result.workExperience[0].keyAchievements).toBe('Single highlight')
+      expect(result.workExperience[0].keyAchievements).toEqual([
+        { text: 'Single highlight' },
+      ])
     })
 
     it('should handle work with empty keywords array', () => {

@@ -254,7 +254,7 @@ describe('convertFromJSONResume - Edge Cases', () => {
         url: '',
         position: '',
         description: '',
-        keyAchievements: '',
+        keyAchievements: [],
         startYear: '',
         endYear: 'Present',
         technologies: [],
@@ -275,7 +275,7 @@ describe('convertFromJSONResume - Edge Cases', () => {
       expect(result.workExperience[0].url).toBe('company.com')
     })
 
-    it('should join highlights with newlines', () => {
+    it('should convert highlights to keyAchievements array', () => {
       const resume: JSONResume = {
         work: [
           {
@@ -285,9 +285,11 @@ describe('convertFromJSONResume - Edge Cases', () => {
       } as JSONResume
 
       const result = convertFromJSONResume(resume)
-      expect(result.workExperience[0].keyAchievements).toBe(
-        'Achievement 1\nAchievement 2\nAchievement 3'
-      )
+      expect(result.workExperience[0].keyAchievements).toEqual([
+        { text: 'Achievement 1' },
+        { text: 'Achievement 2' },
+        { text: 'Achievement 3' },
+      ])
     })
 
     it('should default endYear to Present when missing', () => {

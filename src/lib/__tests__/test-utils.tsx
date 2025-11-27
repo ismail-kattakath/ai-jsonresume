@@ -166,7 +166,7 @@ export const mockFormData = {
       url: 'techcorp.com',
       position: 'Senior Developer',
       description: 'Led development projects',
-      keyAchievements: 'Increased performance by 50%',
+      keyAchievements: [{ text: 'Increased performance by 50%' }],
       startYear: '2020-01-01',
       endYear: 'Present',
       technologies: ['React', 'Node.js'],

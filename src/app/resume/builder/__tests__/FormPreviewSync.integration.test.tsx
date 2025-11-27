@@ -230,18 +230,23 @@ describe('Integration: Form → Preview Synchronization', () => {
     it('should update preview when work experience key achievements are changed', async () => {
       const { container } = render(<ResumeEditPage />)
 
-      // Find the first key achievements textarea
-      const achievementsTextarea = container.querySelector(
-        'textarea[name="keyAchievements"]'
-      ) as HTMLTextAreaElement
-      expect(achievementsTextarea).toBeInTheDocument()
+      // Find the key achievements add input (dashed border input at bottom)
+      const addInput = container.querySelector(
+        'input[placeholder*="Add key achievement"]'
+      ) as HTMLInputElement
+      expect(addInput).toBeInTheDocument()
 
-      // Change the achievements (multiline)
-      const newAchievements =
-        'Increased performance by 50%\nReduced costs by 30%'
-      fireEvent.change(achievementsTextarea, {
-        target: { name: 'keyAchievements', value: newAchievements },
+      // Add first achievement
+      fireEvent.change(addInput, {
+        target: { value: 'Increased performance by 50%' },
       })
+      fireEvent.keyDown(addInput, { key: 'Enter', code: 'Enter' })
+
+      // Add second achievement
+      fireEvent.change(addInput, {
+        target: { value: 'Reduced costs by 30%' },
+      })
+      fireEvent.keyDown(addInput, { key: 'Enter', code: 'Enter' })
 
       // Verify the preview updates with bullet points
       await waitFor(() => {
