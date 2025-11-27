@@ -94,13 +94,13 @@ export function AccordionHeader({
         <button
           type="button"
           onClick={onToggle}
-          className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-white/60"
+          className="group rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-white/60"
           title={isExpanded ? 'Collapse' : 'Expand'}
         >
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
+            <ChevronUp className="h-4 w-4 transition-transform group-hover:scale-110" />
           ) : (
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="h-4 w-4 transition-transform group-hover:scale-110" />
           )}
         </button>
         <button
