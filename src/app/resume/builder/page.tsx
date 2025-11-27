@@ -576,7 +576,7 @@ function UnifiedEditor() {
               {/* Cover Letter-only sections */}
               {mode === 'coverLetter' && (
                 <CollapsibleSection
-                  title="Cover Letter"
+                  title="Content"
                   icon={<Mail className="h-5 w-5 text-blue-400" />}
                   isExpanded={expandedSection === 'cover-letter'}
                   onToggle={createToggleHandler('cover-letter')}
