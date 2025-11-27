@@ -3,7 +3,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { loadCredentials, saveCredentials } from '@/lib/ai/openai-client'
 
-const DEFAULT_API_URL = 'https://api.openai.com'
+const DEFAULT_API_URL = 'http://localhost:1234'
+const DEFAULT_API_KEY = 'DUMMYTOKEN'
 const DEFAULT_MODEL = 'gpt-4o-mini'
 
 export interface AISettings {
@@ -22,7 +23,7 @@ export interface AISettingsContextType {
 
 const defaultSettings: AISettings = {
   apiUrl: DEFAULT_API_URL,
-  apiKey: '',
+  apiKey: DEFAULT_API_KEY,
   model: DEFAULT_MODEL,
   jobDescription: '',
   rememberCredentials: false,
@@ -44,8 +45,12 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
     if (saved) {
       setSettings((prev) => ({
         ...prev,
-        apiUrl: saved.rememberCredentials ? saved.apiUrl || DEFAULT_API_URL : DEFAULT_API_URL,
-        apiKey: saved.rememberCredentials ? saved.apiKey || '' : '',
+        apiUrl: saved.rememberCredentials
+          ? saved.apiUrl || DEFAULT_API_URL
+          : DEFAULT_API_URL,
+        apiKey: saved.rememberCredentials
+          ? saved.apiKey || DEFAULT_API_KEY
+          : DEFAULT_API_KEY,
         rememberCredentials: saved.rememberCredentials || false,
         jobDescription: saved.lastJobDescription || '',
       }))
