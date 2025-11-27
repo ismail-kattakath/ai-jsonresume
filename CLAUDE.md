@@ -20,6 +20,229 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. **Efficiency Over Perfection** - Deliver working solutions quickly, iterate based on feedback
 4. **Documentation as Code** - Maintain inline comments, JSDoc, and project docs in sync
 5. **Security by Default** - Consider security implications in every change
+6. **GitHub Flow Always** - NEVER commit directly to `main`. Always use feature branches and pull requests
+
+### 🔀 GitHub Flow (MANDATORY)
+
+**🚨 CRITICAL: NEVER make changes directly on the `main` branch. ALWAYS use feature branches and pull requests.**
+
+This is a **REQUIRED** workflow for every Claude Code session. No exceptions.
+
+#### The GitHub Flow Process
+
+```
+1. Create feature branch → 2. Make changes → 3. Commit & push → 4. Create PR → 5. Merge to main
+```
+
+#### Step-by-Step Workflow
+
+**BEFORE starting ANY work:**
+
+```bash
+# 1. Always start from main branch
+git checkout main
+
+# 2. Pull latest changes
+git pull origin main
+
+# 3. Create feature branch with descriptive name
+git checkout -b feature/descriptive-name
+# OR for bug fixes:
+git checkout -b fix/bug-description
+# OR for documentation:
+git checkout -b docs/documentation-update
+```
+
+**Branch Naming Convention:**
+
+- `feature/` - New features (e.g., `feature/add-skills-section`)
+- `fix/` - Bug fixes (e.g., `fix/password-validation-error`)
+- `docs/` - Documentation updates (e.g., `docs/update-readme`)
+- `refactor/` - Code refactoring (e.g., `refactor/resume-adapter`)
+- `test/` - Test additions/updates (e.g., `test/add-component-tests`)
+- `chore/` - Maintenance tasks (e.g., `chore/update-dependencies`)
+
+**During work:**
+
+```bash
+# Make changes to files
+# Run tests frequently
+npm test
+
+# Commit changes (follows conventional commits via commitlint)
+git add .
+git commit -m "feat: add new skills section component"
+
+# Push to remote feature branch
+git push origin feature/descriptive-name
+# OR if first push on new branch:
+git push -u origin feature/descriptive-name
+```
+
+**After work is complete:**
+
+```bash
+# 1. Ensure all tests pass
+npm test
+npm run build
+
+# 2. Push final changes
+git push origin feature/descriptive-name
+
+# 3. Create Pull Request using GitHub CLI (if available)
+gh pr create --title "feat: Add new skills section" --body "$(cat <<'EOF'
+## Summary
+- Added new skills section component
+- Updated portfolio data structure
+- Added comprehensive tests
+
+## Test plan
+- [ ] Unit tests pass
+- [ ] Build succeeds
+- [ ] Visual verification on dev server
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
+
+# OR create PR manually via GitHub web interface
+```
+
+**After PR is created:**
+
+- Wait for CI/CD checks to pass (GitHub Actions runs tests automatically)
+- Review the PR yourself for any issues
+- If user approves, merge the PR via GitHub interface
+- **NEVER merge directly via command line unless explicitly instructed**
+
+**After PR is merged:**
+
+```bash
+# Switch back to main
+git checkout main
+
+# Pull merged changes
+git pull origin main
+
+# Delete local feature branch (cleanup)
+git branch -d feature/descriptive-name
+
+# Delete remote feature branch (cleanup)
+git push origin --delete feature/descriptive-name
+```
+
+#### Why GitHub Flow?
+
+1. **Code Review** - PRs allow review before merging to main
+2. **CI/CD Validation** - Automated tests run on every PR
+3. **Rollback Safety** - Easy to revert problematic changes
+4. **History Clarity** - Clean commit history with merge commits
+5. **Collaboration** - Multiple features can be developed in parallel
+6. **Production Protection** - Main branch always stays deployable
+
+#### Emergency Hotfix Workflow
+
+For critical production bugs that need immediate fixing:
+
+```bash
+# 1. Create hotfix branch from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-bug-description
+
+# 2. Fix the bug
+# Make minimal changes - only fix the critical issue
+
+# 3. Test thoroughly
+npm test
+npm run build
+
+# 4. Commit and push
+git add .
+git commit -m "fix: resolve critical bug in production"
+git push -u origin hotfix/critical-bug-description
+
+# 5. Create PR with "hotfix" label
+gh pr create --title "hotfix: Critical bug fix" --label hotfix --body "..."
+
+# 6. After approval, merge immediately
+# Main branch auto-deploys via GitHub Actions
+```
+
+#### What Claude Code Should Do
+
+**At the START of every task:**
+
+1. Check current branch: `git branch --show-current`
+2. If on `main`, IMMEDIATELY create feature branch
+3. If already on feature branch, verify it's the right one
+4. NEVER proceed with changes until on a feature branch
+
+**During the task:**
+
+1. Make commits frequently with conventional commit messages
+2. Push changes to remote feature branch regularly
+3. Run tests before each push
+
+**At the END of every task:**
+
+1. Ensure all tests pass
+2. Push final changes
+3. Create pull request with detailed description
+4. Provide PR link to user
+5. Do NOT merge - wait for user approval
+
+#### Common Scenarios
+
+**Scenario: User asks to "deploy this"**
+
+```
+❌ WRONG: git push origin main
+✅ CORRECT:
+   1. Ensure on feature branch
+   2. Push to feature branch
+   3. Create PR
+   4. Tell user: "PR created at [URL]. Once you merge it, GitHub Actions will auto-deploy."
+```
+
+**Scenario: User asks to "commit these changes"**
+
+```
+❌ WRONG: git commit -m "changes" && git push origin main
+✅ CORRECT:
+   1. Verify on feature branch (create if needed)
+   2. git commit -m "feat: description"
+   3. git push origin feature-branch
+```
+
+**Scenario: User says "push to production"**
+
+```
+❌ WRONG: git push origin main
+✅ CORRECT:
+   1. Create PR from feature branch
+   2. Tell user: "PR created. Merging it will trigger production deployment."
+```
+
+#### Breaking This Rule
+
+**NEVER break this rule unless:**
+
+- User explicitly says "I want you to commit directly to main" (confirm first!)
+- It's a documentation-only change AND user explicitly approves
+- User provides written confirmation: "bypass GitHub Flow for this change"
+
+**Even then, ask for confirmation:**
+
+```
+⚠️ You're asking me to commit directly to main, which bypasses our GitHub Flow process.
+This means:
+- No code review
+- No CI/CD validation before merge
+- Risk to production stability
+
+Are you sure you want to proceed? (yes/no)
+```
 
 ### 🔧 MCP Server Tool Priority (CRITICAL)
 
@@ -677,6 +900,9 @@ npm test:coverage
 **Example Workflow:**
 
 ```bash
+# 0. ALWAYS start on feature branch
+git checkout -b feature/your-feature-name
+
 # 1. Make code change
 # 2. Update related tests
 npm test -- path/to/changed-file.test.tsx
@@ -691,6 +917,12 @@ npm test
 # 5. Commit all related changes together
 git add .
 git commit -m "feat: feature with tests and docs"
+
+# 6. Push to feature branch
+git push origin feature/your-feature-name
+
+# 7. Create PR for review
+gh pr create --title "feat: Your feature" --body "..."
 ```
 
 ---
@@ -875,25 +1107,45 @@ kill -9 $(lsof -ti:3000)
 - [ ] Tests added/updated for new/changed functionality
 - [ ] Type definitions updated (if data structures changed)
 
-### Deployment Workflow
+### Deployment Workflow (GitHub Flow)
+
+**🚨 CRITICAL: Follow GitHub Flow. NEVER push directly to `main`.**
 
 ```bash
-# 1. Make changes
+# 1. Create feature branch (if not already on one)
+git checkout -b feature/your-feature-name
+
+# 2. Make changes and commit
 git add .
 git commit -m "feat: description"
 
-# 2. Push to main
-git push origin main
+# 3. Push to feature branch
+git push origin feature/your-feature-name
 
-# 3. GitHub Actions automatically:
+# 4. Create Pull Request
+gh pr create --title "feat: Your feature" --body "Description..."
+# OR create PR manually via GitHub web interface
+
+# 5. Wait for CI checks to pass
+#    GitHub Actions automatically runs:
+#    - npm test (PR fails if any test fails)
+#    - npm run build (PR fails if build fails)
+
+# 6. After user approves and merges PR:
+#    GitHub Actions automatically:
 #    - Runs npm test (fails deployment if any test fails)
 #    - Runs npm run build (includes sitemap generation)
 #    - Deploys to GitHub Pages
 
-# 4. Site live in 2-3 minutes
+# 7. Site live in 2-3 minutes after merge
 ```
 
-**⚠️ Important:** Deployment FAILS if ANY test fails (enforced by CI)
+**⚠️ Important:**
+
+- Deployment FAILS if ANY test fails (enforced by CI)
+- PRs MUST pass CI checks before merging
+- NEVER merge your own PRs - wait for user approval
+- Main branch is protected - direct pushes should be blocked
 
 ---
 
@@ -1098,7 +1350,7 @@ NEXT_PUBLIC_EDIT_PASSWORD_HASH
 **"Where are tests?"** → `src/**/__tests__/`
 **"How to add password?"** → Generate hash, set `NEXT_PUBLIC_EDIT_PASSWORD_HASH`
 **"How to customize colors?"** → `src/app/globals.css`
-**"How to deploy?"** → Push to main branch (GitHub Actions auto-deploys)
+**"How to deploy?"** → Create PR from feature branch, merge to main (GitHub Actions auto-deploys)
 
 ---
 
