@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import '@/styles/document-builder.css'
 import '@/styles/resume-preview.css'
 
@@ -23,9 +23,10 @@ import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSect
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { Toaster } from 'sonner'
 import { useDocumentHandlers } from '@/hooks/useDocumentHandlers'
+import { useSkillGroupsManagement } from '@/hooks/useSkillGroupsManagement'
 import PasswordProtection from '@/components/auth/PasswordProtection'
 import Footer from '@/components/layout/Footer'
-import type { CoverLetterData } from '@/types'
+import type { CoverLetterData, ResumeData } from '@/types'
 import {
   User,
   Share2,
@@ -36,13 +37,151 @@ import {
   Code,
   Languages,
   Award,
+  Plus,
 } from 'lucide-react'
+import {
+  DnDContext,
+  DnDDroppable,
+  DnDDraggable,
+} from '@/components/ui/DragAndDrop'
+import type { DropResult } from '@hello-pangea/dnd'
 
 // Default cover letter content
 const DEFAULT_COVER_LETTER_CONTENT =
   "I'm a Toronto-based Principal Software Engineer with 7+ years delivering production-ready full-stack applications using React, React Native, Node.js, and MongoDB—the exact stack you're seeking. At Homewood Health, I transformed an abandoned MEAN application into a nationally-deployed platform serving 100,000+ users with 99.5% uptime, implemented enterprise OAuth/SAML authentication, and led the AngularJS-to-Next.js migration while reducing deployment time by 92%. My experience architecting REST APIs with Express.js, integrating external SDKs, implementing security protocols, and managing agile sprints directly aligns with your requirements. Having built FDA-compliant healthcare systems and worked with cross-functional teams across multiple countries, I understand the rigorous standards and fast-paced environment of innovative startups like Speer. I'm excited to leverage my proven track record in building scalable, testable code to help deliver your groundbreaking technologies—let's discuss how I can contribute to your mission this week."
 
 type EditorMode = 'resume' | 'coverLetter'
+
+/**
+ * Skill Groups Section Component
+ * Handles drag-and-drop reordering and CRUD operations for skill groups
+ */
+function SkillGroupsSection() {
+  const context = useContext(ResumeContext)
+  if (!context) return null
+
+  const { resumeData } = context
+  const { addGroup, removeGroup, renameGroup, reorderGroups } =
+    useSkillGroupsManagement()
+  const [isAdding, setIsAdding] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
+
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source } = result
+    if (!destination) return
+    if (destination.index === source.index) return
+    reorderGroups(source.index, destination.index)
+  }
+
+  const handleAddGroup = () => {
+    if (newGroupName.trim()) {
+      addGroup(newGroupName)
+      setNewGroupName('')
+      setIsAdding(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddGroup()
+    } else if (e.key === 'Escape') {
+      setNewGroupName('')
+      setIsAdding(false)
+    }
+  }
+
+  return (
+    <>
+      <DnDContext onDragEnd={handleDragEnd}>
+        <DnDDroppable droppableId="skill-groups">
+          {(provided) => (
+            <div
+              className="flex flex-col gap-6"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {resumeData.skills.map((skill, index) => (
+                <DnDDraggable
+                  key={`skill-group-${skill.title}`}
+                  draggableId={`skill-group-${skill.title}`}
+                  index={index}
+                >
+                  {(dragProvided, snapshot) => (
+                    <div
+                      ref={dragProvided.innerRef}
+                      {...dragProvided.draggableProps}
+                      className={snapshot.isDragging ? 'opacity-50' : ''}
+                    >
+                      <CollapsibleSection
+                        title={skill.title}
+                        icon={<Code className="h-5 w-5 text-blue-400" />}
+                        editable={true}
+                        onRename={(newTitle) =>
+                          renameGroup(skill.title, newTitle)
+                        }
+                        onDelete={() => removeGroup(skill.title)}
+                        dragHandleProps={dragProvided.dragHandleProps}
+                      >
+                        <Skill title={skill.title} />
+                      </CollapsibleSection>
+                    </div>
+                  )}
+                </DnDDraggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </DnDDroppable>
+      </DnDContext>
+
+      {/* Add Skill Group Button/Input */}
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+        {isAdding ? (
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Enter skill group name (e.g., 'Frontend Stack')"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={() => {
+                if (!newGroupName.trim()) setIsAdding(false)
+              }}
+              autoFocus
+              className="flex-1 rounded-lg border border-blue-400 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/40 focus:ring-2 focus:ring-blue-400/20"
+            />
+            <button
+              type="button"
+              onClick={handleAddGroup}
+              className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 font-medium text-white transition-all hover:from-blue-600 hover:to-purple-600"
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setNewGroupName('')
+                setIsAdding(false)
+              }}
+              className="rounded-lg bg-white/10 px-6 py-3 font-medium text-white/60 transition-all hover:bg-white/20 hover:text-white"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsAdding(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-white/20 bg-white/5 px-4 py-3 text-white/60 transition-all hover:border-blue-400/40 hover:bg-white/10 hover:text-blue-400"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="font-medium">Add Skill Group</span>
+          </button>
+        )}
+      </div>
+    </>
+  )
+}
 
 function UnifiedEditor() {
   // Editor mode state
@@ -261,15 +400,8 @@ function UnifiedEditor() {
                 <WorkExperience />
               </CollapsibleSection>
 
-              {resumeData.skills.map((skill, index) => (
-                <CollapsibleSection
-                  key={index}
-                  title={skill.title}
-                  icon={<Code className="h-5 w-5 text-blue-400" />}
-                >
-                  <Skill title={skill.title} />
-                </CollapsibleSection>
-              ))}
+              {/* Skill Groups Section - Now Editable! */}
+              <SkillGroupsSection />
 
               <CollapsibleSection
                 title="Languages"
