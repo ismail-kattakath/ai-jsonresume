@@ -143,22 +143,51 @@ export default function Footer() {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   viewport={{ once: true }}
                 >
-                  <button
-                    onClick={() => {
-                      if (item.href.startsWith('#')) {
-                        const element = document.querySelector(item.href)
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth' })
+                  {item.submenu ? (
+                    <div className="space-y-2">
+                      <div className="md3-body-medium font-semibold text-[var(--md-sys-color-on-surface)]">
+                        {item.name}
+                      </div>
+                      {item.submenu.map((subItem) => (
+                        <button
+                          key={subItem.name}
+                          onClick={() => {
+                            if (subItem.href.startsWith('#')) {
+                              const element = document.querySelector(
+                                subItem.href
+                              )
+                              if (element) {
+                                element.scrollIntoView({ behavior: 'smooth' })
+                              }
+                            } else {
+                              window.location.href = subItem.href
+                            }
+                          }}
+                          className="md3-body-medium group flex w-full cursor-pointer items-center gap-2 pl-4 text-[var(--md-sys-color-on-surface-variant)] transition-colors hover:text-[var(--md-sys-color-primary)]"
+                        >
+                          <span className="h-0.5 w-0 rounded-full bg-gradient-to-r from-[var(--md-sys-color-primary)] to-[var(--md-sys-color-tertiary)] transition-all group-hover:w-3"></span>
+                          {subItem.name}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (item.href && item.href.startsWith('#')) {
+                          const element = document.querySelector(item.href)
+                          if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' })
+                          }
+                        } else if (item.href) {
+                          window.location.href = item.href
                         }
-                      } else {
-                        window.location.href = item.href
-                      }
-                    }}
-                    className="md3-body-medium group flex cursor-pointer items-center gap-2 text-[var(--md-sys-color-on-surface-variant)] transition-colors hover:text-[var(--md-sys-color-primary)]"
-                  >
-                    <span className="h-0.5 w-0 rounded-full bg-gradient-to-r from-[var(--md-sys-color-primary)] to-[var(--md-sys-color-tertiary)] transition-all group-hover:w-3"></span>
-                    {item.name}
-                  </button>
+                      }}
+                      className="md3-body-medium group flex cursor-pointer items-center gap-2 text-[var(--md-sys-color-on-surface-variant)] transition-colors hover:text-[var(--md-sys-color-primary)]"
+                    >
+                      <span className="h-0.5 w-0 rounded-full bg-gradient-to-r from-[var(--md-sys-color-primary)] to-[var(--md-sys-color-tertiary)] transition-all group-hover:w-3"></span>
+                      {item.name}
+                    </button>
+                  )}
                 </motion.li>
               ))}
             </ul>

@@ -25,9 +25,21 @@ describe('Config - Navigation', () => {
   it('should have correct structure for nav items', () => {
     navItems.forEach((item) => {
       expect(item).toHaveProperty('name')
-      expect(item).toHaveProperty('href')
       expect(typeof item.name).toBe('string')
-      expect(typeof item.href).toBe('string')
+      // Item should have either href or submenu
+      if (item.href) {
+        expect(typeof item.href).toBe('string')
+      } else if (item.submenu) {
+        expect(Array.isArray(item.submenu)).toBe(true)
+        item.submenu.forEach((subItem) => {
+          expect(subItem).toHaveProperty('name')
+          expect(subItem).toHaveProperty('href')
+          expect(typeof subItem.name).toBe('string')
+          expect(typeof subItem.href).toBe('string')
+        })
+      } else {
+        fail('Nav item must have either href or submenu')
+      }
     })
   })
 
@@ -42,8 +54,19 @@ describe('Config - Navigation', () => {
 
   it('should have valid href values', () => {
     navItems.forEach((item) => {
-      // Should be either an anchor link or a path
-      expect(item.href.startsWith('#') || item.href.startsWith('/')).toBe(true)
+      if (item.href) {
+        // Should be either an anchor link or a path
+        expect(item.href.startsWith('#') || item.href.startsWith('/')).toBe(
+          true
+        )
+      }
+      if (item.submenu) {
+        item.submenu.forEach((subItem) => {
+          expect(
+            subItem.href.startsWith('#') || subItem.href.startsWith('/')
+          ).toBe(true)
+        })
+      }
     })
   })
 })
