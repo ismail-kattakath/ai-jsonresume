@@ -494,19 +494,19 @@ function UnifiedEditor() {
 
               <form
                 onSubmit={(e) => e.preventDefault()}
-                className="exclude-print flex-1 space-y-6 overflow-y-scroll p-4 md:h-0 md:min-h-full md:flex-none md:space-y-8 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
+                className="exclude-print flex-1 space-y-4 overflow-y-scroll p-4 md:h-0 md:min-h-full md:flex-none md:space-y-5 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
               >
                 {/* Header */}
-                <div className="space-y-4 border-b border-white/10 pb-6">
+                <div className="space-y-3 border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
-                      <span className="text-2xl">🎯</span>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+                      <span className="text-xl">🎯</span>
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold text-white">
+                      <h1 className="text-xl font-bold text-white">
                         Resume Generator
                       </h1>
-                      <p className="text-sm text-white/60">
+                      <p className="text-xs text-white/60">
                         Build your targeted resume and cover letter
                       </p>
                     </div>
@@ -517,7 +517,7 @@ function UnifiedEditor() {
                     <button
                       type="button"
                       onClick={() => setMode('resume')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all ${
+                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
                         mode === 'resume'
                           ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
                           : 'text-white/60 hover:bg-white/5 hover:text-white/80'
@@ -529,7 +529,7 @@ function UnifiedEditor() {
                     <button
                       type="button"
                       onClick={() => setMode('coverLetter')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition-all ${
+                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
                         mode === 'coverLetter'
                           ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
                           : 'text-white/60 hover:bg-white/5 hover:text-white/80'
@@ -544,7 +544,7 @@ function UnifiedEditor() {
                 {/* Form Sections - Conditionally rendered based on mode */}
                 <CollapsibleSection
                   title="Import / Export"
-                  icon={<ArrowDownUp className="h-5 w-5 text-amber-400" />}
+                  icon={<ArrowDownUp className="h-4 w-4 text-amber-400" />}
                   isExpanded={expandedSection === 'import-export'}
                   onToggle={createToggleHandler('import-export')}
                   variant="utility"
@@ -554,7 +554,7 @@ function UnifiedEditor() {
 
                 <CollapsibleSection
                   title="Generative AI Settings"
-                  icon={<Sparkles className="h-5 w-5 text-amber-400" />}
+                  icon={<Sparkles className="h-4 w-4 text-amber-400" />}
                   isExpanded={expandedSection === 'ai-settings'}
                   onToggle={createToggleHandler('ai-settings')}
                   action={<AISettingsStatusIndicator />}
@@ -565,7 +565,7 @@ function UnifiedEditor() {
 
                 <CollapsibleSection
                   title="Personal Information"
-                  icon={<User className="h-5 w-5 text-blue-400" />}
+                  icon={<User className="h-4 w-4 text-blue-400" />}
                   isExpanded={expandedSection === 'personal-info'}
                   onToggle={createToggleHandler('personal-info')}
                 >
@@ -574,7 +574,7 @@ function UnifiedEditor() {
 
                 <CollapsibleSection
                   title="Social Media"
-                  icon={<Share2 className="h-5 w-5 text-blue-400" />}
+                  icon={<Share2 className="h-4 w-4 text-blue-400" />}
                   isExpanded={expandedSection === 'social-media'}
                   onToggle={createToggleHandler('social-media')}
                 >
@@ -586,7 +586,7 @@ function UnifiedEditor() {
                   <>
                     <CollapsibleSection
                       title="Summary"
-                      icon={<FileText className="h-5 w-5 text-blue-400" />}
+                      icon={<FileText className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'summary'}
                       onToggle={createToggleHandler('summary')}
                     >
@@ -595,7 +595,7 @@ function UnifiedEditor() {
 
                     <CollapsibleSection
                       title="Education"
-                      icon={<GraduationCap className="h-5 w-5 text-blue-400" />}
+                      icon={<GraduationCap className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'education'}
                       onToggle={createToggleHandler('education')}
                     >
@@ -604,7 +604,7 @@ function UnifiedEditor() {
 
                     <CollapsibleSection
                       title="Experience"
-                      icon={<Briefcase className="h-5 w-5 text-blue-400" />}
+                      icon={<Briefcase className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'work-experience'}
                       onToggle={createToggleHandler('work-experience')}
                     >
@@ -614,7 +614,7 @@ function UnifiedEditor() {
                     {/* Skills Section - All groups in single collapsible */}
                     <CollapsibleSection
                       title="Skills"
-                      icon={<Code className="h-5 w-5 text-blue-400" />}
+                      icon={<Code className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'skills'}
                       onToggle={createToggleHandler('skills')}
                     >
@@ -623,7 +623,7 @@ function UnifiedEditor() {
 
                     <CollapsibleSection
                       title="Additional Info"
-                      icon={<Layers className="h-5 w-5 text-blue-400" />}
+                      icon={<Layers className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'additional-info'}
                       onToggle={createToggleHandler('additional-info')}
                     >
@@ -636,7 +636,7 @@ function UnifiedEditor() {
                 {mode === 'coverLetter' && (
                   <CollapsibleSection
                     title="Content"
-                    icon={<Mail className="h-5 w-5 text-blue-400" />}
+                    icon={<Mail className="h-4 w-4 text-blue-400" />}
                     isExpanded={expandedSection === 'cover-letter'}
                     onToggle={createToggleHandler('cover-letter')}
                   >

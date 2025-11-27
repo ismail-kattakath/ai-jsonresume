@@ -103,13 +103,13 @@ const CollapsibleSection = ({
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border backdrop-blur-sm transition-all ${variantClasses}`}
+      className={`overflow-hidden rounded-lg border backdrop-blur-sm transition-all ${variantClasses}`}
     >
       {/* Header - Clickable */}
       <button
         type="button"
         onClick={() => !isEditing && handleToggle()}
-        className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-white/5"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
       >
         <div className="flex min-w-0 flex-1 items-center gap-3">
           {/* Drag Handle - Only for editable sections */}
@@ -124,14 +124,12 @@ const CollapsibleSection = ({
           )}
 
           {icon && (
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20">
               {icon}
             </div>
           )}
 
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="h-6 w-1 flex-shrink-0 rounded-full bg-gradient-to-b from-blue-500 to-cyan-500"></div>
-
             {isEditing ? (
               <input
                 ref={inputRef}
@@ -141,10 +139,10 @@ const CollapsibleSection = ({
                 onBlur={handleRename}
                 onKeyDown={handleKeyDown}
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 rounded-lg border border-blue-400 bg-white/10 px-3 py-1 text-lg font-semibold text-white outline-none focus:ring-2 focus:ring-blue-400/20"
+                className="flex-1 rounded-lg border border-blue-400 bg-white/10 px-3 py-1 text-sm font-semibold text-white outline-none focus:ring-2 focus:ring-blue-400/20"
               />
             ) : (
-              <h2 className="truncate text-lg font-semibold text-white">
+              <h2 className="truncate text-sm font-semibold text-white">
                 {title}
               </h2>
             )}
@@ -209,7 +207,7 @@ const CollapsibleSection = ({
             : 'max-h-0 overflow-hidden opacity-0'
         }`}
       >
-        <div className="border-t border-white/10 p-6 pt-4">{children}</div>
+        <div className="border-t border-white/10 p-4 pt-3">{children}</div>
       </div>
     </div>
   )
