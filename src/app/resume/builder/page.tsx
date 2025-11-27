@@ -144,7 +144,7 @@ function UnifiedEditor() {
       <Toaster position="top-right" richColors closeButton />
       <ResumeContext.Provider value={currentContext}>
         <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900">
-          <div className="relative flex flex-1 flex-col overflow-hidden md:flex-row">
+          <div className="relative flex flex-1 flex-col md:flex-row">
             {/* Floating Print Button - Hidden on print */}
             <div className="exclude-print fixed right-8 bottom-8 z-50">
               <PrintButton
