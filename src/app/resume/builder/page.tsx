@@ -37,11 +37,11 @@ import {
   Code,
   Languages,
   Award,
-  Plus,
   Pencil,
   Trash2,
   GripVertical,
 } from 'lucide-react'
+import { MdAddCircle } from 'react-icons/md'
 import {
   DnDContext,
   DnDDroppable,
@@ -109,47 +109,51 @@ function SkillGroupHeader({
   }
 
   return (
-    <div className="flex items-center gap-2">
-      {dragHandleProps && (
-        <div
-          {...dragHandleProps}
-          className="cursor-grab text-white/30 hover:text-white/50 active:cursor-grabbing"
-        >
-          <GripVertical className="h-4 w-4" />
-        </div>
-      )}
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        {dragHandleProps && (
+          <div
+            {...dragHandleProps}
+            className="cursor-grab text-white/40 hover:text-white/60 active:cursor-grabbing"
+          >
+            <GripVertical className="h-4 w-4" />
+          </div>
+        )}
 
-      {isEditing ? (
-        <input
-          ref={inputRef}
-          type="text"
-          value={editedTitle}
-          onChange={(e) => setEditedTitle(e.target.value)}
-          onBlur={handleRename}
-          onKeyDown={handleKeyDown}
-          className="rounded border border-pink-400 bg-white/10 px-2 py-0.5 text-sm font-medium text-white outline-none focus:ring-2 focus:ring-pink-400/20"
-        />
-      ) : (
-        <span className="text-sm font-medium text-white/70">{title}</span>
-      )}
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            onBlur={handleRename}
+            onKeyDown={handleKeyDown}
+            className="rounded border border-pink-400 bg-white/10 px-2 py-1 text-sm font-semibold text-white outline-none focus:ring-2 focus:ring-pink-400/20"
+          />
+        ) : (
+          <span className="text-sm font-semibold tracking-wide text-white/80">
+            {title}
+          </span>
+        )}
+      </div>
 
       {!isEditing && (
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="rounded p-1 text-white/30 transition-all hover:bg-white/10 hover:text-white/60"
+            className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-blue-400"
             title="Rename group"
           >
-            <Pencil className="h-3 w-3" />
+            <Pencil className="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
             onClick={handleDeleteClick}
-            className="rounded p-1 text-white/30 transition-all hover:bg-white/10 hover:text-red-400"
+            className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-red-400"
             title="Delete group"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       )}
@@ -245,7 +249,7 @@ function SkillsSection() {
           <div className="flex items-center gap-2">
             <input
               type="text"
-              placeholder="Group name (e.g., 'Frontend')"
+              placeholder="e.g., Frontend, Backend, DevOps..."
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -253,14 +257,14 @@ function SkillsSection() {
                 if (!newGroupName.trim()) setIsAdding(false)
               }}
               autoFocus
-              className="flex-1 rounded-full border border-dashed border-pink-400 bg-transparent px-3 py-1 text-sm text-white outline-none placeholder:text-white/40 focus:ring-2 focus:ring-pink-400/20"
+              className="flex-1 rounded border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white outline-none placeholder:text-white/40 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
             />
             <button
               type="button"
               onClick={handleAddGroup}
-              className="rounded-full bg-pink-500/20 px-3 py-1 text-sm font-medium text-pink-400 transition-all hover:bg-pink-500/30"
+              className="inline-flex cursor-pointer items-center gap-2 rounded bg-red-800 px-3 py-1.5 text-sm text-white transition-colors hover:opacity-90"
             >
-              Add
+              Create
             </button>
             <button
               type="button"
@@ -268,19 +272,20 @@ function SkillsSection() {
                 setNewGroupName('')
                 setIsAdding(false)
               }}
-              className="rounded-full px-2 py-1 text-sm text-white/40 transition-all hover:text-white/60"
+              className="rounded px-2 py-1.5 text-sm text-white/40 transition-all hover:bg-white/10 hover:text-white/60"
             >
-              ✕
+              Cancel
             </button>
           </div>
         ) : (
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-1 text-sm text-white/40 transition-all hover:text-pink-400"
+            aria-label="Add Skill Group"
+            className="inline-flex cursor-pointer items-center gap-2 rounded bg-red-800 px-3 py-1.5 text-sm text-white transition-colors hover:opacity-90"
           >
-            <Plus className="h-4 w-4" />
-            <span>Add group</span>
+            <MdAddCircle className="text-lg" />
+            <span>Add Skill Group</span>
           </button>
         )}
       </div>
