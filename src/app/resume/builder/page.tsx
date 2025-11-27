@@ -501,7 +501,7 @@ function UnifiedEditor() {
                 </div>
               </div>
 
-              {/* All Form Sections - Always Visible */}
+              {/* Form Sections - Conditionally rendered based on mode */}
               <ImportExport preserveContent={mode === 'coverLetter'} />
 
               <CollapsibleSection
@@ -522,72 +522,80 @@ function UnifiedEditor() {
                 <SocialMedia />
               </CollapsibleSection>
 
-              <CollapsibleSection
-                title="Professional Summary"
-                icon={<FileText className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'summary'}
-                onToggle={createToggleHandler('summary')}
-              >
-                <Summary />
-              </CollapsibleSection>
+              {/* Resume-only sections */}
+              {mode === 'resume' && (
+                <>
+                  <CollapsibleSection
+                    title="Professional Summary"
+                    icon={<FileText className="h-5 w-5 text-blue-400" />}
+                    isExpanded={expandedSection === 'summary'}
+                    onToggle={createToggleHandler('summary')}
+                  >
+                    <Summary />
+                  </CollapsibleSection>
 
-              <CollapsibleSection
-                title="Cover Letter"
-                icon={<Mail className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'cover-letter'}
-                onToggle={createToggleHandler('cover-letter')}
-              >
-                <ResumeContext.Provider
-                  value={{
-                    resumeData: coverLetterData as ResumeData,
-                    setResumeData: setCoverLetterData as React.Dispatch<
-                      React.SetStateAction<ResumeData>
-                    >,
-                    handleProfilePicture:
-                      coverLetterHandlers.handleProfilePicture,
-                    handleChange: coverLetterHandlers.handleChange,
-                  }}
+                  <CollapsibleSection
+                    title="Education"
+                    icon={<GraduationCap className="h-5 w-5 text-blue-400" />}
+                    isExpanded={expandedSection === 'education'}
+                    onToggle={createToggleHandler('education')}
+                  >
+                    <Education />
+                  </CollapsibleSection>
+
+                  <CollapsibleSection
+                    title="Work Experience"
+                    icon={<Briefcase className="h-5 w-5 text-blue-400" />}
+                    isExpanded={expandedSection === 'work-experience'}
+                    onToggle={createToggleHandler('work-experience')}
+                  >
+                    <WorkExperience />
+                  </CollapsibleSection>
+
+                  {/* Skills Section - All groups in single collapsible */}
+                  <CollapsibleSection
+                    title="Skills"
+                    icon={<Code className="h-5 w-5 text-blue-400" />}
+                    isExpanded={expandedSection === 'skills'}
+                    onToggle={createToggleHandler('skills')}
+                  >
+                    <SkillsSection />
+                  </CollapsibleSection>
+
+                  <CollapsibleSection
+                    title="Additional Info"
+                    icon={<Layers className="h-5 w-5 text-blue-400" />}
+                    isExpanded={expandedSection === 'additional-info'}
+                    onToggle={createToggleHandler('additional-info')}
+                  >
+                    <AdditionalSections />
+                  </CollapsibleSection>
+                </>
+              )}
+
+              {/* Cover Letter-only sections */}
+              {mode === 'coverLetter' && (
+                <CollapsibleSection
+                  title="Cover Letter"
+                  icon={<Mail className="h-5 w-5 text-blue-400" />}
+                  isExpanded={expandedSection === 'cover-letter'}
+                  onToggle={createToggleHandler('cover-letter')}
                 >
-                  <CoverLetterContent />
-                </ResumeContext.Provider>
-              </CollapsibleSection>
-
-              <CollapsibleSection
-                title="Education"
-                icon={<GraduationCap className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'education'}
-                onToggle={createToggleHandler('education')}
-              >
-                <Education />
-              </CollapsibleSection>
-
-              <CollapsibleSection
-                title="Work Experience"
-                icon={<Briefcase className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'work-experience'}
-                onToggle={createToggleHandler('work-experience')}
-              >
-                <WorkExperience />
-              </CollapsibleSection>
-
-              {/* Skills Section - All groups in single collapsible */}
-              <CollapsibleSection
-                title="Skills"
-                icon={<Code className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'skills'}
-                onToggle={createToggleHandler('skills')}
-              >
-                <SkillsSection />
-              </CollapsibleSection>
-
-              <CollapsibleSection
-                title="Additional Info"
-                icon={<Layers className="h-5 w-5 text-blue-400" />}
-                isExpanded={expandedSection === 'additional-info'}
-                onToggle={createToggleHandler('additional-info')}
-              >
-                <AdditionalSections />
-              </CollapsibleSection>
+                  <ResumeContext.Provider
+                    value={{
+                      resumeData: coverLetterData as ResumeData,
+                      setResumeData: setCoverLetterData as React.Dispatch<
+                        React.SetStateAction<ResumeData>
+                      >,
+                      handleProfilePicture:
+                        coverLetterHandlers.handleProfilePicture,
+                      handleChange: coverLetterHandlers.handleChange,
+                    }}
+                  >
+                    <CoverLetterContent />
+                  </ResumeContext.Provider>
+                </CollapsibleSection>
+              )}
             </form>
 
             {/* Preview Section */}
