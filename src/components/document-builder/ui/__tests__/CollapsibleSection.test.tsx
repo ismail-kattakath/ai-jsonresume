@@ -352,4 +352,80 @@ describe('CollapsibleSection', () => {
       expect(wrapper).toHaveClass('max-h-0')
     })
   })
+
+  describe('Event Propagation', () => {
+    it('prevents propagation when clicking drag handle', () => {
+      const onToggle = jest.fn()
+      const dragHandleProps = {
+        'data-testid': 'drag-handle',
+      }
+
+      render(
+        <CollapsibleSection
+          {...defaultProps}
+          editable={true}
+          dragHandleProps={dragHandleProps}
+          isExpanded={false}
+          onToggle={onToggle}
+        />
+      )
+
+      const dragHandle = screen.getByTestId('drag-handle')
+      fireEvent.click(dragHandle)
+
+      // onToggle should not be called because stopPropagation prevents it
+      expect(onToggle).not.toHaveBeenCalled()
+    })
+
+    it('prevents propagation when clicking title input during edit mode', () => {
+      const onToggle = jest.fn()
+
+      render(
+        <CollapsibleSection
+          {...defaultProps}
+          editable={true}
+          isExpanded={false}
+          onToggle={onToggle}
+        />
+      )
+
+      // Enter edit mode
+      const editButton = screen.getByTitle('Rename skill group')
+      fireEvent.click(editButton)
+
+      // Click on the input field
+      const input = screen.getByRole('textbox')
+      fireEvent.click(input)
+
+      // onToggle should not be called (only called once to enter edit mode)
+      expect(onToggle).toHaveBeenCalledTimes(0)
+    })
+
+    it('prevents propagation when clicking action element', () => {
+      const onToggle = jest.fn()
+      const mockActionClick = jest.fn()
+
+      render(
+        <CollapsibleSection
+          {...defaultProps}
+          action={
+            <button onClick={mockActionClick} data-testid="action-btn">
+              Custom Action
+            </button>
+          }
+          isExpanded={false}
+          onToggle={onToggle}
+        />
+      )
+
+      const actionButton = screen.getByTestId('action-btn')
+      fireEvent.click(actionButton)
+
+      // Action click should fire
+      expect(mockActionClick).toHaveBeenCalledTimes(1)
+
+      // onToggle should not be called because stopPropagation prevents it
+      expect(onToggle).not.toHaveBeenCalled()
+    })
+  })
 })
