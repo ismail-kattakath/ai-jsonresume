@@ -63,7 +63,7 @@ const AISettings: React.FC = () => {
         name="jobDescription"
         value={settings.jobDescription}
         onChange={(e) => updateSettings({ jobDescription: e.target.value })}
-        placeholder="Paste the job posting here..."
+        placeholder="Paste the job description here to tailor your resume and cover letter..."
         variant="blue"
         minHeight="160px"
       />
