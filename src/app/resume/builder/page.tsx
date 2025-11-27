@@ -443,7 +443,7 @@ function UnifiedEditor() {
         <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900">
           <div className="relative flex flex-1 flex-col md:grid md:grid-cols-[1fr_auto]">
             {/* Floating Print Button - Hidden on print */}
-            <div className="exclude-print fixed right-8 bottom-8 z-50">
+            <div className="exclude-print fixed top-8 right-8 z-50">
               <PrintButton
                 name={
                   mode === 'resume' ? resumeData.name : coverLetterData.name
