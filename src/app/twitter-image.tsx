@@ -1,21 +1,17 @@
 import resumeData from '@/lib/resumeAdapter'
 import { generateOgImage } from '@/lib/utils/generateOgImage'
+import { TWITTER_IMAGE_CONFIG } from '@/lib/utils/ogImageConfigs'
 
 export const dynamic = 'force-static'
 
 export const alt = (resumeData.name || 'Portfolio').toUpperCase()
 export const size = {
-  width: 1200,
-  height: 600,
+  width: TWITTER_IMAGE_CONFIG.width,
+  height: TWITTER_IMAGE_CONFIG.height,
 }
 
 export const contentType = 'image/png'
 
 export default async function Image() {
-  return generateOgImage({
-    width: size.width,
-    height: size.height,
-    logoWidth: 560,
-    logoHeight: 315,
-  })
+  return generateOgImage(TWITTER_IMAGE_CONFIG)
 }
