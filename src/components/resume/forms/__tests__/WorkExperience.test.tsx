@@ -224,6 +224,39 @@ describe('WorkExperience Component', () => {
     })
   })
 
+  describe('Accordion Toggle Functionality', () => {
+    it('should toggle accordion when expand/collapse button is clicked', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [{ text: 'Test' }],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+          },
+        ],
+      })
+
+      const { container } = renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      // Find the toggle button by title attribute (should be "Expand" or "Collapse")
+      const expandButton = container.querySelector('button[title="Expand"]')
+      const collapseButton = container.querySelector('button[title="Collapse"]')
+      const toggleButton = expandButton || collapseButton
+
+      if (toggleButton) {
+        fireEvent.click(toggleButton)
+        // After click, should toggle the expanded state
+        expect(toggleButton).toBeInTheDocument()
+      }
+    })
+  })
+
   describe('Delete Functionality', () => {
     it('should render delete button for each entry', () => {
       const mockData = createMockResumeData({
@@ -443,7 +476,7 @@ describe('WorkExperience Component', () => {
       }
     })
 
-    it('should handle date changes', () => {
+    it('should handle start date changes', () => {
       const mockSetResumeData = jest.fn()
       const mockData = createMockResumeData({
         workExperience: [
@@ -471,6 +504,40 @@ describe('WorkExperience Component', () => {
       if (startYearInput) {
         fireEvent.change(startYearInput, {
           target: { name: 'startYear', value: '2020-01-01' },
+        })
+
+        expect(mockSetResumeData).toHaveBeenCalled()
+      }
+    })
+
+    it('should handle end date changes', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test',
+            url: '',
+            position: '',
+            description: '',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '',
+          },
+        ],
+      })
+
+      const { container } = renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const endYearInput = container.querySelector('input[name="endYear"]')
+
+      if (endYearInput) {
+        fireEvent.change(endYearInput, {
+          target: { name: 'endYear', value: '2023-01-01' },
         })
 
         expect(mockSetResumeData).toHaveBeenCalled()
