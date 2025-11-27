@@ -1,30 +1,83 @@
+import React, { useContext, useState, useEffect, useCallback } from 'react'
 import FormButton from '@/components/ui/FormButton'
-import React, { useContext, useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
+import { FormInput } from '@/components/ui/FormInput'
+import { AccordionCard, AccordionHeader } from '@/components/ui/AccordionCard'
+import { useArrayForm } from '@/hooks/useArrayForm'
+import { useAccordion } from '@/hooks/useAccordion'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
-import { MdDelete, MdCheckCircle, MdLink, MdLinkOff } from 'react-icons/md'
-import { AiOutlineLoading3Quarters } from 'react-icons/ai'
+import {
+  DnDContext,
+  DnDDroppable,
+  DnDDraggable,
+} from '@/components/ui/DragAndDrop'
+import type { DropResult } from '@hello-pangea/dnd'
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
-// Dynamic imports for drag-and-drop
-const DragDropContext = dynamic(
-  () => import('@hello-pangea/dnd').then((mod) => mod.DragDropContext),
-  { ssr: false }
-)
-const Droppable = dynamic(
-  () => import('@hello-pangea/dnd').then((mod) => mod.Droppable),
-  { ssr: false }
-)
-const Draggable = dynamic(
-  () => import('@hello-pangea/dnd').then((mod) => mod.Draggable),
-  { ssr: false }
-)
+type ValidationStatus = 'empty' | 'checking' | 'valid' | 'invalid'
 
+/**
+ * URL Status Indicator Component
+ * Shows a subtle pill indicator for URL validation status
+ */
+function UrlStatusIndicator({ status }: { status: ValidationStatus }) {
+  switch (status) {
+    case 'valid':
+      return (
+        <span
+          className="inline-flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-0.5 text-xs text-green-400"
+          title="URL is reachable"
+        >
+          <CheckCircle className="h-3 w-3" />
+          <span>Valid</span>
+        </span>
+      )
+    case 'invalid':
+      return (
+        <span
+          className="inline-flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-400"
+          title="URL may be unreachable"
+        >
+          <XCircle className="h-3 w-3" />
+          <span>Check URL</span>
+        </span>
+      )
+    case 'checking':
+      return (
+        <span
+          className="inline-flex items-center gap-1 rounded-full bg-blue-500/20 px-2 py-0.5 text-xs text-blue-400"
+          title="Validating URL..."
+        >
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span>Checking</span>
+        </span>
+      )
+    case 'empty':
+    default:
+      return null
+  }
+}
+
+/**
+ * Social Media form component
+ * Card-based layout with collapsible entries, matching WorkExperience/Education pattern
+ */
 const SocialMedia = () => {
   const { resumeData, setResumeData } = useContext(ResumeContext)
-  const [validationStatus, setValidationStatus] = useState({})
+  const { data, handleChange, add, remove } = useArrayForm(
+    'socialMedia',
+    { socialMedia: '', link: '' },
+    { urlFields: ['link'] }
+  )
+
+  const { isExpanded, toggleExpanded, expandNew, updateAfterReorder } =
+    useAccordion()
+
+  const [validationStatus, setValidationStatus] = useState<
+    Record<number, ValidationStatus>
+  >({})
 
   // Validate URL
-  const validateUrl = async (url, index) => {
+  const validateUrl = useCallback(async (url: string, index: number) => {
     if (!url || url.trim() === '') {
       setValidationStatus((prev) => ({ ...prev, [index]: 'empty' }))
       return
@@ -39,18 +92,16 @@ const SocialMedia = () => {
         mode: 'no-cors',
         cache: 'no-cache',
       })
-
-      // With no-cors mode, we can't check status, but if fetch succeeds, URL is likely valid
       setValidationStatus((prev) => ({ ...prev, [index]: 'valid' }))
     } catch {
       setValidationStatus((prev) => ({ ...prev, [index]: 'invalid' }))
     }
-  }
+  }, [])
 
   // Debounce URL validation
   useEffect(() => {
-    const timeouts = {}
-    resumeData.socialMedia.forEach((socialMedia, index) => {
+    const timeouts: Record<number, NodeJS.Timeout> = {}
+    data.forEach((socialMedia, index) => {
       if (socialMedia.link) {
         timeouts[index] = setTimeout(() => {
           validateUrl(socialMedia.link, index)
@@ -63,37 +114,18 @@ const SocialMedia = () => {
     return () => {
       Object.values(timeouts).forEach((timeout) => clearTimeout(timeout))
     }
-  }, [resumeData.socialMedia])
+  }, [data, validateUrl])
 
-  // social media
-  const handleSocialMedia = (e, index) => {
-    const newSocialMedia = [...resumeData.socialMedia]
-    newSocialMedia[index][e.target.name] = e.target.value.replace(
-      'https://',
-      ''
-    )
-    setResumeData({ ...resumeData, socialMedia: newSocialMedia })
-
-    // Clear validation status if link field is cleared
-    if (e.target.name === 'link' && e.target.value.trim() === '') {
-      setValidationStatus((prev) => ({ ...prev, [index]: 'empty' }))
-    }
+  const handleAdd = () => {
+    add()
+    expandNew(data.length)
   }
 
-  const addSocialMedia = () => {
-    setResumeData({
-      ...resumeData,
-      socialMedia: [...resumeData.socialMedia, { socialMedia: '', link: '' }],
-    })
-  }
-
-  const deleteSocialMedia = (index) => {
-    const newSocialMedia = resumeData.socialMedia.filter((_, i) => i !== index)
-    setResumeData({ ...resumeData, socialMedia: newSocialMedia })
-
-    // Remove validation status for deleted item and reindex remaining items
+  const handleRemove = (index: number) => {
+    remove(index)
+    // Reindex validation status
     setValidationStatus((prev) => {
-      const newStatus = {}
+      const newStatus: Record<number, ValidationStatus> = {}
       Object.keys(prev).forEach((key) => {
         const keyIndex = parseInt(key)
         if (keyIndex < index) {
@@ -106,164 +138,124 @@ const SocialMedia = () => {
     })
   }
 
-  // Handle drag and drop reordering
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     const { destination, source } = result
+
     if (!destination) return
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return
+    if (destination.index === source.index) return
 
     const newSocialMedia = [...resumeData.socialMedia]
     const [removed] = newSocialMedia.splice(source.index, 1)
     newSocialMedia.splice(destination.index, 0, removed)
-
     setResumeData({ ...resumeData, socialMedia: newSocialMedia })
 
-    // Reindex validation status
-    const newStatus = {}
-    Object.keys(validationStatus).forEach((key) => {
-      const keyIndex = parseInt(key)
-      if (keyIndex === source.index) {
-        newStatus[destination.index] = validationStatus[keyIndex]
-      } else if (
-        keyIndex > source.index &&
-        keyIndex <= destination.index &&
-        source.index < destination.index
-      ) {
-        newStatus[keyIndex - 1] = validationStatus[keyIndex]
-      } else if (
-        keyIndex < source.index &&
-        keyIndex >= destination.index &&
-        source.index > destination.index
-      ) {
-        newStatus[keyIndex + 1] = validationStatus[keyIndex]
-      } else {
-        newStatus[keyIndex] = validationStatus[keyIndex]
-      }
+    updateAfterReorder(source.index, destination.index)
+
+    // Reindex validation status for drag
+    setValidationStatus((prev) => {
+      const newStatus: Record<number, ValidationStatus> = {}
+      Object.keys(prev).forEach((key) => {
+        const keyIndex = parseInt(key)
+        if (keyIndex === source.index) {
+          newStatus[destination.index] = prev[keyIndex]
+        } else if (
+          keyIndex > source.index &&
+          keyIndex <= destination.index &&
+          source.index < destination.index
+        ) {
+          newStatus[keyIndex - 1] = prev[keyIndex]
+        } else if (
+          keyIndex < source.index &&
+          keyIndex >= destination.index &&
+          source.index > destination.index
+        ) {
+          newStatus[keyIndex + 1] = prev[keyIndex]
+        } else {
+          newStatus[keyIndex] = prev[keyIndex]
+        }
+      })
+      return newStatus
     })
-    setValidationStatus(newStatus)
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="social-media">
+      <DnDContext onDragEnd={onDragEnd}>
+        <DnDDroppable droppableId="social-media">
           {(provided) => (
             <div
-              className="flex flex-col gap-3"
+              className="space-y-3"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {resumeData.socialMedia.map((socialMedia, index) => {
-                const status = validationStatus[index] || 'empty'
-                const getStatusIcon = () => {
-                  switch (status) {
-                    case 'valid':
-                      return (
-                        <MdCheckCircle
-                          className="text-xl text-green-400"
-                          title="URL is valid and reachable"
+              {data.map((socialMedia, index) => (
+                <DnDDraggable
+                  key={`SOCIAL-${index}`}
+                  draggableId={`SOCIAL-${index}`}
+                  index={index}
+                >
+                  {(dragProvided, snapshot) => (
+                    <AccordionCard
+                      isDragging={snapshot.isDragging}
+                      isExpanded={isExpanded(index)}
+                      theme="pink"
+                      innerRef={dragProvided.innerRef}
+                      draggableProps={dragProvided.draggableProps}
+                      header={
+                        <AccordionHeader
+                          title={socialMedia.socialMedia}
+                          subtitle={socialMedia.link}
+                          placeholder="New Social Link"
+                          isExpanded={isExpanded(index)}
+                          onToggle={() => toggleExpanded(index)}
+                          onDelete={() => handleRemove(index)}
+                          deleteTitle="Delete social media"
+                          dragHandleProps={dragProvided.dragHandleProps}
+                          titleExtra={
+                            <UrlStatusIndicator
+                              status={validationStatus[index] || 'empty'}
+                            />
+                          }
                         />
-                      )
-                    case 'invalid':
-                      return (
-                        <MdLinkOff
-                          className="text-xl text-red-400"
-                          title="URL is invalid or unreachable"
-                        />
-                      )
-                    case 'checking':
-                      return (
-                        <AiOutlineLoading3Quarters
-                          className="animate-spin text-xl text-blue-400"
-                          title="Validating URL..."
-                        />
-                      )
-                    case 'empty':
-                    default:
-                      return (
-                        <MdLink
-                          className="text-xl text-white/30"
-                          title="Enter a URL to validate"
-                        />
-                      )
-                  }
-                }
+                      }
+                    >
+                      <FormInput
+                        label="Platform Name"
+                        name="socialMedia"
+                        placeholder="e.g., LinkedIn, GitHub, Twitter..."
+                        value={socialMedia.socialMedia}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="pink"
+                      />
 
-                return (
-                  <Draggable
-                    key={`SOCIAL-${index}`}
-                    draggableId={`SOCIAL-${index}`}
-                    index={index}
-                  >
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={`group flex cursor-grab flex-col items-stretch gap-3 rounded-lg border border-white/10 bg-white/5 p-3 hover:border-white/20 hover:bg-white/10 active:cursor-grabbing sm:flex-row sm:items-center ${
-                          snapshot.isDragging
-                            ? 'bg-white/20 outline-2 outline-fuchsia-400 outline-dashed'
-                            : ''
-                        }`}
-                      >
-                        <div className="flex flex-1 items-center gap-3">
-                          <div className="flex flex-shrink-0 items-center">
-                            {getStatusIcon()}
-                          </div>
-                          <div className="floating-label-group flex-1">
-                            <input
-                              type="text"
-                              placeholder="Platform Name"
-                              name="socialMedia"
-                              className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
-                              value={socialMedia.socialMedia}
-                              onChange={(e) => handleSocialMedia(e, index)}
-                            />
-                            <label className="floating-label">
-                              Platform Name
-                            </label>
-                          </div>
-                        </div>
-                        <div className="flex flex-1 items-center gap-3">
-                          <div className="floating-label-group flex-1">
-                            <input
-                              type="text"
-                              placeholder="URL"
-                              name="link"
-                              className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20"
-                              value={socialMedia.link}
-                              onChange={(e) => handleSocialMedia(e, index)}
-                            />
-                            <label className="floating-label">URL</label>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => deleteSocialMedia(index)}
-                            className="flex-shrink-0 cursor-pointer rounded-lg p-2 text-red-400 transition-all hover:bg-red-400/10 hover:text-red-300"
-                            title="Delete this social media"
-                          >
-                            <MdDelete className="text-xl" />
-                          </button>
-                        </div>
+                      <div className="space-y-1">
+                        <FormInput
+                          label="URL"
+                          name="link"
+                          type="url"
+                          placeholder="e.g., linkedin.com/in/username"
+                          value={socialMedia.link}
+                          onChange={(e) => handleChange(e, index)}
+                          variant="pink"
+                        />
+                        {validationStatus[index] === 'invalid' && (
+                          <p className="text-xs text-amber-400/80">
+                            This URL may not be reachable. Double-check the
+                            spelling.
+                          </p>
+                        )}
                       </div>
-                    )}
-                  </Draggable>
-                )
-              })}
+                    </AccordionCard>
+                  )}
+                </DnDDraggable>
+              ))}
               {provided.placeholder}
             </div>
           )}
-        </Droppable>
-      </DragDropContext>
-      <FormButton
-        size={resumeData.socialMedia.length}
-        add={addSocialMedia}
-        label="Social Media"
-      />
+        </DnDDroppable>
+      </DnDContext>
+
+      <FormButton size={data.length} add={handleAdd} label="Social Media" />
     </div>
   )
 }

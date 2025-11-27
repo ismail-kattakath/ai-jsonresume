@@ -5,7 +5,7 @@ import '@/styles/document-builder.css'
 import '@/styles/resume-preview.css'
 
 // Import components
-import Language from '@/components/resume/forms/Language'
+import AdditionalSections from '@/components/resume/forms/AdditionalSections'
 import ImportExport from '@/components/document-builder/shared-forms/ImportExport'
 import Preview from '@/components/resume/preview/Preview'
 import CoverLetterPreview from '@/components/cover-letter/preview/CoverLetterPreview'
@@ -16,14 +16,15 @@ import Skill from '@/components/resume/forms/Skill'
 import PersonalInformation from '@/components/document-builder/shared-forms/PersonalInformation'
 import Summary from '@/components/resume/forms/Summary'
 import Education from '@/components/resume/forms/Education'
-import Certification from '@/components/resume/forms/Certification'
 import CoverLetterContent from '@/components/cover-letter/forms/CoverLetterContent'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
 import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSection'
+import { AccordionCard } from '@/components/ui/AccordionCard'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { Toaster } from 'sonner'
 import { useDocumentHandlers } from '@/hooks/useDocumentHandlers'
 import { useSkillGroupsManagement } from '@/hooks/useSkillGroupsManagement'
+import { useAccordion } from '@/hooks/useAccordion'
 import PasswordProtection from '@/components/auth/PasswordProtection'
 import Footer from '@/components/layout/Footer'
 import type { CoverLetterData, ResumeData } from '@/types'
@@ -35,11 +36,12 @@ import {
   GraduationCap,
   Briefcase,
   Code,
-  Languages,
-  Award,
+  Layers,
   Pencil,
   Trash2,
   GripVertical,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react'
 import { MdAddCircle } from 'react-icons/md'
 import {
@@ -57,15 +59,19 @@ type EditorMode = 'resume' | 'coverLetter'
 
 /**
  * Skill Group Header Component
- * Displays group name with edit/delete controls
+ * Displays group name with expand/collapse and edit/delete controls
  */
 function SkillGroupHeader({
   title,
+  isExpanded,
+  onToggle,
   onRename,
   onDelete,
   dragHandleProps,
 }: {
   title: string
+  isExpanded: boolean
+  onToggle: () => void
   onRename: (newTitle: string) => void
   onDelete: () => void
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement> | null
@@ -110,7 +116,7 @@ function SkillGroupHeader({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {dragHandleProps && (
           <div
             {...dragHandleProps}
@@ -131,9 +137,33 @@ function SkillGroupHeader({
             className="rounded border border-pink-400 bg-white/10 px-2 py-1 text-sm font-semibold text-white outline-none focus:ring-2 focus:ring-pink-400/20"
           />
         ) : (
-          <span className="text-sm font-semibold tracking-wide text-white/80">
-            {title}
-          </span>
+          <button
+            type="button"
+            onClick={onToggle}
+            className="flex min-w-0 items-center gap-1.5 text-left"
+          >
+            <span className="truncate text-sm font-semibold tracking-wide text-white/80">
+              {title}
+            </span>
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsEditing(true)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation()
+                  setIsEditing(true)
+                }
+              }}
+              className="rounded p-0.5 text-white/30 transition-all hover:bg-white/10 hover:text-blue-400"
+              title="Rename group"
+            >
+              <Pencil className="h-3 w-3" />
+            </span>
+          </button>
         )}
       </div>
 
@@ -141,11 +171,15 @@ function SkillGroupHeader({
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setIsEditing(true)}
-            className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-blue-400"
-            title="Rename group"
+            onClick={onToggle}
+            className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-white/60"
+            title={isExpanded ? 'Collapse' : 'Expand'}
           >
-            <Pencil className="h-3.5 w-3.5" />
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </button>
           <button
             type="button"
@@ -175,16 +209,21 @@ function SkillsSection() {
   const [isAdding, setIsAdding] = useState(false)
   const [newGroupName, setNewGroupName] = useState('')
 
+  const { isExpanded, toggleExpanded, expandNew, updateAfterReorder } =
+    useAccordion()
+
   const handleDragEnd = (result: DropResult) => {
     const { destination, source } = result
     if (!destination) return
     if (destination.index === source.index) return
     reorderGroups(source.index, destination.index)
+    updateAfterReorder(source.index, destination.index)
   }
 
   const handleAddGroup = () => {
     if (newGroupName.trim()) {
       addGroup(newGroupName)
+      expandNew(resumeData.skills.length)
       setNewGroupName('')
       setIsAdding(false)
     }
@@ -220,21 +259,27 @@ function SkillsSection() {
                     index={index}
                   >
                     {(dragProvided, snapshot) => (
-                      <div
-                        ref={dragProvided.innerRef}
-                        {...dragProvided.draggableProps}
-                        className={`space-y-2 rounded-lg border border-white/10 bg-white/5 p-3 transition-all ${snapshot.isDragging ? 'opacity-50 shadow-lg' : ''}`}
+                      <AccordionCard
+                        isDragging={snapshot.isDragging}
+                        isExpanded={isExpanded(index)}
+                        theme="pink"
+                        innerRef={dragProvided.innerRef}
+                        draggableProps={dragProvided.draggableProps}
+                        header={
+                          <SkillGroupHeader
+                            title={skillGroup.title}
+                            isExpanded={isExpanded(index)}
+                            onToggle={() => toggleExpanded(index)}
+                            onRename={(newTitle) =>
+                              renameGroup(skillGroup.title, newTitle)
+                            }
+                            onDelete={() => removeGroup(skillGroup.title)}
+                            dragHandleProps={dragProvided.dragHandleProps}
+                          />
+                        }
                       >
-                        <SkillGroupHeader
-                          title={skillGroup.title}
-                          onRename={(newTitle) =>
-                            renameGroup(skillGroup.title, newTitle)
-                          }
-                          onDelete={() => removeGroup(skillGroup.title)}
-                          dragHandleProps={dragProvided.dragHandleProps}
-                        />
                         <Skill title={skillGroup.title} />
-                      </div>
+                      </AccordionCard>
                     )}
                   </DnDDraggable>
                 ))}
@@ -514,17 +559,10 @@ function UnifiedEditor() {
               <SkillsSection />
 
               <CollapsibleSection
-                title="Languages"
-                icon={<Languages className="h-5 w-5 text-blue-400" />}
+                title="Additional Info"
+                icon={<Layers className="h-5 w-5 text-blue-400" />}
               >
-                <Language />
-              </CollapsibleSection>
-
-              <CollapsibleSection
-                title="Certifications"
-                icon={<Award className="h-5 w-5 text-blue-400" />}
-              >
-                <Certification />
+                <AdditionalSections />
               </CollapsibleSection>
             </form>
 

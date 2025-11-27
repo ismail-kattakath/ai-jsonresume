@@ -20,12 +20,12 @@ export function useSimpleArrayForm(dataKey: 'certifications' | 'languages') {
   }
 
   /**
-   * Add new empty item
+   * Add new item (empty or with value)
    */
-  const add = () => {
+  const add = (value: string = '') => {
     setResumeData({
       ...resumeData,
-      [dataKey]: [...data, ''],
+      [dataKey]: [...data, value],
     })
   }
 

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(/opt/homebrew/bin/npm test -- src/components/resume/forms/__tests__/Skill.test.tsx --no-coverage)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(/opt/homebrew/bin/npx jest src/components/resume/forms/__tests__/Skill.test.tsx --no-coverage)",
+      "Bash(/opt/homebrew/bin/node /opt/homebrew/bin/npm test -- src/components/resume/forms/__tests__/Skill.test.tsx --no-coverage)",
+      "Bash(/opt/homebrew/bin/node ./node_modules/.bin/jest:*)",
+      "Bash(/opt/homebrew/bin/node /opt/homebrew/bin/npm install)",
+      "Bash(export PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\")",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create --title \"refactor: make skills read-only with X remove button\" --body \"$(cat <<''EOF''\n## Summary\n- Replace editable input fields with non-editable text labels for skills\n- Replace delete icon (trash) with ✕ character for a cleaner look\n- Update tests to reflect new non-editable behavior\n\n## Changes\n- `src/components/resume/forms/Skill.tsx`: Changed from input fields to span text labels, replaced DeleteButton with inline X button\n- `src/components/resume/forms/__tests__/Skill.test.tsx`: Updated tests to verify non-editable behavior and new remove button\n\n## Test plan\n- [x] Unit tests pass (20 tests)\n- [x] Build succeeds\n- [x] Skills display as text labels (not editable)\n- [x] X button removes skills correctly\n- [x] Drag and drop still works\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\nEOF\n)\")",
+      "Bash(/opt/homebrew/bin/npm run build)",
+      "Bash(/opt/homebrew/bin/node /opt/homebrew/bin/npm run build)",
+      "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\" npm run build:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\" git add:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\" git commit:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\" git push:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH\" npm test:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

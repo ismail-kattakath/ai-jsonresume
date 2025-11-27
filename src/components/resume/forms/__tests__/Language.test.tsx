@@ -8,67 +8,9 @@ import {
   createMockResumeData,
 } from '@/lib/__tests__/test-utils'
 
-// Store the onDragEnd callback for testing
-let capturedOnDragEnd: ((result: unknown) => void) | null = null
-
-// Mock @hello-pangea/dnd to test drag-and-drop functionality
-jest.mock('@hello-pangea/dnd', () => ({
-  DragDropContext: ({
-    children,
-    onDragEnd,
-  }: {
-    children: React.ReactNode
-    onDragEnd: (result: unknown) => void
-  }) => {
-    capturedOnDragEnd = onDragEnd
-    return <div data-testid="drag-drop-context">{children}</div>
-  },
-  Droppable: ({
-    children,
-  }: {
-    children: (provided: unknown, snapshot: unknown) => React.ReactNode
-  }) => (
-    <div data-testid="droppable">
-      {children(
-        {
-          droppableProps: {},
-          innerRef: jest.fn(),
-          placeholder: null,
-        },
-        {
-          isDraggingOver: false,
-          draggingOverWith: null,
-          draggingFromThisWith: null,
-          isUsingPlaceholder: false,
-        }
-      )}
-    </div>
-  ),
-  Draggable: ({
-    children,
-  }: {
-    children: (provided: unknown, snapshot: unknown) => React.ReactNode
-  }) => (
-    <div data-testid="draggable">
-      {children(
-        {
-          draggableProps: {},
-          dragHandleProps: {},
-          innerRef: jest.fn(),
-        },
-        {
-          isDragging: false,
-          isDropAnimating: false,
-        }
-      )}
-    </div>
-  ),
-}))
-
 describe('Language Component', () => {
   describe('Rendering', () => {
-    // Note: Skipping this test due to next/dynamic SSR:false causing issues in test environment
-    it.skip('should render all language inputs', () => {
+    it('should render all languages as tags', () => {
       const mockData = createMockResumeData({
         languages: ['English', 'Spanish'],
       })
@@ -76,14 +18,11 @@ describe('Language Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const inputs = screen.getAllByPlaceholderText('Language')
-      expect(inputs).toHaveLength(2)
-      expect(inputs[0]).toHaveValue('English')
-      expect(inputs[1]).toHaveValue('Spanish')
+      expect(screen.getByText('English')).toBeInTheDocument()
+      expect(screen.getByText('Spanish')).toBeInTheDocument()
     })
 
-    // Note: Skipping this test due to next/dynamic SSR:false causing issues in test environment
-    it.skip('should render floating labels for each language input', () => {
+    it('should render remove button for each language', () => {
       const mockData = createMockResumeData({
         languages: ['English', 'Spanish'],
       })
@@ -91,34 +30,18 @@ describe('Language Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const labels = screen.getAllByText('Language')
-      expect(labels).toHaveLength(2)
-      labels.forEach((label) => {
-        expect(label.tagName.toLowerCase()).toBe('label')
-      })
+      const removeButtons = screen.getAllByTitle('Remove')
+      expect(removeButtons).toHaveLength(2)
     })
 
-    // Note: Skipping this test due to next/dynamic SSR:false causing issues in test environment
-    it.skip('should render delete button for each language', () => {
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish'],
-      })
-      renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButtons = screen.getAllByTitle('Delete this language')
-      expect(deleteButtons).toHaveLength(2)
-    })
-
-    it('should render add button', () => {
+    it('should render add input field', () => {
       renderWithContext(<Language />)
-      expect(screen.getByText(/Add/i)).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Add language...')).toBeInTheDocument()
     })
   })
 
   describe('Add Functionality', () => {
-    it('should add new language when add button is clicked', () => {
+    it('should add new language when pressing Enter', () => {
       const mockData = createMockResumeData({
         languages: ['English'],
       })
@@ -137,17 +60,20 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const addButton = screen.getByText(/Add/i)
-      fireEvent.click(addButton)
+      const input = screen.getByPlaceholderText('Add language...')
+      fireEvent.change(input, { target: { value: 'Spanish' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        languages: ['English', ''],
+        languages: ['English', 'Spanish'],
       })
     })
 
-    it('should add empty string to languages array', () => {
-      const mockData = createMockResumeData({ languages: [] })
+    it('should add new language on blur', () => {
+      const mockData = createMockResumeData({
+        languages: ['English'],
+      })
       const mockSetResumeData = jest.fn()
 
       render(
@@ -163,18 +89,71 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const addButton = screen.getByText(/Add/i)
-      fireEvent.click(addButton)
+      const input = screen.getByPlaceholderText('Add language...')
+      fireEvent.change(input, { target: { value: 'French' } })
+      fireEvent.blur(input)
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        languages: [''],
+        languages: ['English', 'French'],
       })
+    })
+
+    it('should not add empty language', () => {
+      const mockData = createMockResumeData({
+        languages: ['English'],
+      })
+      const mockSetResumeData = jest.fn()
+
+      render(
+        <ResumeContext.Provider
+          value={{
+            resumeData: mockData,
+            setResumeData: mockSetResumeData,
+            handleProfilePicture: jest.fn(),
+            handleChange: jest.fn(),
+          }}
+        >
+          <Language />
+        </ResumeContext.Provider>
+      )
+
+      const input = screen.getByPlaceholderText('Add language...')
+      fireEvent.change(input, { target: { value: '   ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockSetResumeData).not.toHaveBeenCalled()
+    })
+
+    it('should clear input after adding', () => {
+      const mockData = createMockResumeData({
+        languages: ['English'],
+      })
+      const mockSetResumeData = jest.fn()
+
+      render(
+        <ResumeContext.Provider
+          value={{
+            resumeData: mockData,
+            setResumeData: mockSetResumeData,
+            handleProfilePicture: jest.fn(),
+            handleChange: jest.fn(),
+          }}
+        >
+          <Language />
+        </ResumeContext.Provider>
+      )
+
+      const input = screen.getByPlaceholderText('Add language...')
+      fireEvent.change(input, { target: { value: 'Spanish' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(input).toHaveValue('')
     })
   })
 
   describe('Delete Functionality', () => {
-    it('should delete language when delete button is clicked', () => {
+    it('should delete language when remove button is clicked', () => {
       const mockData = createMockResumeData({
         languages: ['English', 'Spanish', 'French'],
       })
@@ -193,8 +172,8 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this language')
-      fireEvent.click(deleteButtons[1]) // Delete Spanish
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[1]) // Delete Spanish
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
@@ -221,8 +200,8 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this language')
-      fireEvent.click(deleteButtons[0])
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[0])
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
@@ -249,130 +228,18 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this language')
-      fireEvent.click(deleteButtons[1])
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[1])
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
         languages: ['English'],
       })
-    })
-  })
-
-  describe('Input Changes', () => {
-    it('should update language value when input changes', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      const input = screen.getByPlaceholderText('Language')
-      fireEvent.change(input, { target: { value: 'Spanish' } })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: ['Spanish'],
-      })
-    })
-
-    it('should update correct language when multiple languages exist', () => {
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish', 'French'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      const inputs = screen.getAllByPlaceholderText('Language')
-      fireEvent.change(inputs[1], { target: { value: 'German' } })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: ['English', 'German', 'French'],
-      })
-    })
-
-    it('should handle empty string input', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      const input = screen.getByPlaceholderText('Language')
-      fireEvent.change(input, { target: { value: '' } })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: [''],
-      })
-    })
-  })
-
-  describe('Floating Labels', () => {
-    it('should have floating-label-group wrapper for each input', () => {
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish'],
-      })
-      const { container } = renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const floatingGroups = container.querySelectorAll('.floating-label-group')
-      expect(floatingGroups).toHaveLength(2)
-    })
-
-    it('should have floating-label class for each label', () => {
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish'],
-      })
-      const { container } = renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const floatingLabels = container.querySelectorAll('.floating-label')
-      expect(floatingLabels).toHaveLength(2)
     })
   })
 
   describe('Layout and Styling', () => {
-    it('should have hover states on language containers', () => {
+    it('should display languages as inline tags', () => {
       const mockData = createMockResumeData({
         languages: ['English'],
       })
@@ -380,62 +247,18 @@ describe('Language Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const languageContainer = container.querySelector(
-        '.hover\\:border-white\\/20'
-      )
-      expect(languageContainer).toBeInTheDocument()
+      const tag = container.querySelector('.rounded-full')
+      expect(tag).toBeInTheDocument()
     })
 
-    // Note: Section heading is now rendered by CollapsibleSection wrapper in page.tsx
-
-    it('should have proper delete button styling', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      renderWithContext(<Language />, {
+    it('should have emerald focus color on input', () => {
+      const mockData = createMockResumeData({ languages: [] })
+      const { container } = renderWithContext(<Language />, {
         contextValue: { resumeData: mockData },
       })
 
-      const deleteButton = screen.getByTitle('Delete this language')
-      expect(deleteButton).toHaveClass('text-red-400')
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have title attribute on delete buttons', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButton = screen.getByTitle('Delete this language')
-      expect(deleteButton).toHaveAttribute('title', 'Delete this language')
-    })
-
-    it('should use text input type', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const input = screen.getByPlaceholderText('Language')
-      expect(input).toHaveAttribute('type', 'text')
-    })
-
-    it('should have button type=button for delete buttons', () => {
-      const mockData = createMockResumeData({
-        languages: ['English'],
-      })
-      renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButton = screen.getByTitle('Delete this language')
-      expect(deleteButton).toHaveAttribute('type', 'button')
+      const input = container.querySelector('.focus\\:border-emerald-400')
+      expect(input).toBeInTheDocument()
     })
   })
 
@@ -446,13 +269,24 @@ describe('Language Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      expect(screen.getByText('Add Language')).toBeInTheDocument()
-      expect(screen.queryByPlaceholderText('Language')).not.toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Add language...')).toBeInTheDocument()
+      expect(screen.queryByTitle('Remove')).not.toBeInTheDocument()
     })
 
     it('should handle special characters in language input', () => {
       const mockData = createMockResumeData({
         languages: ['中文 (Chinese)'],
+      })
+      renderWithContext(<Language />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.getByText('中文 (Chinese)')).toBeInTheDocument()
+    })
+
+    it('should trim whitespace when adding', () => {
+      const mockData = createMockResumeData({
+        languages: ['English'],
       })
       const mockSetResumeData = jest.fn()
 
@@ -469,27 +303,14 @@ describe('Language Component', () => {
         </ResumeContext.Provider>
       )
 
-      const input = screen.getByPlaceholderText('Language')
-      fireEvent.change(input, { target: { value: 'العربية (Arabic)' } })
+      const input = screen.getByPlaceholderText('Add language...')
+      fireEvent.change(input, { target: { value: '  Spanish  ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        languages: ['العربية (Arabic)'],
+        languages: ['English', 'Spanish'],
       })
-    })
-
-    it('should handle long language names', () => {
-      const longName =
-        'Language with a very long name that exceeds normal length'
-      const mockData = createMockResumeData({
-        languages: [longName],
-      })
-      renderWithContext(<Language />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const input = screen.getByPlaceholderText('Language')
-      expect(input).toHaveValue(longName)
     })
 
     it('should handle multiple languages with same value', () => {
@@ -500,167 +321,44 @@ describe('Language Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const inputs = screen.getAllByPlaceholderText('Language')
-      expect(inputs).toHaveLength(3)
-      inputs.forEach((input) => {
-        expect(input).toHaveValue('English')
-      })
+      const englishTags = screen.getAllByText('English')
+      expect(englishTags).toHaveLength(3)
     })
   })
 
-  describe('Drag and Drop Functionality', () => {
-    beforeEach(() => {
-      jest.clearAllMocks()
-      capturedOnDragEnd = null
+  describe('Accessibility', () => {
+    it('should have title attribute on remove buttons', () => {
+      const mockData = createMockResumeData({
+        languages: ['English'],
+      })
+      renderWithContext(<Language />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      const removeButton = screen.getByTitle('Remove')
+      expect(removeButton).toHaveAttribute('title', 'Remove')
     })
 
-    it('should not update data when dropped outside droppable area', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish'],
+    it('should use text input type', () => {
+      const mockData = createMockResumeData({ languages: [] })
+      renderWithContext(<Language />, {
+        contextValue: { resumeData: mockData },
       })
 
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      // Simulate dropping outside droppable area
-      capturedOnDragEnd!({
-        source: { droppableId: 'languages', index: 0 },
-        destination: null,
-      })
-
-      expect(mockSetResumeData).not.toHaveBeenCalled()
+      const input = screen.getByPlaceholderText('Add language...')
+      expect(input).toHaveAttribute('type', 'text')
     })
 
-    it('should not update data when dropped in same position', () => {
-      const mockSetResumeData = jest.fn()
+    it('should have button type=button for remove buttons', () => {
       const mockData = createMockResumeData({
-        languages: ['English', 'Spanish'],
+        languages: ['English'],
+      })
+      renderWithContext(<Language />, {
+        contextValue: { resumeData: mockData },
       })
 
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      // Simulate dropping in the same position
-      capturedOnDragEnd!({
-        source: { droppableId: 'languages', index: 1 },
-        destination: { droppableId: 'languages', index: 1 },
-      })
-
-      expect(mockSetResumeData).not.toHaveBeenCalled()
-    })
-
-    it('should reorder languages from first to last position', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish', 'French'],
-      })
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      // Drag first item to last position
-      capturedOnDragEnd!({
-        source: { droppableId: 'languages', index: 0 },
-        destination: { droppableId: 'languages', index: 2 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: ['Spanish', 'French', 'English'],
-      })
-    })
-
-    it('should reorder languages from last to first position', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish', 'French'],
-      })
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      // Drag last item to first position
-      capturedOnDragEnd!({
-        source: { droppableId: 'languages', index: 2 },
-        destination: { droppableId: 'languages', index: 0 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: ['French', 'English', 'Spanish'],
-      })
-    })
-
-    it('should reorder languages between middle positions', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        languages: ['English', 'Spanish', 'French'],
-      })
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Language />
-        </ResumeContext.Provider>
-      )
-
-      // Drag middle item (index 1) down one position (index 2)
-      capturedOnDragEnd!({
-        source: { droppableId: 'languages', index: 1 },
-        destination: { droppableId: 'languages', index: 2 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        languages: ['English', 'French', 'Spanish'],
-      })
+      const removeButton = screen.getByTitle('Remove')
+      expect(removeButton).toHaveAttribute('type', 'button')
     })
   })
 })

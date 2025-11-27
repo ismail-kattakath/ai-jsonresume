@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import Certification from '@/components/resume/forms/Certification'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
@@ -8,41 +8,9 @@ import {
   createMockResumeData,
 } from '@/lib/__tests__/test-utils'
 
-// Store the onDragEnd callback for testing
-let capturedOnDragEnd: ((result: unknown) => void) | null = null
-
-// Mock @hello-pangea/dnd
-jest.mock('@hello-pangea/dnd', () => ({
-  DragDropContext: ({ children, onDragEnd }: any) => {
-    capturedOnDragEnd = onDragEnd
-    return <div data-testid="drag-drop-context">{children}</div>
-  },
-  Droppable: ({ children }: any) => (
-    <div data-testid="droppable">
-      {children(
-        { droppableProps: {}, innerRef: jest.fn(), placeholder: null },
-        {
-          isDraggingOver: false,
-          draggingOverWith: null,
-          draggingFromThisWith: null,
-          isUsingPlaceholder: false,
-        }
-      )}
-    </div>
-  ),
-  Draggable: ({ children }: any) => (
-    <div data-testid="draggable">
-      {children(
-        { draggableProps: {}, dragHandleProps: {}, innerRef: jest.fn() },
-        { isDragging: false, isDropAnimating: false }
-      )}
-    </div>
-  ),
-}))
-
 describe('Certification Component', () => {
   describe('Rendering', () => {
-    it('should render all certification inputs', async () => {
+    it('should render all certifications as tags', () => {
       const mockData = createMockResumeData({
         certifications: [
           'AWS Solutions Architect',
@@ -53,17 +21,11 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      await waitFor(() => {
-        const inputs = screen.getAllByPlaceholderText(
-          'Enter certification name'
-        )
-        expect(inputs).toHaveLength(2)
-        expect(inputs[0]).toHaveValue('AWS Solutions Architect')
-        expect(inputs[1]).toHaveValue('Google Cloud Professional')
-      })
+      expect(screen.getByText('AWS Solutions Architect')).toBeInTheDocument()
+      expect(screen.getByText('Google Cloud Professional')).toBeInTheDocument()
     })
 
-    it('should render floating labels for each certification input', () => {
+    it('should render remove button for each certification', () => {
       const mockData = createMockResumeData({
         certifications: [
           'AWS Solutions Architect',
@@ -74,36 +36,20 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const labels = screen.getAllByText('Certification Name')
-      expect(labels).toHaveLength(2)
-      labels.forEach((label) => {
-        expect(label.tagName.toLowerCase()).toBe('label')
-      })
+      const removeButtons = screen.getAllByTitle('Remove')
+      expect(removeButtons).toHaveLength(2)
     })
 
-    it('should render delete button for each certification', () => {
-      const mockData = createMockResumeData({
-        certifications: [
-          'AWS Solutions Architect',
-          'Google Cloud Professional',
-        ],
-      })
-      renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButtons = screen.getAllByTitle('Delete this certification')
-      expect(deleteButtons).toHaveLength(2)
-    })
-
-    it('should render add button', () => {
+    it('should render add input field', () => {
       renderWithContext(<Certification />)
-      expect(screen.getByText(/Add/i)).toBeInTheDocument()
+      expect(
+        screen.getByPlaceholderText('Add certification...')
+      ).toBeInTheDocument()
     })
   })
 
   describe('Add Functionality', () => {
-    it('should add new certification when add button is clicked', () => {
+    it('should add new certification when pressing Enter', () => {
       const mockData = createMockResumeData({
         certifications: ['AWS Solutions Architect'],
       })
@@ -122,17 +68,20 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const addButton = screen.getByText(/Add/i)
-      fireEvent.click(addButton)
+      const input = screen.getByPlaceholderText('Add certification...')
+      fireEvent.change(input, { target: { value: 'Azure Administrator' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        certifications: ['AWS Solutions Architect', ''],
+        certifications: ['AWS Solutions Architect', 'Azure Administrator'],
       })
     })
 
-    it('should add empty string to certifications array', () => {
-      const mockData = createMockResumeData({ certifications: [] })
+    it('should add new certification on blur', () => {
+      const mockData = createMockResumeData({
+        certifications: ['AWS Solutions Architect'],
+      })
       const mockSetResumeData = jest.fn()
 
       render(
@@ -148,18 +97,71 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const addButton = screen.getByText(/Add/i)
-      fireEvent.click(addButton)
+      const input = screen.getByPlaceholderText('Add certification...')
+      fireEvent.change(input, { target: { value: 'CompTIA Security+' } })
+      fireEvent.blur(input)
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        certifications: [''],
+        certifications: ['AWS Solutions Architect', 'CompTIA Security+'],
       })
+    })
+
+    it('should not add empty certification', () => {
+      const mockData = createMockResumeData({
+        certifications: ['AWS Solutions Architect'],
+      })
+      const mockSetResumeData = jest.fn()
+
+      render(
+        <ResumeContext.Provider
+          value={{
+            resumeData: mockData,
+            setResumeData: mockSetResumeData,
+            handleProfilePicture: jest.fn(),
+            handleChange: jest.fn(),
+          }}
+        >
+          <Certification />
+        </ResumeContext.Provider>
+      )
+
+      const input = screen.getByPlaceholderText('Add certification...')
+      fireEvent.change(input, { target: { value: '   ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(mockSetResumeData).not.toHaveBeenCalled()
+    })
+
+    it('should clear input after adding', () => {
+      const mockData = createMockResumeData({
+        certifications: ['AWS Solutions Architect'],
+      })
+      const mockSetResumeData = jest.fn()
+
+      render(
+        <ResumeContext.Provider
+          value={{
+            resumeData: mockData,
+            setResumeData: mockSetResumeData,
+            handleProfilePicture: jest.fn(),
+            handleChange: jest.fn(),
+          }}
+        >
+          <Certification />
+        </ResumeContext.Provider>
+      )
+
+      const input = screen.getByPlaceholderText('Add certification...')
+      fireEvent.change(input, { target: { value: 'Azure' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
+
+      expect(input).toHaveValue('')
     })
   })
 
   describe('Delete Functionality', () => {
-    it('should delete certification when delete button is clicked', () => {
+    it('should delete certification when remove button is clicked', () => {
       const mockData = createMockResumeData({
         certifications: [
           'AWS Solutions Architect',
@@ -182,8 +184,8 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this certification')
-      fireEvent.click(deleteButtons[1]) // Delete Google Cloud Professional
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[1]) // Delete Google Cloud Professional
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
@@ -213,8 +215,8 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this certification')
-      fireEvent.click(deleteButtons[0])
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[0])
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
@@ -244,148 +246,18 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const deleteButtons = screen.getAllByTitle('Delete this certification')
-      fireEvent.click(deleteButtons[1])
+      const removeButtons = screen.getAllByTitle('Remove')
+      fireEvent.click(removeButtons[1])
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
         certifications: ['AWS Solutions Architect'],
       })
-    })
-  })
-
-  describe('Input Changes', () => {
-    it('should update certification value when input changes', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Certification />
-        </ResumeContext.Provider>
-      )
-
-      const input = screen.getByPlaceholderText('Enter certification name')
-      fireEvent.change(input, {
-        target: { value: 'Google Cloud Professional' },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: ['Google Cloud Professional'],
-      })
-    })
-
-    it('should update correct certification when multiple certifications exist', () => {
-      const mockData = createMockResumeData({
-        certifications: [
-          'AWS Solutions Architect',
-          'Google Cloud Professional',
-          'Azure Administrator',
-        ],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Certification />
-        </ResumeContext.Provider>
-      )
-
-      const inputs = screen.getAllByPlaceholderText('Enter certification name')
-      fireEvent.change(inputs[1], {
-        target: { value: 'Certified Kubernetes Administrator' },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: [
-          'AWS Solutions Architect',
-          'Certified Kubernetes Administrator',
-          'Azure Administrator',
-        ],
-      })
-    })
-
-    it('should handle empty string input', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Certification />
-        </ResumeContext.Provider>
-      )
-
-      const input = screen.getByPlaceholderText('Enter certification name')
-      fireEvent.change(input, { target: { value: '' } })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: [''],
-      })
-    })
-  })
-
-  describe('Floating Labels', () => {
-    it('should have floating-label-group wrapper for each input', () => {
-      const mockData = createMockResumeData({
-        certifications: [
-          'AWS Solutions Architect',
-          'Google Cloud Professional',
-        ],
-      })
-      const { container } = renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const floatingGroups = container.querySelectorAll('.floating-label-group')
-      expect(floatingGroups).toHaveLength(2)
-    })
-
-    it('should have floating-label class for each label', () => {
-      const mockData = createMockResumeData({
-        certifications: [
-          'AWS Solutions Architect',
-          'Google Cloud Professional',
-        ],
-      })
-      const { container } = renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const floatingLabels = container.querySelectorAll('.floating-label')
-      expect(floatingLabels).toHaveLength(2)
     })
   })
 
   describe('Layout and Styling', () => {
-    it('should have hover states on certification containers', () => {
+    it('should display certifications as inline tags', () => {
       const mockData = createMockResumeData({
         certifications: ['AWS Solutions Architect'],
       })
@@ -393,74 +265,18 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const certificationContainer = container.querySelector(
-        '.hover\\:border-white\\/20'
-      )
-      expect(certificationContainer).toBeInTheDocument()
+      const tag = container.querySelector('.rounded-full')
+      expect(tag).toBeInTheDocument()
     })
 
-    // Note: Section heading is now rendered by CollapsibleSection wrapper in page.tsx
-
-    it('should have proper delete button styling', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButton = screen.getByTitle('Delete this certification')
-      expect(deleteButton).toHaveClass('text-red-400')
-    })
-
-    it('should have focus styles with violet color', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
+    it('should have violet focus color on input', () => {
+      const mockData = createMockResumeData({ certifications: [] })
       const { container } = renderWithContext(<Certification />, {
         contextValue: { resumeData: mockData },
       })
 
       const input = container.querySelector('.focus\\:border-violet-400')
       expect(input).toBeInTheDocument()
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have title attribute on delete buttons', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButton = screen.getByTitle('Delete this certification')
-      expect(deleteButton).toHaveAttribute('title', 'Delete this certification')
-    })
-
-    it('should use text input type', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const input = screen.getByPlaceholderText('Enter certification name')
-      expect(input).toHaveAttribute('type', 'text')
-    })
-
-    it('should have button type=button for delete buttons', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Solutions Architect'],
-      })
-      renderWithContext(<Certification />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const deleteButton = screen.getByTitle('Delete this certification')
-      expect(deleteButton).toHaveAttribute('type', 'button')
     })
   })
 
@@ -471,15 +287,28 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      expect(screen.getByText('Add Certification')).toBeInTheDocument()
       expect(
-        screen.queryByPlaceholderText('Enter certification name')
-      ).not.toBeInTheDocument()
+        screen.getByPlaceholderText('Add certification...')
+      ).toBeInTheDocument()
+      expect(screen.queryByTitle('Remove')).not.toBeInTheDocument()
     })
 
     it('should handle special characters in certification input', () => {
       const mockData = createMockResumeData({
-        certifications: ['AWS Certified Solutions Architect – Professional'],
+        certifications: ['Cisco CCNA® Routing & Switching'],
+      })
+      renderWithContext(<Certification />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(
+        screen.getByText('Cisco CCNA® Routing & Switching')
+      ).toBeInTheDocument()
+    })
+
+    it('should trim whitespace when adding', () => {
+      const mockData = createMockResumeData({
+        certifications: ['AWS'],
       })
       const mockSetResumeData = jest.fn()
 
@@ -496,14 +325,13 @@ describe('Certification Component', () => {
         </ResumeContext.Provider>
       )
 
-      const input = screen.getByPlaceholderText('Enter certification name')
-      fireEvent.change(input, {
-        target: { value: 'Cisco CCNA® Routing & Switching' },
-      })
+      const input = screen.getByPlaceholderText('Add certification...')
+      fireEvent.change(input, { target: { value: '  Azure  ' } })
+      fireEvent.keyDown(input, { key: 'Enter' })
 
       expect(mockSetResumeData).toHaveBeenCalledWith({
         ...mockData,
-        certifications: ['Cisco CCNA® Routing & Switching'],
+        certifications: ['AWS', 'Azure'],
       })
     })
 
@@ -517,173 +345,68 @@ describe('Certification Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const input = screen.getByPlaceholderText('Enter certification name')
-      expect(input).toHaveValue(longName)
+      expect(screen.getByText(longName)).toBeInTheDocument()
     })
 
     it('should handle multiple certifications with same value', () => {
       const mockData = createMockResumeData({
-        certifications: [
-          'AWS Solutions Architect',
-          'AWS Solutions Architect',
-          'AWS Solutions Architect',
-        ],
+        certifications: ['AWS', 'AWS', 'AWS'],
       })
       renderWithContext(<Certification />, {
         contextValue: { resumeData: mockData },
       })
 
-      const inputs = screen.getAllByPlaceholderText('Enter certification name')
-      expect(inputs).toHaveLength(3)
-      inputs.forEach((input) => {
-        expect(input).toHaveValue('AWS Solutions Architect')
-      })
+      const awsTags = screen.getAllByText('AWS')
+      expect(awsTags).toHaveLength(3)
     })
 
     it('should handle certification names with numbers', () => {
       const mockData = createMockResumeData({
-        certifications: ['CompTIA Security+ CE'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      render(
-        <ResumeContext.Provider
-          value={{
-            resumeData: mockData,
-            setResumeData: mockSetResumeData,
-            handleProfilePicture: jest.fn(),
-            handleChange: jest.fn(),
-          }}
-        >
-          <Certification />
-        </ResumeContext.Provider>
-      )
-
-      const input = screen.getByPlaceholderText('Enter certification name')
-      fireEvent.change(input, {
-        target: { value: 'ISO/IEC 27001:2013 Lead Auditor' },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
         certifications: ['ISO/IEC 27001:2013 Lead Auditor'],
       })
+      renderWithContext(<Certification />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(
+        screen.getByText('ISO/IEC 27001:2013 Lead Auditor')
+      ).toBeInTheDocument()
     })
   })
 
-  describe('Drag and Drop Functionality', () => {
-    it('should reorder certifications from first to last position', () => {
+  describe('Accessibility', () => {
+    it('should have title attribute on remove buttons', () => {
       const mockData = createMockResumeData({
-        certifications: ['AWS Certified', 'Google Cloud', 'Azure Certified'],
+        certifications: ['AWS'],
       })
-      const mockSetResumeData = jest.fn()
-
       renderWithContext(<Certification />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
+        contextValue: { resumeData: mockData },
       })
 
-      capturedOnDragEnd!({
-        source: { droppableId: 'certifications', index: 0 },
-        destination: { droppableId: 'certifications', index: 2 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: ['Google Cloud', 'Azure Certified', 'AWS Certified'],
-      })
+      const removeButton = screen.getByTitle('Remove')
+      expect(removeButton).toHaveAttribute('title', 'Remove')
     })
 
-    it('should reorder certifications from last to first position', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Certified', 'Google Cloud', 'Azure Certified'],
-      })
-      const mockSetResumeData = jest.fn()
-
+    it('should use text input type', () => {
+      const mockData = createMockResumeData({ certifications: [] })
       renderWithContext(<Certification />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
+        contextValue: { resumeData: mockData },
       })
 
-      capturedOnDragEnd!({
-        source: { droppableId: 'certifications', index: 2 },
-        destination: { droppableId: 'certifications', index: 0 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: ['Azure Certified', 'AWS Certified', 'Google Cloud'],
-      })
+      const input = screen.getByPlaceholderText('Add certification...')
+      expect(input).toHaveAttribute('type', 'text')
     })
 
-    it('should reorder certifications to adjacent position', () => {
+    it('should have button type=button for remove buttons', () => {
       const mockData = createMockResumeData({
-        certifications: ['AWS Certified', 'Google Cloud', 'Azure Certified'],
+        certifications: ['AWS'],
       })
-      const mockSetResumeData = jest.fn()
-
       renderWithContext(<Certification />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
+        contextValue: { resumeData: mockData },
       })
 
-      capturedOnDragEnd!({
-        source: { droppableId: 'certifications', index: 0 },
-        destination: { droppableId: 'certifications', index: 1 },
-      })
-
-      expect(mockSetResumeData).toHaveBeenCalledWith({
-        ...mockData,
-        certifications: ['Google Cloud', 'AWS Certified', 'Azure Certified'],
-      })
-    })
-
-    it('should not reorder when dropped in same position', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Certified', 'Google Cloud'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      renderWithContext(<Certification />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      capturedOnDragEnd!({
-        source: { droppableId: 'certifications', index: 0 },
-        destination: { droppableId: 'certifications', index: 0 },
-      })
-
-      expect(mockSetResumeData).not.toHaveBeenCalled()
-    })
-
-    it('should not reorder when dropped outside droppable area', () => {
-      const mockData = createMockResumeData({
-        certifications: ['AWS Certified', 'Google Cloud'],
-      })
-      const mockSetResumeData = jest.fn()
-
-      renderWithContext(<Certification />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      capturedOnDragEnd!({
-        source: { droppableId: 'certifications', index: 0 },
-        destination: null,
-      })
-
-      expect(mockSetResumeData).not.toHaveBeenCalled()
+      const removeButton = screen.getByTitle('Remove')
+      expect(removeButton).toHaveAttribute('type', 'button')
     })
   })
 })

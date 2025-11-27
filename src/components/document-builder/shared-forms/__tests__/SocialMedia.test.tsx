@@ -27,8 +27,6 @@ describe('SocialMedia Component', () => {
   })
 
   describe('Rendering', () => {
-    // Note: Section heading is now rendered by CollapsibleSection wrapper
-
     it('should render social media entries with inputs', async () => {
       const mockData = createMockResumeData({
         socialMedia: [
@@ -41,10 +39,10 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      // Wait for dynamic imports to load
+      // Check for inputs
       await waitFor(() => {
-        const entries = container.querySelectorAll('.group')
-        expect(entries.length).toBeGreaterThanOrEqual(2)
+        const inputs = container.querySelectorAll('input[name="socialMedia"]')
+        expect(inputs.length).toBe(2)
       })
     })
 
@@ -71,9 +69,21 @@ describe('SocialMedia Component', () => {
     it('should render add button with FormButton', () => {
       renderWithContext(<SocialMedia />)
 
-      // FormButton should render with "Add Social Media" label
       const addButton = screen.getByText(/Add Social Media/i)
       expect(addButton).toBeInTheDocument()
+    })
+
+    it('should display platform name in collapsed header', () => {
+      const mockData = createMockResumeData({
+        socialMedia: [{ socialMedia: 'Github', link: 'github.com/test' }],
+      })
+
+      renderWithContext(<SocialMedia />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      // The title should be displayed in the AccordionHeader
+      expect(screen.getByText('Github')).toBeInTheDocument()
     })
   })
 
@@ -108,7 +118,7 @@ describe('SocialMedia Component', () => {
   })
 
   describe('Delete Functionality', () => {
-    it('should render delete buttons with cursor-pointer class', () => {
+    it('should render delete buttons', () => {
       const mockData = createMockResumeData({
         socialMedia: [{ socialMedia: 'Github', link: 'github.com/test' }],
       })
@@ -118,14 +128,17 @@ describe('SocialMedia Component', () => {
       })
 
       const deleteButton = container.querySelector(
-        'button[title="Delete this social media"]'
+        'button[title="Delete social media"]'
       )
 
       expect(deleteButton).toBeInTheDocument()
-      expect(deleteButton).toHaveClass('cursor-pointer')
     })
 
     it('should delete social media entry when delete button is clicked', () => {
+      // Mock window.confirm to return true
+      const originalConfirm = window.confirm
+      window.confirm = jest.fn(() => true)
+
       const mockSetResumeData = jest.fn()
       const mockData = createMockResumeData({
         socialMedia: [
@@ -142,7 +155,7 @@ describe('SocialMedia Component', () => {
       })
 
       const deleteButtons = container.querySelectorAll(
-        'button[title="Delete this social media"]'
+        'button[title="Delete social media"]'
       )
 
       if (deleteButtons[0]) {
@@ -155,6 +168,8 @@ describe('SocialMedia Component', () => {
           ],
         })
       }
+
+      window.confirm = originalConfirm
     })
   })
 
@@ -210,7 +225,7 @@ describe('SocialMedia Component', () => {
   })
 
   describe('URL Validation', () => {
-    it('should show validation icon after debounce period', async () => {
+    it('should show validation indicator after debounce period', async () => {
       const mockData = createMockResumeData({
         socialMedia: [{ socialMedia: 'Github', link: 'github.com/test' }],
       })
@@ -225,27 +240,16 @@ describe('SocialMedia Component', () => {
         await Promise.resolve()
       })
 
-      // Should show validation icon (checking or valid)
-      const icons = container.querySelectorAll('[title]')
-      expect(icons.length).toBeGreaterThan(0)
-    })
-
-    it('should show empty state icon when URL is empty', async () => {
-      const mockData = createMockResumeData({
-        socialMedia: [{ socialMedia: 'Github', link: '' }],
+      // Should show validation indicator (checking or valid pill)
+      await waitFor(() => {
+        const validIndicator = container.querySelector(
+          '[title="URL is reachable"]'
+        )
+        const checkingIndicator = container.querySelector(
+          '[title="Validating URL..."]'
+        )
+        expect(validIndicator || checkingIndicator).toBeTruthy()
       })
-
-      const { container } = renderWithContext(<SocialMedia />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      // Should show empty state icon with link icon
-      const icons = container.querySelectorAll('svg')
-      expect(icons.length).toBeGreaterThan(0)
     })
 
     it('should validate URL with https prefix when not provided', async () => {
@@ -279,7 +283,7 @@ describe('SocialMedia Component', () => {
         socialMedia: [{ socialMedia: 'Github', link: 'invalid-url' }],
       })
 
-      renderWithContext(<SocialMedia />, {
+      const { container } = renderWithContext(<SocialMedia />, {
         contextValue: { resumeData: mockData },
       })
 
@@ -292,8 +296,13 @@ describe('SocialMedia Component', () => {
         await Promise.resolve()
       })
 
-      // Component should handle the error and show some validation icon
-      expect(global.fetch).toHaveBeenCalled()
+      // Should show invalid indicator
+      await waitFor(() => {
+        const invalidIndicator = container.querySelector(
+          '[title="URL may be unreachable"]'
+        )
+        expect(invalidIndicator).toBeInTheDocument()
+      })
     })
 
     it('should clear validation status when link is cleared', () => {
@@ -316,7 +325,6 @@ describe('SocialMedia Component', () => {
           target: { name: 'link', value: '' },
         })
 
-        // Validation status should be cleared
         expect(mockSetResumeData).toHaveBeenCalled()
       }
     })
@@ -354,8 +362,8 @@ describe('SocialMedia Component', () => {
     })
   })
 
-  describe('Layout and Styling', () => {
-    it('should apply hover effects to entry containers', () => {
+  describe('Accordion Behavior', () => {
+    it('should have expand/collapse buttons', () => {
       const mockData = createMockResumeData({
         socialMedia: [{ socialMedia: 'Github', link: 'github.com/test' }],
       })
@@ -364,15 +372,14 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const entryContainer = container.querySelector('.group')
-
-      expect(entryContainer).toHaveClass(
-        'hover:border-white/20',
-        'hover:bg-white/10'
-      )
+      // Should have expand/collapse button
+      const toggleButton =
+        container.querySelector('button[title="Expand"]') ||
+        container.querySelector('button[title="Collapse"]')
+      expect(toggleButton).toBeInTheDocument()
     })
 
-    it('should use responsive layout for inputs', () => {
+    it('should have drag handle', () => {
       const mockData = createMockResumeData({
         socialMedia: [{ socialMedia: 'Github', link: 'github.com/test' }],
       })
@@ -381,9 +388,9 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const entryContainer = container.querySelector('.group')
-
-      expect(entryContainer).toHaveClass('flex-col', 'sm:flex-row')
+      // Should have drag handle (cursor-grab class)
+      const dragHandle = container.querySelector('.cursor-grab')
+      expect(dragHandle).toBeInTheDocument()
     })
   })
 
@@ -401,7 +408,6 @@ describe('SocialMedia Component', () => {
         await Promise.resolve()
       })
 
-      // Check for inputs (heading is now in CollapsibleSection wrapper)
       const inputs = container.querySelectorAll('input')
       expect(inputs.length).toBeGreaterThan(0)
     })
@@ -416,34 +422,15 @@ describe('SocialMedia Component', () => {
       })
 
       const deleteButton = container.querySelector(
-        'button[title="Delete this social media"]'
+        'button[title="Delete social media"]'
       )
 
       expect(deleteButton).toHaveAttribute('title')
     })
-
-    it('should have descriptive titles on validation icons', async () => {
-      const mockData = createMockResumeData({
-        socialMedia: [{ socialMedia: 'Github', link: '' }],
-      })
-
-      const { container } = renderWithContext(<SocialMedia />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      await act(async () => {
-        await Promise.resolve()
-      })
-
-      // Check that validation icons with titles exist
-      const icons = container.querySelectorAll('svg')
-      expect(icons.length).toBeGreaterThan(0)
-    })
   })
 
   describe('Drag and Drop', () => {
-    it('should handle drag and drop reordering', () => {
-      const mockSetResumeData = jest.fn()
+    it('should render multiple entries for drag and drop', () => {
       const mockData = createMockResumeData({
         socialMedia: [
           { socialMedia: 'Github', link: 'github.com/test1' },
@@ -453,38 +440,21 @@ describe('SocialMedia Component', () => {
       })
 
       const { container } = renderWithContext(<SocialMedia />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
+        contextValue: { resumeData: mockData },
       })
 
-      // Component should render with drag-drop context
-      const entries = container.querySelectorAll('.group')
-      expect(entries.length).toBe(3)
-    })
-
-    it('should not reorder when dropped in same position', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        socialMedia: [
-          { socialMedia: 'Github', link: 'github.com/test1' },
-          { socialMedia: 'LinkedIn', link: 'linkedin.com/in/test2' },
-        ],
-      })
-
-      renderWithContext(<SocialMedia />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      // Component should handle same-position drops gracefully
-      expect(mockSetResumeData).not.toHaveBeenCalled()
+      // Should render 3 platform inputs
+      const platformInputs = container.querySelectorAll(
+        'input[name="socialMedia"]'
+      )
+      expect(platformInputs.length).toBe(3)
     })
 
     it('should reindex validation status after delete', async () => {
+      // Mock window.confirm
+      const originalConfirm = window.confirm
+      window.confirm = jest.fn(() => true)
+
       const mockSetResumeData = jest.fn()
       const mockData = createMockResumeData({
         socialMedia: [
@@ -502,7 +472,7 @@ describe('SocialMedia Component', () => {
       })
 
       const deleteButtons = container.querySelectorAll(
-        'button[title="Delete this social media"]'
+        'button[title="Delete social media"]'
       )
 
       // Delete middle item
@@ -517,6 +487,8 @@ describe('SocialMedia Component', () => {
           ],
         })
       }
+
+      window.confirm = originalConfirm
     })
   })
 
@@ -530,7 +502,6 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      // Should still render add button (heading is in CollapsibleSection wrapper)
       expect(screen.getByText(/Add Social Media/i)).toBeInTheDocument()
     })
 
@@ -547,9 +518,10 @@ describe('SocialMedia Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      const entries = container.querySelectorAll('.group')
-
-      expect(entries.length).toBe(3)
+      const platformInputs = container.querySelectorAll(
+        'input[name="socialMedia"]'
+      )
+      expect(platformInputs.length).toBe(3)
     })
 
     it('should handle URLs with existing https:// protocol', () => {
@@ -573,7 +545,6 @@ describe('SocialMedia Component', () => {
         })
 
         const callArg = mockSetResumeData.mock.calls[0][0]
-        // Should strip the https://
         expect(callArg.socialMedia[0].link).toBe('github.com/test')
       }
     })
@@ -598,7 +569,6 @@ describe('SocialMedia Component', () => {
           target: { name: 'link', value: 'http://github.com/test' },
         })
 
-        // Component should still process the input
         expect(mockSetResumeData).toHaveBeenCalled()
       }
     })
