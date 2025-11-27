@@ -48,25 +48,14 @@ const Skills = ({ title, skills }) => {
           {skills.map((skill, index) => (
             <span key={index}>
               {index > 0 && ', '}
-              {skill.highlight ? (
-                <span
-                  className="editable bg-blue-100 font-semibold"
-                  contentEditable={editable}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleSkillChange(e, index)}
-                >
-                  {skill.text}
-                </span>
-              ) : (
-                <span
-                  className="editable"
-                  contentEditable={editable}
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleSkillChange(e, index)}
-                >
-                  {skill.text}
-                </span>
-              )}
+              <span
+                className="editable"
+                contentEditable={editable}
+                suppressContentEditableWarning
+                onBlur={(e) => handleSkillChange(e, index)}
+              >
+                {skill.text}
+              </span>
             </span>
           ))}
         </p>

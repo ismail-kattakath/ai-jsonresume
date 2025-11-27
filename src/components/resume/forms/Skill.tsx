@@ -18,8 +18,7 @@ interface SkillProps {
  * Uses reusable drag-and-drop components
  */
 const Skill = ({ title }: SkillProps) => {
-  const { skills, handleChange, toggleHighlight, add, remove, reorder } =
-    useSkillsForm(title)
+  const { skills, handleChange, add, remove, reorder } = useSkillsForm(title)
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source } = result
@@ -50,14 +49,6 @@ const Skill = ({ title }: SkillProps) => {
                   outlineColor="pink"
                 >
                   <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={skill.highlight}
-                      onChange={() => toggleHighlight(index)}
-                      className="h-4 w-4 flex-shrink-0 cursor-pointer rounded accent-pink-500"
-                      title="Highlight this skill"
-                    />
-
                     <div className="floating-label-group flex-1">
                       <input
                         type="text"

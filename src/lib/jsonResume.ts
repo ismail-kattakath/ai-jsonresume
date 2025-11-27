@@ -196,7 +196,6 @@ export function convertFromJSONResume(
       title: skillGroup.name || 'Skills',
       skills: (skillGroup.keywords || []).map((keyword: string) => ({
         text: keyword,
-        highlight: false,
       })),
     }))
 

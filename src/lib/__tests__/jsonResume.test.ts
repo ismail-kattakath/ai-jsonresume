@@ -527,7 +527,6 @@ describe('JSON Resume Conversion', () => {
       expect(result.skills[0].title).toBe('Product Management')
       expect(result.skills[0].skills).toHaveLength(3)
       expect(result.skills[0].skills[0].text).toBe('Roadmapping')
-      expect(result.skills[0].skills[0].highlight).toBe(false)
     })
 
     it('should convert languages to internal format', () => {

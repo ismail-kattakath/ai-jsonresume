@@ -5,11 +5,7 @@ import type { ResumeData, SkillGroup } from '@/types/resume'
 
 const mockSkillGroup: SkillGroup = {
   title: 'Programming Languages',
-  skills: [
-    { text: 'JavaScript', highlight: false },
-    { text: 'TypeScript', highlight: true },
-    { text: 'Python', highlight: false },
-  ],
+  skills: [{ text: 'JavaScript' }, { text: 'TypeScript' }, { text: 'Python' }],
 }
 
 const mockResumeData: ResumeData = {
@@ -74,17 +70,10 @@ describe('Skills Component', () => {
       expect(screen.getByText('Python')).toBeInTheDocument()
     })
 
-    it('renders highlighted skill with special styling', () => {
-      renderWithContext('Programming Languages', mockSkillGroup.skills)
-      const typescriptSkill = screen.getByText('TypeScript')
-      expect(typescriptSkill).toHaveClass('bg-blue-100', 'font-semibold')
-    })
-
-    it('renders regular skill without highlight styling', () => {
+    it('renders skill with editable class', () => {
       renderWithContext('Programming Languages', mockSkillGroup.skills)
       const jsSkill = screen.getByText('JavaScript')
       expect(jsSkill).toHaveClass('editable')
-      expect(jsSkill).not.toHaveClass('bg-blue-100')
     })
 
     it('does not render when skills array is empty', () => {
@@ -141,14 +130,14 @@ describe('Skills Component', () => {
           mockSkillGroup,
           {
             title: 'Frameworks',
-            skills: [{ text: 'React', highlight: false }],
+            skills: [{ text: 'React' }],
           },
         ],
       }
 
       renderWithContext(
         'Frameworks',
-        [{ text: 'React', highlight: false }],
+        [{ text: 'React' }],
         true,
         resumeDataWithMultipleGroups
       )
@@ -163,7 +152,7 @@ describe('Skills Component', () => {
           mockSkillGroup,
           {
             title: 'Libraries & Frameworks',
-            skills: [{ text: 'React', highlight: false }],
+            skills: [{ text: 'React' }],
           },
         ],
       })
@@ -215,20 +204,14 @@ describe('Skills Component', () => {
           mockSkillGroup,
           {
             title: 'Frameworks',
-            skills: [
-              { text: 'React', highlight: false },
-              { text: 'Next.js', highlight: true },
-            ],
+            skills: [{ text: 'React' }, { text: 'Next.js' }],
           },
         ],
       }
 
       renderWithContext(
         'Frameworks',
-        [
-          { text: 'React', highlight: false },
-          { text: 'Next.js', highlight: true },
-        ],
+        [{ text: 'React' }, { text: 'Next.js' }],
         true,
         resumeDataWithMultipleGroups
       )
@@ -252,20 +235,14 @@ describe('Skills Component', () => {
           mockSkillGroup,
           {
             title: 'Frameworks',
-            skills: [
-              { text: 'React', highlight: false },
-              { text: 'Next.js', highlight: true },
-            ],
+            skills: [{ text: 'React' }, { text: 'Next.js' }],
           },
         ],
       }
 
       renderWithContext(
         'Frameworks',
-        [
-          { text: 'React', highlight: false },
-          { text: 'Next.js', highlight: true },
-        ],
+        [{ text: 'React' }, { text: 'Next.js' }],
         true,
         resumeDataWithMultipleGroups
       )
@@ -280,10 +257,7 @@ describe('Skills Component', () => {
           mockSkillGroup, // Unchanged
           {
             title: 'Frameworks',
-            skills: [
-              { text: 'React 19', highlight: false },
-              { text: 'Next.js', highlight: true },
-            ],
+            skills: [{ text: 'React 19' }, { text: 'Next.js' }],
           },
         ],
       })
@@ -292,32 +266,19 @@ describe('Skills Component', () => {
 
   describe('Edge Cases', () => {
     it('renders single skill without comma', () => {
-      renderWithContext('Tools', [{ text: 'Git', highlight: false }])
+      renderWithContext('Tools', [{ text: 'Git' }])
       const container = screen.getByText('Git').parentElement
       expect(container?.textContent).toBe('Git')
     })
 
     it('handles skill with special characters', () => {
       renderWithContext('Frameworks', [
-        { text: 'React.js', highlight: false },
-        { text: 'Node.js', highlight: false },
+        { text: 'React.js' },
+        { text: 'Node.js' },
       ])
 
       expect(screen.getByText('React.js')).toBeInTheDocument()
       expect(screen.getByText('Node.js')).toBeInTheDocument()
-    })
-
-    it('highlighted skills maintain bg-blue-100 class', () => {
-      renderWithContext('Programming Languages', mockSkillGroup.skills)
-
-      const tsSkill = screen.getByText('TypeScript')
-      const jsSkill = screen.getByText('JavaScript')
-
-      // TypeScript is highlighted
-      expect(tsSkill).toHaveClass('bg-blue-100', 'font-semibold')
-
-      // JavaScript is not highlighted
-      expect(jsSkill).not.toHaveClass('bg-blue-100')
     })
 
     it('renders correct number of skills for the group', () => {

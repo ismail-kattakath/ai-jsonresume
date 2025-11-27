@@ -83,16 +83,14 @@ describe('Resume Adapter', () => {
     }
   })
 
-  it('should have skill objects with text and highlight fields', () => {
+  it('should have skill objects with text field', () => {
     if (
       resumeData.skills.length > 0 &&
       resumeData.skills[0].skills.length > 0
     ) {
       const firstSkill = resumeData.skills[0].skills[0]
       expect(firstSkill).toHaveProperty('text')
-      expect(firstSkill).toHaveProperty('highlight')
       expect(typeof firstSkill.text).toBe('string')
-      expect(typeof firstSkill.highlight).toBe('boolean')
     }
   })
 
@@ -351,9 +349,9 @@ describe('convertFromJSONResume - Edge Cases', () => {
       const result = convertFromJSONResume(resume)
       expect(result.skills[0].title).toBe('Programming')
       expect(result.skills[0].skills).toEqual([
-        { text: 'JavaScript', highlight: false },
-        { text: 'TypeScript', highlight: false },
-        { text: 'Python', highlight: false },
+        { text: 'JavaScript' },
+        { text: 'TypeScript' },
+        { text: 'Python' },
       ])
     })
 

@@ -33,28 +33,10 @@ export function useSkillsForm(title: string) {
   }
 
   /**
-   * Toggle highlight state for a skill
-   */
-  const toggleHighlight = (index: number) => {
-    const newSkills = [...skillType.skills]
-    newSkills[index] = {
-      ...newSkills[index],
-      highlight: !newSkills[index].highlight,
-    }
-
-    setResumeData((prevData) => ({
-      ...prevData,
-      skills: prevData.skills.map((skill) =>
-        skill.title === title ? { ...skill, skills: newSkills } : skill
-      ),
-    }))
-  }
-
-  /**
    * Add new skill to the group
    */
   const add = () => {
-    const newSkill: Skill = { text: '', highlight: false }
+    const newSkill: Skill = { text: '' }
     const newSkills = [...skillType.skills, newSkill]
 
     setResumeData((prevData) => ({
@@ -98,7 +80,6 @@ export function useSkillsForm(title: string) {
   return {
     skills: skillType.skills,
     handleChange,
-    toggleHighlight,
     add,
     remove,
     reorder,

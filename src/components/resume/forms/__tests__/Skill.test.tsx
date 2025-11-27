@@ -59,15 +59,12 @@ jest.mock('@hello-pangea/dnd', () => ({
 
 describe('Skill Component', () => {
   describe('Rendering', () => {
-    it('should render skills with text and highlight checkbox', async () => {
+    it('should render skills with text inputs', async () => {
       const mockData = createMockResumeData({
         skills: [
           {
             title: 'Technical Skills',
-            skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'TypeScript', highlight: true },
-            ],
+            skills: [{ text: 'JavaScript' }, { text: 'TypeScript' }],
           },
         ],
       })
@@ -84,9 +81,6 @@ describe('Skill Component', () => {
 
       const skillInputs = container.querySelectorAll('input[type="text"]')
       expect(skillInputs.length).toBe(2)
-
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
-      expect(checkboxes.length).toBe(2)
     })
 
     it('should display skill text in inputs', () => {
@@ -94,7 +88,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Languages',
-            skills: [{ text: 'Python', highlight: false }],
+            skills: [{ text: 'Python' }],
           },
         ],
       })
@@ -108,31 +102,6 @@ describe('Skill Component', () => {
       ) as HTMLInputElement
 
       expect(skillInput?.value).toBe('Python')
-    })
-
-    it('should reflect highlight state in checkbox', () => {
-      const mockData = createMockResumeData({
-        skills: [
-          {
-            title: 'Tools',
-            skills: [
-              { text: 'Git', highlight: true },
-              { text: 'Docker', highlight: false },
-            ],
-          },
-        ],
-      })
-
-      const { container } = renderWithContext(<Skill title="Tools" />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const checkboxes = container.querySelectorAll(
-        'input[type="checkbox"]'
-      ) as NodeListOf<HTMLInputElement>
-
-      expect(checkboxes[0].checked).toBe(true)
-      expect(checkboxes[1].checked).toBe(false)
     })
 
     it('should render add button with FormButton', () => {
@@ -149,105 +118,6 @@ describe('Skill Component', () => {
     })
   })
 
-  describe('Highlight Toggle', () => {
-    it('should toggle highlight when checkbox is clicked', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        skills: [
-          {
-            title: 'Skills',
-            skills: [{ text: 'React', highlight: false }],
-          },
-        ],
-      })
-
-      const { container } = renderWithContext(<Skill title="Skills" />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-
-      fireEvent.click(checkbox)
-
-      expect(mockSetResumeData).toHaveBeenCalled()
-      const callback = mockSetResumeData.mock.calls[0][0]
-      const newState = callback(mockData)
-
-      expect(newState.skills[0].skills[0].highlight).toBe(true)
-    })
-
-    it('should untoggle highlight when checked checkbox is clicked', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        skills: [
-          {
-            title: 'Skills',
-            skills: [{ text: 'Node.js', highlight: true }],
-          },
-        ],
-      })
-
-      const { container } = renderWithContext(<Skill title="Skills" />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-
-      fireEvent.click(checkbox)
-
-      expect(mockSetResumeData).toHaveBeenCalled()
-      const callback = mockSetResumeData.mock.calls[0][0]
-      const newState = callback(mockData)
-
-      expect(newState.skills[0].skills[0].highlight).toBe(false)
-    })
-
-    it('should toggle correct skill when multiple skills exist', () => {
-      const mockSetResumeData = jest.fn()
-      const mockData = createMockResumeData({
-        skills: [
-          {
-            title: 'Skills',
-            skills: [
-              { text: 'React', highlight: false },
-              { text: 'Vue', highlight: false },
-            ],
-          },
-        ],
-      })
-
-      const { container } = renderWithContext(<Skill title="Skills" />, {
-        contextValue: {
-          resumeData: mockData,
-          setResumeData: mockSetResumeData,
-        },
-      })
-
-      const checkboxes = container.querySelectorAll(
-        'input[type="checkbox"]'
-      ) as NodeListOf<HTMLInputElement>
-
-      fireEvent.click(checkboxes[1])
-
-      expect(mockSetResumeData).toHaveBeenCalled()
-      const callback = mockSetResumeData.mock.calls[0][0]
-      const newState = callback(mockData)
-
-      expect(newState.skills[0].skills[0].highlight).toBe(false)
-      expect(newState.skills[0].skills[1].highlight).toBe(true)
-    })
-  })
-
   describe('Add Functionality', () => {
     it('should add new skill when add button is clicked', () => {
       const mockSetResumeData = jest.fn()
@@ -255,7 +125,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Existing Skill', highlight: false }],
+            skills: [{ text: 'Existing Skill' }],
           },
         ],
       })
@@ -279,7 +149,6 @@ describe('Skill Component', () => {
         expect(newState.skills[0].skills.length).toBe(2)
         expect(newState.skills[0].skills[1]).toEqual({
           text: '',
-          highlight: false,
         })
       }
     })
@@ -291,7 +160,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Test Skill', highlight: false }],
+            skills: [{ text: 'Test Skill' }],
           },
         ],
       })
@@ -313,10 +182,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [
-              { text: 'Skill 1', highlight: false },
-              { text: 'Skill 2', highlight: false },
-            ],
+            skills: [{ text: 'Skill 1' }, { text: 'Skill 2' }],
           },
         ],
       })
@@ -352,7 +218,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: '', highlight: false }],
+            skills: [{ text: '' }],
           },
         ],
       })
@@ -385,10 +251,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [
-              { text: 'Skill 1', highlight: false },
-              { text: 'Skill 2', highlight: false },
-            ],
+            skills: [{ text: 'Skill 1' }, { text: 'Skill 2' }],
           },
         ],
       })
@@ -423,10 +286,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [
-              { text: 'Skill 1', highlight: false },
-              { text: 'Skill 2', highlight: false },
-            ],
+            skills: [{ text: 'Skill 1' }, { text: 'Skill 2' }],
           },
         ],
       })
@@ -447,7 +307,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Test', highlight: false }],
+            skills: [{ text: 'Test' }],
           },
         ],
       })
@@ -466,7 +326,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Programming Languages',
-            skills: [{ text: 'Python', highlight: false }],
+            skills: [{ text: 'Python' }],
           },
         ],
       })
@@ -486,7 +346,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Test', highlight: false }],
+            skills: [{ text: 'Test' }],
           },
         ],
       })
@@ -503,12 +363,12 @@ describe('Skill Component', () => {
       )
     })
 
-    it('should layout checkbox, input, and delete button in row', () => {
+    it('should layout input and delete button in row', () => {
       const mockData = createMockResumeData({
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Test', highlight: false }],
+            skills: [{ text: 'Test' }],
           },
         ],
       })
@@ -531,10 +391,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Technical Skills',
-            skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: true },
-            ],
+            skills: [{ text: 'JavaScript' }, { text: 'Python' }],
           },
         ],
       })
@@ -553,31 +410,12 @@ describe('Skill Component', () => {
       expect(inputs.length).toBeGreaterThan(0)
     })
 
-    it('should have title attribute on highlight checkbox', () => {
-      const mockData = createMockResumeData({
-        skills: [
-          {
-            title: 'Skills',
-            skills: [{ text: 'Test', highlight: false }],
-          },
-        ],
-      })
-
-      const { container } = renderWithContext(<Skill title="Skills" />, {
-        contextValue: { resumeData: mockData },
-      })
-
-      const checkbox = container.querySelector('input[type="checkbox"]')
-
-      expect(checkbox).toHaveAttribute('title', 'Highlight this skill')
-    })
-
     it('should have title attribute on delete button', () => {
       const mockData = createMockResumeData({
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'Test', highlight: false }],
+            skills: [{ text: 'Test' }],
           },
         ],
       })
@@ -598,7 +436,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Frameworks',
-            skills: [{ text: '', highlight: false }],
+            skills: [{ text: '' }],
           },
         ],
       })
@@ -621,11 +459,11 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Languages',
-            skills: [{ text: 'JavaScript', highlight: false }],
+            skills: [{ text: 'JavaScript' }],
           },
           {
             title: 'Frameworks',
-            skills: [{ text: 'React', highlight: false }],
+            skills: [{ text: 'React' }],
           },
         ],
       })
@@ -648,11 +486,11 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Languages',
-            skills: [{ text: 'JavaScript', highlight: false }],
+            skills: [{ text: 'JavaScript' }],
           },
           {
             title: 'Frameworks',
-            skills: [{ text: 'React', highlight: false }],
+            skills: [{ text: 'React' }],
           },
         ],
       })
@@ -699,7 +537,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: 'C++/C#', highlight: false }],
+            skills: [{ text: 'C++/C#' }],
           },
         ],
       })
@@ -722,7 +560,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [{ text: longSkillText, highlight: false }],
+            skills: [{ text: longSkillText }],
           },
         ],
       })
@@ -746,9 +584,9 @@ describe('Skill Component', () => {
           {
             title: 'Skills',
             skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: false },
-              { text: 'Java', highlight: false },
+              { text: 'JavaScript' },
+              { text: 'Python' },
+              { text: 'Java' },
             ],
           },
         ],
@@ -777,9 +615,9 @@ describe('Skill Component', () => {
           {
             title: 'Skills',
             skills: [
-              { text: 'Python', highlight: false },
-              { text: 'Java', highlight: false },
-              { text: 'JavaScript', highlight: false },
+              { text: 'Python' },
+              { text: 'Java' },
+              { text: 'JavaScript' },
             ],
           },
         ],
@@ -792,9 +630,9 @@ describe('Skill Component', () => {
           {
             title: 'Skills',
             skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: false },
-              { text: 'Java', highlight: false },
+              { text: 'JavaScript' },
+              { text: 'Python' },
+              { text: 'Java' },
             ],
           },
         ],
@@ -823,9 +661,9 @@ describe('Skill Component', () => {
           {
             title: 'Skills',
             skills: [
-              { text: 'Java', highlight: false },
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: false },
+              { text: 'Java' },
+              { text: 'JavaScript' },
+              { text: 'Python' },
             ],
           },
         ],
@@ -837,10 +675,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: false },
-            ],
+            skills: [{ text: 'JavaScript' }, { text: 'Python' }],
           },
         ],
       })
@@ -866,10 +701,7 @@ describe('Skill Component', () => {
         skills: [
           {
             title: 'Skills',
-            skills: [
-              { text: 'JavaScript', highlight: false },
-              { text: 'Python', highlight: false },
-            ],
+            skills: [{ text: 'JavaScript' }, { text: 'Python' }],
           },
         ],
       })

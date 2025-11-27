@@ -53,7 +53,6 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     title: skillGroup.name || 'Skills',
     skills: (skillGroup.keywords || []).map((keyword) => ({
       text: keyword,
-      highlight: false,
     })),
   }))
 

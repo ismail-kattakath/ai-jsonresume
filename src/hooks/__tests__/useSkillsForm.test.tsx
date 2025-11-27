@@ -20,14 +20,14 @@ const mockResumeData: ResumeData = {
     {
       title: 'Programming',
       skills: [
-        { text: 'JavaScript', highlight: false },
-        { text: 'TypeScript', highlight: true },
-        { text: 'Python', highlight: false },
+        { text: 'JavaScript' },
+        { text: 'TypeScript' },
+        { text: 'Python' },
       ],
     },
     {
       title: 'Databases',
-      skills: [{ text: 'PostgreSQL', highlight: false }],
+      skills: [{ text: 'PostgreSQL' }],
     },
   ],
   languages: [],
@@ -99,7 +99,6 @@ describe('useSkillsForm', () => {
       (s: SkillGroup) => s.title === 'Programming'
     )
     expect(programmingSkills.skills[0].text).toBe('JavaScript ES2024')
-    expect(programmingSkills.skills[0].highlight).toBe(false)
   })
 
   it('should preserve other skill groups when changing text', () => {
@@ -121,42 +120,6 @@ describe('useSkillsForm', () => {
     expect(databaseSkills.skills[0].text).toBe('PostgreSQL')
   })
 
-  it('should toggle highlight state for a skill', () => {
-    const { result } = renderHook(() => useSkillsForm('Programming'), {
-      wrapper,
-    })
-
-    act(() => {
-      result.current.toggleHighlight(0)
-    })
-
-    const updater = setResumeData.mock.calls[0][0]
-    const newData = updater(mockResumeData)
-
-    const programmingSkills = newData.skills.find(
-      (s: SkillGroup) => s.title === 'Programming'
-    )
-    expect(programmingSkills.skills[0].highlight).toBe(true)
-  })
-
-  it('should toggle highlight from true to false', () => {
-    const { result } = renderHook(() => useSkillsForm('Programming'), {
-      wrapper,
-    })
-
-    act(() => {
-      result.current.toggleHighlight(1) // TypeScript is already highlighted
-    })
-
-    const updater = setResumeData.mock.calls[0][0]
-    const newData = updater(mockResumeData)
-
-    const programmingSkills = newData.skills.find(
-      (s: SkillGroup) => s.title === 'Programming'
-    )
-    expect(programmingSkills.skills[1].highlight).toBe(false)
-  })
-
   it('should add new skill to the group', () => {
     const { result } = renderHook(() => useSkillsForm('Programming'), {
       wrapper,
@@ -173,7 +136,7 @@ describe('useSkillsForm', () => {
       (s: SkillGroup) => s.title === 'Programming'
     )
     expect(programmingSkills.skills).toHaveLength(4)
-    expect(programmingSkills.skills[3]).toEqual({ text: '', highlight: false })
+    expect(programmingSkills.skills[3]).toEqual({ text: '' })
   })
 
   it('should remove skill by index', () => {

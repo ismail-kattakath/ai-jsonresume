@@ -30,7 +30,6 @@ export interface Education {
 
 export interface Skill {
   text: string
-  highlight: boolean
 }
 
 export interface SkillGroup {
