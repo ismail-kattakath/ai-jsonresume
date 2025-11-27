@@ -157,7 +157,7 @@ function UnifiedEditor() {
 
             <form
               onSubmit={(e) => e.preventDefault()}
-              className="exclude-print flex-1 space-y-6 overflow-y-auto p-4 md:h-screen md:space-y-8 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
+              className="exclude-print flex-1 space-y-6 overflow-y-auto p-4 md:h-full md:space-y-8 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
             >
               {/* Header */}
               <div className="space-y-4 border-b border-white/10 pb-6">
