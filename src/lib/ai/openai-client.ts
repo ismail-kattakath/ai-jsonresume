@@ -44,7 +44,7 @@ async function makeOpenAIRequest(
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
 
   try {
-    const response = await fetch(`${config.baseURL}/v1/chat/completions`, {
+    const response = await fetch(`${config.baseURL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ async function makeOpenAIStreamRequest(
   onProgress: StreamCallback
 ): Promise<string> {
   try {
-    const response = await fetch(`${config.baseURL}/v1/chat/completions`, {
+    const response = await fetch(`${config.baseURL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -442,8 +442,8 @@ export async function testConnection(config: OpenAIConfig): Promise<boolean> {
 
 /**
  * Fetches available models from the API
- * Uses the standard OpenAI-compatible /v1/models endpoint
- * Note: OpenRouter uses /api/v1/models instead of /v1/models
+ * Uses the standard OpenAI-compatible /models endpoint
+ * Note: baseURL should already include /v1 or /api/v1
  */
 export async function fetchAvailableModels(
   config: Pick<OpenAIConfig, 'baseURL' | 'apiKey'>
@@ -454,11 +454,8 @@ export async function fetchAvailableModels(
       return []
     }
 
-    // OpenRouter uses /api/v1/models, others use /v1/models
-    const isOpenRouter = config.baseURL.includes('openrouter.ai')
-    const endpoint = isOpenRouter
-      ? `${config.baseURL}/models`
-      : `${config.baseURL}/v1/models`
+    // All providers: baseURL already includes /v1 or /api/v1, just append /models
+    const endpoint = `${config.baseURL}/models`
 
     console.log('[fetchAvailableModels] Debug:', {
       baseURL: config.baseURL,
