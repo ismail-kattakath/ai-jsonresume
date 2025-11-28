@@ -283,7 +283,7 @@ const AISettings: React.FC = () => {
           name="customApiUrl"
           value={customURL}
           onChange={handleCustomURLChange}
-          placeholder="https://api.example.com/v1"
+          placeholder="http://localhost:1234/v1"
           variant="blue"
           helpText="Enter the base URL for your OpenAI-compatible API"
         />
@@ -322,7 +322,7 @@ const AISettings: React.FC = () => {
           name="model"
           value={settings.model}
           onChange={(e) => updateSettings({ model: e.target.value })}
-          placeholder="gpt-4o-mini"
+          placeholder={selectedProvider === 'Custom' ? '' : 'gpt-4o-mini'}
           variant="blue"
           helpText={
             loadingModels
