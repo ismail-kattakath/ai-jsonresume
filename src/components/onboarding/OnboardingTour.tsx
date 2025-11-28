@@ -6,10 +6,8 @@ import {
   onboardingTours,
   hasCompletedOnboarding,
   markOnboardingComplete,
-  resetOnboarding,
 } from '@/config/onboarding'
 import { TourCard } from './TourCard'
-import { HelpCircle } from 'lucide-react'
 
 /**
  * Onboarding Tour Wrapper Component
@@ -33,9 +31,8 @@ interface OnboardingTourProps {
  * Must be inside OnbordaProvider to use useOnborda hook
  */
 function TourController({ children }: OnboardingTourProps) {
-  const { startOnborda, isOnbordaVisible, closeOnborda } = useOnborda()
+  const { startOnborda, isOnbordaVisible } = useOnborda()
   const [isClient, setIsClient] = useState(false)
-  const [showStartButton, setShowStartButton] = useState(false)
 
   // Ensure we're on the client before checking localStorage
   useEffect(() => {
@@ -54,9 +51,6 @@ function TourController({ children }: OnboardingTourProps) {
         startOnborda('resume-builder')
       }, 800)
       return () => clearTimeout(timer)
-    } else {
-      // Show the help button for users who completed the tour
-      setShowStartButton(true)
     }
   }, [isClient, startOnborda])
 
@@ -65,34 +59,10 @@ function TourController({ children }: OnboardingTourProps) {
     if (isClient && !isOnbordaVisible && hasCompletedOnboarding() === false) {
       // Tour was closed (either completed or skipped)
       markOnboardingComplete()
-      setShowStartButton(true)
     }
   }, [isOnbordaVisible, isClient])
 
-  // Handle replay tour
-  const handleReplayTour = () => {
-    resetOnboarding()
-    startOnborda('resume-builder')
-  }
-
-  return (
-    <>
-      {children}
-
-      {/* Help Button - Replay Tour */}
-      {isClient && showStartButton && !isOnbordaVisible && (
-        <button
-          onClick={handleReplayTour}
-          className="exclude-print fixed bottom-6 left-6 z-50 flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-          aria-label="Replay onboarding tour"
-          title="Take a guided tour"
-        >
-          <HelpCircle className="h-4 w-4" />
-          <span className="hidden sm:inline">Tour</span>
-        </button>
-      )}
-    </>
-  )
+  return <>{children}</>
 }
 
 /**

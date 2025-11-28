@@ -130,6 +130,14 @@ describe('TourCard', () => {
       fireEvent.click(closeButton)
       expect(mockCloseOnborda).toHaveBeenCalledTimes(1)
     })
+
+    it('calls closeOnborda when "Let\'s Go!" button is clicked on last step', () => {
+      render(<TourCard {...defaultProps} currentStep={4} totalSteps={5} />)
+      const letsGoButton = screen.getByText("Let's Go!")
+      fireEvent.click(letsGoButton)
+      expect(mockCloseOnborda).toHaveBeenCalledTimes(1)
+      expect(mockNextStep).not.toHaveBeenCalled()
+    })
   })
 
   describe('without controls', () => {

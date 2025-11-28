@@ -36,8 +36,10 @@ export function TourCard({
 
   return (
     <div className="relative max-w-[400px] min-w-[320px]">
-      {/* Arrow pointing to target element */}
-      <div className="absolute">{arrow}</div>
+      {/* Arrow pointing to target element - centered at top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
+        {arrow}
+      </div>
 
       {/* Card Container */}
       <div className="overflow-hidden rounded-2xl border border-white/20 bg-gray-900/95 shadow-2xl backdrop-blur-xl">
@@ -107,7 +109,7 @@ export function TourCard({
 
               {/* Next/Finish Button */}
               <button
-                onClick={nextStep}
+                onClick={isLastStep ? closeOnborda : nextStep}
                 className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
               >
                 {isLastStep ? (
