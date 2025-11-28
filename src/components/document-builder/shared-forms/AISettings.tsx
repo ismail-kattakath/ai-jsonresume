@@ -126,14 +126,31 @@ const AISettings: React.FC = () => {
     },
   ]
 
-  // Model dropdown options
-  const modelOptions = availableModels.map((model) => ({
-    value: model,
-    label: model,
-  }))
+  // Get current provider for common models fallback
+  const currentProvider = PROVIDER_PRESETS.find(
+    (p) => p.name === selectedProvider
+  )
+
+  // Model dropdown options - use API models or fallback to common models
+  const hasApiModels = availableModels.length > 0
+  const hasCommonModels =
+    currentProvider?.commonModels && currentProvider.commonModels.length > 0
+
+  const modelOptions = hasApiModels
+    ? availableModels.map((model) => ({
+        value: model,
+        label: model,
+      }))
+    : hasCommonModels
+      ? currentProvider.commonModels!.map((model) => ({
+          value: model,
+          label: model,
+        }))
+      : []
 
   const showCustomURL = selectedProvider === 'Custom'
-  const showModelDropdown = availableModels.length > 0 && !loadingModels
+  const showModelDropdown = modelOptions.length > 0 && !loadingModels
+  const usingFallbackModels = !hasApiModels && hasCommonModels
 
   return (
     <div className="flex flex-col gap-4">
@@ -187,7 +204,11 @@ const AISettings: React.FC = () => {
           onChange={(e) => updateSettings({ model: e.target.value })}
           options={modelOptions}
           variant="blue"
-          helpText={`${availableModels.length} models available from API`}
+          helpText={
+            usingFallbackModels
+              ? `Showing common ${selectedProvider} models - enter API key to fetch all available models`
+              : `${availableModels.length} models available from API`
+          }
         />
       ) : (
         <FormInput
