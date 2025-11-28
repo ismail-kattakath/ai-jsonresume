@@ -33,14 +33,12 @@ export async function generateResumeBuilderOgImage(
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
+          position: 'relative',
           alignItems: 'center',
           justifyContent: 'center',
-          position: 'relative',
-          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
         }}
       >
-        {/* Background Image with blur effect */}
+        {/* Background Image - Same as homepage with stronger blur */}
         <img
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           src={backgroundImageData as any}
@@ -52,12 +50,11 @@ export async function generateResumeBuilderOgImage(
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            filter: 'blur(8px)',
-            opacity: 0.3,
+            filter: 'blur(12px) brightness(0.7)',
           }}
         />
 
-        {/* Dark Overlay */}
+        {/* Rich Dark Overlay - Depth and sophistication */}
         <div
           style={{
             position: 'absolute',
@@ -66,11 +63,24 @@ export async function generateResumeBuilderOgImage(
             right: 0,
             bottom: 0,
             background:
-              'linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%)',
+              'linear-gradient(135deg, rgba(0, 0, 0, 0.80) 0%, rgba(17, 24, 39, 0.90) 50%, rgba(0, 0, 0, 0.85) 100%)',
           }}
         />
 
-        {/* Content Container */}
+        {/* Brand Gradient Overlay - Subtle color harmony */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background:
+              'radial-gradient(ellipse at center, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.08) 50%, transparent 100%)',
+          }}
+        />
+
+        {/* Content - Professional hierarchy */}
         <div
           style={{
             display: 'flex',
@@ -80,70 +90,90 @@ export async function generateResumeBuilderOgImage(
             zIndex: 1,
             padding: '80px',
             textAlign: 'center',
+            maxWidth: '1100px',
           }}
         >
-          {/* Icon/Emoji */}
+          {/* Hero Icon - Large with brand-colored glow */}
           <div
             style={{
-              fontSize: '120px',
-              marginBottom: '40px',
-              filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))',
+              fontSize: '160px',
+              marginBottom: '56px',
+              filter:
+                'drop-shadow(0 16px 48px rgba(102, 126, 234, 0.6)) drop-shadow(0 8px 24px rgba(118, 75, 162, 0.4))',
             }}
           >
             🎯
           </div>
 
-          {/* Main Title */}
+          {/* Main Title - Bold, high-impact typography */}
           <div
             style={{
-              fontSize: '72px',
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              backgroundClip: 'text',
-              color: 'transparent',
-              marginBottom: '20px',
-              letterSpacing: '-2px',
-              filter: 'drop-shadow(0 4px 12px rgba(102, 126, 234, 0.3))',
+              fontSize: '92px',
+              fontWeight: 900,
+              color: '#ffffff',
+              marginBottom: '32px',
+              letterSpacing: '-4px',
+              lineHeight: 1,
+              textShadow:
+                '0 8px 32px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(102, 126, 234, 0.3)',
             }}
           >
             AI Resume Builder
           </div>
 
-          {/* Subtitle */}
+          {/* Brand Accent Line - Visual separator with glow */}
           <div
             style={{
-              fontSize: '28px',
-              color: 'rgba(255, 255, 255, 0.9)',
-              marginBottom: '50px',
-              maxWidth: '1000px',
+              width: '160px',
+              height: '8px',
+              background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '4px',
+              marginBottom: '40px',
+              boxShadow:
+                '0 0 24px rgba(102, 126, 234, 0.8), 0 8px 32px rgba(118, 75, 162, 0.5)',
+            }}
+          />
+
+          {/* Value Proposition - Clear and compelling */}
+          <div
+            style={{
+              fontSize: '36px',
+              color: 'rgba(255, 255, 255, 0.98)',
+              marginBottom: '64px',
+              maxWidth: '950px',
               lineHeight: 1.4,
+              fontWeight: 500,
+              textShadow: '0 4px 16px rgba(0, 0, 0, 0.7)',
             }}
           >
             Build JD-tailored ATS resumes with AI - from JSON Resume or start
             fresh
           </div>
 
-          {/* Feature Pills */}
+          {/* Feature Pills - Glassmorphism with depth */}
           <div
             style={{
               display: 'flex',
               gap: '20px',
               flexWrap: 'wrap',
               justifyContent: 'center',
-              maxWidth: '1000px',
             }}
           >
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '12px 24px',
-                background: 'rgba(102, 126, 234, 0.2)',
-                border: '2px solid rgba(102, 126, 234, 0.4)',
-                borderRadius: '50px',
-                color: '#a5b4fc',
-                fontSize: '24px',
-                fontWeight: '600',
+                padding: '16px 32px',
+                background:
+                  'linear-gradient(135deg, rgba(102, 126, 234, 0.30) 0%, rgba(102, 126, 234, 0.20) 100%)',
+                border: '2.5px solid rgba(102, 126, 234, 0.6)',
+                borderRadius: '60px',
+                color: '#ddd6fe',
+                fontSize: '26px',
+                fontWeight: 700,
+                boxShadow:
+                  '0 12px 32px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
               }}
             >
               ✨ AI-Powered
@@ -152,46 +182,42 @@ export async function generateResumeBuilderOgImage(
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '12px 24px',
-                background: 'rgba(168, 85, 247, 0.2)',
-                border: '2px solid rgba(168, 85, 247, 0.4)',
-                borderRadius: '50px',
-                color: '#e9d5ff',
-                fontSize: '24px',
-                fontWeight: '600',
+                padding: '16px 32px',
+                background:
+                  'linear-gradient(135deg, rgba(168, 85, 247, 0.30) 0%, rgba(168, 85, 247, 0.20) 100%)',
+                border: '2.5px solid rgba(168, 85, 247, 0.6)',
+                borderRadius: '60px',
+                color: '#f3e8ff',
+                fontSize: '26px',
+                fontWeight: 700,
+                boxShadow:
+                  '0 12px 32px rgba(168, 85, 247, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
               }}
             >
-              📄 Real-time Preview
+              👁️ Real-time Preview
             </div>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '12px 24px',
-                background: 'rgba(236, 72, 153, 0.2)',
-                border: '2px solid rgba(236, 72, 153, 0.4)',
-                borderRadius: '50px',
-                color: '#fbcfe8',
-                fontSize: '24px',
-                fontWeight: '600',
+                padding: '16px 32px',
+                background:
+                  'linear-gradient(135deg, rgba(236, 72, 153, 0.30) 0%, rgba(236, 72, 153, 0.20) 100%)',
+                border: '2.5px solid rgba(236, 72, 153, 0.6)',
+                borderRadius: '60px',
+                color: '#fce7f3',
+                fontSize: '26px',
+                fontWeight: 700,
+                boxShadow:
+                  '0 12px 32px rgba(236, 72, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
               }}
             >
-              📋 JSON Resume
+              📄 JSON Resume
             </div>
           </div>
         </div>
-
-        {/* Bottom Gradient Accent */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-          }}
-        />
       </div>
     ),
     {
