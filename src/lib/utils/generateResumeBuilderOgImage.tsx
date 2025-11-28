@@ -112,15 +112,14 @@ export async function generateResumeBuilderOgImage(
           {/* Subtitle */}
           <div
             style={{
-              fontSize: '32px',
+              fontSize: '30px',
               color: 'rgba(255, 255, 255, 0.9)',
               marginBottom: '50px',
-              maxWidth: '900px',
+              maxWidth: '1000px',
               lineHeight: 1.4,
             }}
           >
-            Build professional resumes and cover letters with AI-powered
-            suggestions
+            Build JD-targeted ATS-friendly resumes and cover letters with AI
           </div>
 
           {/* Feature Pills */}

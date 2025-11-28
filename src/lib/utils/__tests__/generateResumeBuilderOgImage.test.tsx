@@ -98,7 +98,7 @@ describe('generateResumeBuilderOgImage', () => {
       const [[element]] = (ImageResponse as unknown as jest.Mock).mock.calls
       const elementString = JSON.stringify(element)
 
-      expect(elementString).toContain('professional resumes')
+      expect(elementString).toContain('ATS-friendly resumes')
     })
 
     it('should include emoji icon', async () => {
