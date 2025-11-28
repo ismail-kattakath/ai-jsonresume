@@ -122,7 +122,7 @@ describe('generateResumeBuilderOgImage', () => {
 
       expect(elementString).toContain('AI-Powered')
       expect(elementString).toContain('Real-time Preview')
-      expect(elementString).toContain('Customizable')
+      expect(elementString).toContain('JSON Resume')
     })
   })
 

@@ -176,7 +176,7 @@ export async function generateResumeBuilderOgImage(
                 fontWeight: '600',
               }}
             >
-              🎨 Customizable
+              📋 JSON Resume
             </div>
           </div>
         </div>
