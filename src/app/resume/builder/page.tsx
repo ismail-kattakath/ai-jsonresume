@@ -561,7 +561,7 @@ function UnifiedEditor() {
               {/* Floating Action Buttons (Capsule) - Hidden on print */}
               <div
                 id="print-button"
-                className="exclude-print fixed top-8 right-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none"
+                className="exclude-print fixed right-8 bottom-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none md:top-8 md:bottom-auto"
               >
                 {mode === 'resume' && (
                   <div className="[&>button]:animate-none [&>button]:rounded-r-none [&>button]:shadow-none">
@@ -611,8 +611,6 @@ function UnifiedEditor() {
                   <div
                     id="mode-switcher"
                     className="flex overflow-hidden rounded-lg bg-white/5"
-                    data-tooltip-id="app-tooltip"
-                    data-tooltip-content={tooltips.navigation.modeSwitcher}
                   >
                     <button
                       type="button"
