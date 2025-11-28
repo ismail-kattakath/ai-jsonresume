@@ -40,19 +40,25 @@ export function FormInput({
   const isPassword = type === 'password'
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type
 
+  const inputId = `input-${name}`
+
   return (
     <div className="space-y-1">
       <div className={`floating-label-group ${className}`}>
         <input
+          id={inputId}
           type={inputType}
           placeholder={placeholder || label}
           name={name}
+          aria-label={label}
           className={`w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${isPassword ? 'pr-12' : ''} ${variantClasses[variant]}`}
           value={value}
           onChange={onChange}
           maxLength={maxLength}
         />
-        <label className="floating-label">{label}</label>
+        <label htmlFor={inputId} className="floating-label">
+          {label}
+        </label>
         {isPassword && (
           <button
             type="button"

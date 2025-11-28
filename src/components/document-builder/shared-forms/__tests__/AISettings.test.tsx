@@ -103,7 +103,7 @@ describe('AISettings Component', () => {
       })
     })
 
-    it('shows custom URL input when Custom is selected', () => {
+    it('shows custom URL input when Custom is selected', async () => {
       mockUseAISettings.mockReturnValue({
         settings: {
           apiUrl: 'https://custom.api.com/v1',
@@ -120,7 +120,9 @@ describe('AISettings Component', () => {
       })
 
       render(<AISettings />)
-      expect(screen.getByLabelText('Custom API URL')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByLabelText('Custom API URL')).toBeInTheDocument()
+      })
     })
 
     it('hides custom URL input for preset providers', () => {
@@ -179,10 +181,15 @@ describe('AISettings Component', () => {
       })
     })
 
-    it('shows model input when no models available', () => {
+    it('shows model dropdown with common models for preset providers', () => {
+      // Default provider is OpenAI with common models
       render(<AISettings />)
-      const input = screen.getByLabelText('Model')
-      expect(input.tagName).toBe('INPUT')
+      const select = screen.getByLabelText('Model')
+      expect(select.tagName).toBe('SELECT')
+
+      // Should show common OpenAI models
+      const options = Array.from((select as HTMLSelectElement).options)
+      expect(options.some((opt) => opt.value === 'gpt-4o-mini')).toBe(true)
     })
 
     it('fetches models when API key is provided', async () => {
@@ -307,10 +314,11 @@ describe('AISettings Component', () => {
   })
 
   describe('Help Text', () => {
-    it('shows appropriate help text for model input states', () => {
+    it('shows appropriate help text for model dropdown with common models', () => {
       render(<AISettings />)
+      // Default provider (OpenAI) shows common models without API key
       expect(
-        screen.getByText(/Enter API key to load available models/i)
+        screen.getByText(/Showing common OpenAI models/i)
       ).toBeInTheDocument()
     })
 
