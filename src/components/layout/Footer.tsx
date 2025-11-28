@@ -221,27 +221,58 @@ export default function Footer() {
               © {currentYear} {contactInfo.name}. All rights reserved.
             </p>
 
-            <p className="md3-body-small flex flex-wrap items-center justify-center gap-2 text-[var(--md-sys-color-on-surface-variant)]">
-              <span className="flex items-center gap-1.5">
-                Built with{' '}
-                <Heart size={14} className="animate-pulse text-red-500" /> using
-              </span>
-              <span className="md3-label-small inline-flex items-center gap-1 rounded-full bg-[var(--md-sys-color-primary-container)] px-2 py-0.5 font-medium text-[var(--md-sys-color-on-primary-container)]">
-                Next.js
-              </span>
-              <span className="text-[var(--md-sys-color-on-surface-variant)]">
-                •
-              </span>
-              <span>Hosted on</span>
-              <a
-                href="https://github.com/ismail-kattakath/jsonresume-to-everything"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="md3-label-small inline-flex items-center gap-1 rounded-full bg-[var(--md-sys-color-secondary-container)] px-2 py-0.5 font-medium text-[var(--md-sys-color-on-secondary-container)] transition-opacity hover:opacity-80"
-              >
-                GitHub Pages
-              </a>
-            </p>
+            <div className="flex flex-col items-center gap-3 md:items-end">
+              <p className="md3-body-small flex flex-wrap items-center justify-center gap-2 text-[var(--md-sys-color-on-surface-variant)]">
+                <span className="flex items-center gap-1.5">
+                  Built with{' '}
+                  <Heart size={14} className="animate-pulse text-red-500" />{' '}
+                  using
+                </span>
+                <span className="md3-label-small inline-flex items-center gap-1 rounded-full bg-[var(--md-sys-color-primary-container)] px-2 py-0.5 font-medium text-[var(--md-sys-color-on-primary-container)]">
+                  Next.js
+                </span>
+                <span className="text-[var(--md-sys-color-on-surface-variant)]">
+                  •
+                </span>
+                <a
+                  href="https://github.com/ismail-kattakath/jsonresume-to-everything"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="md3-label-small inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 px-2 py-0.5 font-medium text-white transition-opacity hover:opacity-90"
+                >
+                  <Github size={12} />
+                  Open Source
+                </a>
+              </p>
+              <div className="md3-body-small flex flex-wrap items-center justify-center gap-2 text-[var(--md-sys-color-on-surface-variant)]">
+                <a
+                  href="https://github.com/ismail-kattakath/jsonresume-to-everything#customization"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-[var(--md-sys-color-primary)]"
+                >
+                  Edit Template
+                </a>
+                <span>•</span>
+                <a
+                  href="https://github.com/ismail-kattakath/jsonresume-to-everything/blob/main/CONTRIBUTING.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-[var(--md-sys-color-primary)]"
+                >
+                  Contribute
+                </a>
+                <span>•</span>
+                <a
+                  href="https://github.com/ismail-kattakath/jsonresume-to-everything/issues/new"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors hover:text-[var(--md-sys-color-primary)]"
+                >
+                  Report Bug
+                </a>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
