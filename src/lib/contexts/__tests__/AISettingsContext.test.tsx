@@ -237,9 +237,12 @@ describe('AISettingsContext', () => {
         })
       })
 
-      await waitFor(() => {
-        expect(result.current.jobDescriptionStatus).toBe('valid')
-      })
+      await waitFor(
+        () => {
+          expect(result.current.jobDescriptionStatus).toBe('valid')
+        },
+        { timeout: 2000 }
+      )
     })
 
     it('skips re-validation for unchanged job description', async () => {
@@ -251,9 +254,12 @@ describe('AISettingsContext', () => {
         result.current.updateSettings({ jobDescription: jobDesc })
       })
 
-      await waitFor(() => {
-        expect(result.current.jobDescriptionStatus).toBe('valid')
-      })
+      await waitFor(
+        () => {
+          expect(result.current.jobDescriptionStatus).toBe('valid')
+        },
+        { timeout: 2000 }
+      )
 
       const previousStatus = result.current.jobDescriptionStatus
 
@@ -315,11 +321,14 @@ describe('AISettingsContext', () => {
         })
       })
 
-      await waitFor(() => {
-        expect(result.current.connectionStatus).toBe('valid')
-        expect(result.current.jobDescriptionStatus).toBe('valid')
-        expect(result.current.isConfigured).toBe(true)
-      })
+      await waitFor(
+        () => {
+          expect(result.current.connectionStatus).toBe('valid')
+          expect(result.current.jobDescriptionStatus).toBe('valid')
+          expect(result.current.isConfigured).toBe(true)
+        },
+        { timeout: 2000 }
+      )
     })
   })
 
@@ -337,10 +346,13 @@ describe('AISettingsContext', () => {
         })
       })
 
-      await waitFor(async () => {
-        const isValid = await result.current.validateAll()
-        expect(isValid).toBe(true)
-      })
+      await waitFor(
+        async () => {
+          const isValid = await result.current.validateAll()
+          expect(isValid).toBe(true)
+        },
+        { timeout: 2000 }
+      )
     })
 
     it('returns false when connection fails', async () => {

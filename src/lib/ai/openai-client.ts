@@ -456,6 +456,7 @@ export async function fetchAvailableModels(
 
     // All providers: baseURL already includes /v1 or /api/v1, just append /models
     const endpoint = `${config.baseURL}/models`
+    const isOpenRouter = config.baseURL.includes('openrouter.ai')
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout

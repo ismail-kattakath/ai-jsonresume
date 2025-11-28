@@ -93,14 +93,9 @@ const defaultSettings: AISettings = {
   rememberCredentials: true,
 }
 
-export const AISettingsContext = createContext<AISettingsContextType>({
-  settings: defaultSettings,
-  updateSettings: () => {},
-  isConfigured: false,
-  connectionStatus: 'idle',
-  jobDescriptionStatus: 'idle',
-  validateAll: async () => false,
-})
+export const AISettingsContext = createContext<
+  AISettingsContextType | undefined
+>(undefined)
 
 export function AISettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<AISettings>(defaultSettings)
@@ -141,17 +136,12 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
   const validateJD = useCallback(() => {
     const jd = settings.jobDescription.trim()
 
-    // Skip validation if JD hasn't changed
-    if (jd === lastValidatedJD.current && jobDescriptionStatus !== 'idle') {
-      return jobDescriptionStatus === 'valid'
-    }
-
     const isValid = validateJobDescription(jd)
 
     lastValidatedJD.current = jd
     setJobDescriptionStatus(isValid ? 'valid' : 'invalid')
     return isValid
-  }, [settings.jobDescription, jobDescriptionStatus])
+  }, [settings.jobDescription])
 
   // Validate all settings
   const validateAll = useCallback(async () => {
@@ -181,10 +171,6 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
   // Validate connection when credentials change (with debounce)
   useEffect(() => {
     if (!isInitialized) return
-
-    // Reset JD status when connection changes
-    setJobDescriptionStatus('idle')
-    lastValidatedJD.current = ''
 
     const timeoutId = setTimeout(() => {
       validateConnection()
