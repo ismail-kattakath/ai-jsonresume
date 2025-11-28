@@ -1,4 +1,5 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import FormButton from '@/components/ui/FormButton'
 import { FormInput } from '@/components/ui/FormInput'
 import { FormTextarea } from '@/components/ui/FormTextarea'
@@ -32,6 +33,7 @@ const WorkExperience = () => {
       startYear: '',
       endYear: '',
       technologies: [],
+      showTechnologies: true, // Default to visible
     },
     { urlFields: ['url'] }
   )
@@ -39,9 +41,22 @@ const WorkExperience = () => {
   const { isExpanded, toggleExpanded, expandNew, updateAfterReorder } =
     useAccordion()
 
+  const toggleTechnologiesVisibility = (index: number) => {
+    const newWorkExperience = [...resumeData.workExperience]
+    newWorkExperience[index] = {
+      ...newWorkExperience[index],
+      showTechnologies: !newWorkExperience[index].showTechnologies,
+    }
+    setResumeData({ ...resumeData, workExperience: newWorkExperience })
+  }
+
   const handleAdd = () => {
     add()
     expandNew(data.length)
+  }
+
+  const handleRemove = (index: number) => {
+    remove(index)
   }
 
   const onDragEnd = (result: DropResult) => {
@@ -125,13 +140,13 @@ const WorkExperience = () => {
                           placeholder="New Experience"
                           isExpanded={isExpanded(index)}
                           onToggle={() => toggleExpanded(index)}
-                          onDelete={() => remove(index)}
+                          onDelete={() => handleRemove(index)}
                           deleteTitle="Delete experience"
                           dragHandleProps={dragProvided.dragHandleProps}
                         />
                       }
                     >
-                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                      <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput
                           label="Organization Name"
                           name="organization"
@@ -152,7 +167,7 @@ const WorkExperience = () => {
                         />
                       </div>
 
-                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                      <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput
                           label="Start Date"
                           name="startYear"
@@ -205,21 +220,45 @@ const WorkExperience = () => {
                       </div>
 
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-white">
-                          Technologies
-                        </label>
-                        <SortableTagInput
-                          tags={workExperience.technologies || []}
-                          onAdd={(tech) => handleAddTechnology(index, tech)}
-                          onRemove={(techIndex) =>
-                            handleRemoveTechnology(index, techIndex)
-                          }
-                          onReorder={(startIndex, endIndex) =>
-                            handleReorderTechnology(index, startIndex, endIndex)
-                          }
-                          placeholder="Add technology..."
-                          variant="teal"
-                        />
+                        <div className="mb-2 flex items-center gap-2">
+                          <label className="text-sm font-medium text-white">
+                            Technologies
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => toggleTechnologiesVisibility(index)}
+                            className="rounded p-1 text-white/40 transition-colors hover:bg-white/10 hover:text-white/60"
+                            title={
+                              workExperience.showTechnologies !== false
+                                ? 'Hide technologies in preview'
+                                : 'Show technologies in preview'
+                            }
+                          >
+                            {workExperience.showTechnologies !== false ? (
+                              <Eye className="h-4 w-4" />
+                            ) : (
+                              <EyeOff className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                        {workExperience.showTechnologies !== false && (
+                          <SortableTagInput
+                            tags={workExperience.technologies || []}
+                            onAdd={(tech) => handleAddTechnology(index, tech)}
+                            onRemove={(techIndex) =>
+                              handleRemoveTechnology(index, techIndex)
+                            }
+                            onReorder={(startIndex, endIndex) =>
+                              handleReorderTechnology(
+                                index,
+                                startIndex,
+                                endIndex
+                              )
+                            }
+                            placeholder="Add technology..."
+                            variant="teal"
+                          />
+                        )}
                       </div>
                     </AccordionCard>
                   )}

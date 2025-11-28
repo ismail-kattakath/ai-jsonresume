@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { GripVertical } from 'lucide-react'
 import { useKeyAchievementsForm } from '@/hooks/useKeyAchievementsForm'
 import {
   DnDContext,
@@ -103,13 +104,13 @@ const KeyAchievements = ({
                         snapshot.isDragging ? 'bg-white/20 shadow-lg' : ''
                       }`}
                     >
-                      {/* Drag handle + Number bullet */}
+                      {/* Drag handle */}
                       <div
                         {...dragProvided.dragHandleProps}
-                        className="mt-0.5 flex h-6 w-6 flex-shrink-0 cursor-grab items-center justify-center rounded-full bg-white/10 text-xs text-white/60 active:cursor-grabbing"
+                        className="mt-0.5 flex-shrink-0 cursor-grab text-white/40 hover:text-white/60 active:cursor-grabbing"
                         title="Drag to reorder"
                       >
-                        {index + 1}
+                        <GripVertical className="h-4 w-4" />
                       </div>
 
                       {/* Achievement text or edit input */}

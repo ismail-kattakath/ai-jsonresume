@@ -78,7 +78,7 @@ const SortableTagInput: React.FC<SortableTagInputProps> = ({
                   index={index}
                 >
                   {(dragProvided, snapshot) => (
-                    <span
+                    <div
                       ref={dragProvided.innerRef}
                       {...dragProvided.draggableProps}
                       {...dragProvided.dragHandleProps}
@@ -97,7 +97,7 @@ const SortableTagInput: React.FC<SortableTagInputProps> = ({
                       >
                         ✕
                       </button>
-                    </span>
+                    </div>
                   )}
                 </DnDDraggable>
               ))}

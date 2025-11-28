@@ -39,12 +39,12 @@ export function FormInput({
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type
 
   return (
-    <div className="floating-label-group">
+    <div className={`floating-label-group ${className}`}>
       <input
         type={inputType}
         placeholder={placeholder || label}
         name={name}
-        className={`w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${isPassword ? 'pr-12' : ''} ${variantClasses[variant]} ${className}`}
+        className={`w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${isPassword ? 'pr-12' : ''} ${variantClasses[variant]}`}
         value={value}
         onChange={onChange}
         maxLength={maxLength}
