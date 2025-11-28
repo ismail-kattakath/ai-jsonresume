@@ -131,7 +131,7 @@ const WorkExperience = () => {
                         />
                       }
                     >
-                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                      <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput
                           label="Organization Name"
                           name="organization"
@@ -152,7 +152,7 @@ const WorkExperience = () => {
                         />
                       </div>
 
-                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                      <div className="flex w-full flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                         <FormInput
                           label="Start Date"
                           name="startYear"
