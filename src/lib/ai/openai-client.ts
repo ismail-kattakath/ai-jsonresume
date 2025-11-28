@@ -442,28 +442,48 @@ export async function testConnection(config: OpenAIConfig): Promise<boolean> {
 /**
  * Fetches available models from the API
  * Uses the standard OpenAI-compatible /v1/models endpoint
+ * Note: OpenRouter uses /api/v1/models instead of /v1/models
  */
 export async function fetchAvailableModels(
   config: Pick<OpenAIConfig, 'baseURL' | 'apiKey'>
 ): Promise<string[]> {
   try {
-    const response = await fetch(`${config.baseURL}/v1/models`, {
+    // OpenRouter uses /api/v1/models, others use /v1/models
+    const isOpenRouter = config.baseURL.includes('openrouter.ai')
+    const endpoint = isOpenRouter
+      ? `${config.baseURL}/models`
+      : `${config.baseURL}/v1/models`
+
+    const response = await fetch(endpoint, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${config.apiKey}`,
         'Content-Type': 'application/json',
+        ...(isOpenRouter && {
+          'HTTP-Referer':
+            'https://github.com/ismail-kattakath/jsonresume-to-everything',
+          'X-Title': 'JSON Resume to Everything',
+        }),
       },
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch models: ${response.status}`)
+      console.warn(
+        `Failed to fetch models from ${endpoint}: ${response.status}`
+      )
+      return []
     }
 
     const data = await response.json()
 
-    // OpenAI format: { data: [{ id: "model-name" }, ...] }
+    // OpenAI/most providers format: { data: [{ id: "model-name" }, ...] }
     if (data.data && Array.isArray(data.data)) {
       return data.data.map((model: { id: string }) => model.id).sort()
+    }
+
+    // Fallback for other formats
+    if (Array.isArray(data)) {
+      return data.map((model: { id: string }) => model.id).sort()
     }
 
     return []
