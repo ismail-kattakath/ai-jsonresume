@@ -59,6 +59,10 @@ import {
   DnDDraggable,
 } from '@/components/ui/DragAndDrop'
 import type { DropResult } from '@hello-pangea/dnd'
+import { Tooltip } from '@/components/ui/Tooltip'
+import { tooltips } from '@/config/tooltips'
+import { OnboardingProvider } from '@/lib/contexts/OnboardingContext'
+import { OnboardingTour } from '@/components/onboarding/OnboardingTour'
 
 // Default cover letter content
 const DEFAULT_COVER_LETTER_CONTENT =
@@ -74,9 +78,17 @@ function AISettingsStatusIndicator() {
   const { isConfigured } = useAISettings()
 
   return isConfigured ? (
-    <CheckCircle className="mr-1 h-4 w-4 text-green-400" />
+    <CheckCircle
+      className="mr-1 h-4 w-4 text-green-400"
+      data-tooltip-id="app-tooltip"
+      data-tooltip-content={tooltips.aiSettings.validStatus}
+    />
   ) : (
-    <XCircle className="mr-1 h-4 w-4 text-red-400" />
+    <XCircle
+      className="mr-1 h-4 w-4 text-red-400"
+      data-tooltip-id="app-tooltip"
+      data-tooltip-content={tooltips.aiSettings.invalidStatus}
+    />
   )
 }
 
@@ -144,6 +156,8 @@ function SkillGroupHeader({
           <div
             {...dragHandleProps}
             className="cursor-grab text-white/40 hover:text-white/60 active:cursor-grabbing"
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content={tooltips.skills.dragGroup}
           >
             <GripVertical className="h-4 w-4" />
           </div>
@@ -182,7 +196,8 @@ function SkillGroupHeader({
                 }
               }}
               className="rounded p-0.5 text-white/30 transition-all hover:bg-white/10 hover:text-blue-400"
-              title="Rename group"
+              data-tooltip-id="app-tooltip"
+              data-tooltip-content={tooltips.skills.renameGroup}
             >
               <Pencil className="h-3 w-3" />
             </span>
@@ -196,7 +211,10 @@ function SkillGroupHeader({
             type="button"
             onClick={onToggle}
             className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-white/60"
-            title={isExpanded ? 'Collapse' : 'Expand'}
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content={
+              isExpanded ? tooltips.actions.collapse : tooltips.actions.expand
+            }
           >
             {isExpanded ? (
               <ChevronUp className="h-4 w-4" />
@@ -208,7 +226,8 @@ function SkillGroupHeader({
             type="button"
             onClick={handleDeleteClick}
             className="rounded p-1.5 text-white/40 transition-all hover:bg-white/10 hover:text-red-400"
-            title="Delete group"
+            data-tooltip-id="app-tooltip"
+            data-tooltip-content={tooltips.skills.deleteGroup}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -347,6 +366,8 @@ function SkillsSection() {
           onClick={() => setIsAdding(true)}
           aria-label="Add Skill Group"
           className="inline-flex cursor-pointer items-center gap-2 rounded bg-red-800 px-3 py-1.5 text-sm text-white transition-colors hover:opacity-90"
+          data-tooltip-id="app-tooltip"
+          data-tooltip-content={tooltips.skills.addGroup}
         >
           <MdAddCircle className="text-lg" />
           <span>Add Skill Group</span>
@@ -462,236 +483,279 @@ function UnifiedEditor() {
   return (
     <>
       <Toaster position="top-right" richColors closeButton />
-      <AISettingsProvider>
-        <ResumeContext.Provider value={currentContext}>
-          <MainLayout
-            className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900"
-            excludeFooterFromPrint
-          >
-            <div className="relative flex flex-1 flex-col md:grid md:grid-cols-[1fr_auto]">
-              {/* Floating Action Buttons (Capsule) - Hidden on print */}
-              <div className="exclude-print fixed top-8 right-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none">
-                {mode === 'resume' && (
-                  <div className="[&>button]:animate-none [&>button]:rounded-r-none [&>button]:shadow-none">
-                    <ATSCheckButton name={resumeData.name} />
-                  </div>
-                )}
+      <Tooltip />
+      <OnboardingProvider>
+        <OnboardingTour />
+        <AISettingsProvider>
+          <ResumeContext.Provider value={currentContext}>
+            <MainLayout
+              className="flex min-h-screen flex-col bg-gradient-to-br from-gray-900 via-black to-gray-900"
+              excludeFooterFromPrint
+            >
+              <div className="relative flex flex-1 flex-col md:grid md:grid-cols-[1fr_auto]">
+                {/* Floating Action Buttons (Capsule) - Hidden on print */}
                 <div
-                  className={
-                    mode === 'resume'
-                      ? '[&>button]:animate-none [&>button]:rounded-l-none [&>button]:shadow-none'
-                      : ''
-                  }
+                  id="print-button"
+                  className="exclude-print fixed top-8 right-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none"
                 >
-                  <PrintButton
-                    name={
-                      mode === 'resume' ? resumeData.name : coverLetterData.name
+                  {mode === 'resume' && (
+                    <div className="[&>button]:animate-none [&>button]:rounded-r-none [&>button]:shadow-none">
+                      <ATSCheckButton name={resumeData.name} />
+                    </div>
+                  )}
+                  <div
+                    className={
+                      mode === 'resume'
+                        ? '[&>button]:animate-none [&>button]:rounded-l-none [&>button]:shadow-none'
+                        : ''
                     }
-                    documentType={mode === 'resume' ? 'Resume' : 'CoverLetter'}
-                  />
-                </div>
-              </div>
-
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="exclude-print flex-1 space-y-4 overflow-y-scroll p-4 md:h-0 md:min-h-full md:flex-none md:space-y-5 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
-              >
-                {/* Header */}
-                <div className="space-y-3 border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
-                      <span className="text-xl">🎯</span>
-                    </div>
-                    <div>
-                      <h1 className="text-xl font-bold text-white">
-                        AI Resume Builder
-                      </h1>
-                      <p className="text-xs text-white/60">
-                        Tailor Resumes to Any Job Description
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Preview Mode Switcher */}
-                  <div className="flex overflow-hidden rounded-lg bg-white/5">
-                    <button
-                      type="button"
-                      onClick={() => setMode('resume')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
-                        mode === 'resume'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-                      }`}
-                    >
-                      <span>📄</span>
-                      Resume
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMode('coverLetter')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
-                        mode === 'coverLetter'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-                      }`}
-                    >
-                      <span>✉️</span>
-                      Cover Letter
-                    </button>
-                  </div>
-                </div>
-
-                {/* Form Sections - Conditionally rendered based on mode */}
-                <CollapsibleSection
-                  title="Import / Export"
-                  icon={<ArrowDownUp className="h-4 w-4 text-amber-400" />}
-                  isExpanded={expandedSection === 'import-export'}
-                  onToggle={createToggleHandler('import-export')}
-                  variant="utility"
-                >
-                  <ImportExport preserveContent={mode === 'coverLetter'} />
-                </CollapsibleSection>
-
-                <CollapsibleSection
-                  title="Generative AI Settings"
-                  icon={<Sparkles className="h-4 w-4 text-amber-400" />}
-                  isExpanded={expandedSection === 'ai-settings'}
-                  onToggle={createToggleHandler('ai-settings')}
-                  action={<AISettingsStatusIndicator />}
-                  variant="utility"
-                >
-                  <AISettings />
-                </CollapsibleSection>
-
-                <CollapsibleSection
-                  title="Personal Information"
-                  icon={<User className="h-4 w-4 text-blue-400" />}
-                  isExpanded={expandedSection === 'personal-info'}
-                  onToggle={createToggleHandler('personal-info')}
-                >
-                  <PersonalInformation />
-                </CollapsibleSection>
-
-                <CollapsibleSection
-                  title="Social Media"
-                  icon={<Share2 className="h-4 w-4 text-blue-400" />}
-                  isExpanded={expandedSection === 'social-media'}
-                  onToggle={createToggleHandler('social-media')}
-                >
-                  <SocialMedia />
-                </CollapsibleSection>
-
-                {/* Resume-only sections */}
-                {mode === 'resume' && (
-                  <>
-                    <CollapsibleSection
-                      title="Summary"
-                      icon={<FileText className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'summary'}
-                      onToggle={createToggleHandler('summary')}
-                    >
-                      <Summary />
-                    </CollapsibleSection>
-
-                    <CollapsibleSection
-                      title="Education"
-                      icon={<GraduationCap className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'education'}
-                      onToggle={createToggleHandler('education')}
-                    >
-                      <Education />
-                    </CollapsibleSection>
-
-                    <CollapsibleSection
-                      title="Experience"
-                      icon={<Briefcase className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'work-experience'}
-                      onToggle={createToggleHandler('work-experience')}
-                    >
-                      <WorkExperience />
-                    </CollapsibleSection>
-
-                    {/* Skills Section - All groups in single collapsible */}
-                    <CollapsibleSection
-                      title="Skills"
-                      icon={<Code className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'skills'}
-                      onToggle={createToggleHandler('skills')}
-                    >
-                      <SkillsSection />
-                    </CollapsibleSection>
-
-                    <CollapsibleSection
-                      title="Additional Info"
-                      icon={<Layers className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'additional-info'}
-                      onToggle={createToggleHandler('additional-info')}
-                    >
-                      <AdditionalSections />
-                    </CollapsibleSection>
-                  </>
-                )}
-
-                {/* Cover Letter-only sections */}
-                {mode === 'coverLetter' && (
-                  <CollapsibleSection
-                    title="Content"
-                    icon={<Mail className="h-4 w-4 text-blue-400" />}
-                    isExpanded={expandedSection === 'cover-letter'}
-                    onToggle={createToggleHandler('cover-letter')}
                   >
-                    <ResumeContext.Provider
-                      value={{
-                        resumeData: coverLetterData as ResumeData,
-                        setResumeData: setCoverLetterData as React.Dispatch<
-                          React.SetStateAction<ResumeData>
-                        >,
-                        handleProfilePicture:
-                          coverLetterHandlers.handleProfilePicture,
-                        handleChange: coverLetterHandlers.handleChange,
-                      }}
-                    >
-                      <CoverLetterContent />
-                    </ResumeContext.Provider>
-                  </CollapsibleSection>
-                )}
-              </form>
+                    <PrintButton
+                      name={
+                        mode === 'resume'
+                          ? resumeData.name
+                          : coverLetterData.name
+                      }
+                      documentType={
+                        mode === 'resume' ? 'Resume' : 'CoverLetter'
+                      }
+                    />
+                  </div>
+                </div>
 
-              {/* Preview Section */}
-              <div className="flex flex-col md:w-[8.5in]">
-                {/* Both Previews - Toggle visibility with CSS */}
-                <ResumeContext.Provider
-                  value={{
-                    resumeData,
-                    setResumeData,
-                    handleProfilePicture: resumeHandlers.handleProfilePicture,
-                    handleChange: resumeHandlers.handleChange,
-                  }}
+                <form
+                  onSubmit={(e) => e.preventDefault()}
+                  className="exclude-print flex-1 space-y-4 overflow-y-scroll p-4 md:h-0 md:min-h-full md:flex-none md:space-y-5 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
                 >
-                  <div className={mode === 'resume' ? 'block' : 'hidden'}>
-                    <Preview />
+                  {/* Header */}
+                  <div
+                    id="editor-header"
+                    className="space-y-3 border-b border-white/10 pb-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+                        <span className="text-xl">🎯</span>
+                      </div>
+                      <div>
+                        <h1 className="text-xl font-bold text-white">
+                          AI Resume Builder
+                        </h1>
+                        <p className="text-xs text-white/60">
+                          Tailor Resumes to Any Job Description
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Preview Mode Switcher */}
+                    <div
+                      id="mode-switcher"
+                      className="flex overflow-hidden rounded-lg bg-white/5"
+                      data-tooltip-id="app-tooltip"
+                      data-tooltip-content={tooltips.navigation.modeSwitcher}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setMode('resume')}
+                        className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
+                          mode === 'resume'
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                            : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                        }`}
+                      >
+                        <span>📄</span>
+                        Resume
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMode('coverLetter')}
+                        className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
+                          mode === 'coverLetter'
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                            : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                        }`}
+                      >
+                        <span>✉️</span>
+                        Cover Letter
+                      </button>
+                    </div>
                   </div>
-                </ResumeContext.Provider>
-                <ResumeContext.Provider
-                  value={{
-                    resumeData: coverLetterData as ResumeData,
-                    setResumeData: setCoverLetterData as React.Dispatch<
-                      React.SetStateAction<ResumeData>
-                    >,
-                    handleProfilePicture:
-                      coverLetterHandlers.handleProfilePicture,
-                    handleChange: coverLetterHandlers.handleChange,
-                  }}
-                >
-                  <div className={mode === 'coverLetter' ? 'block' : 'hidden'}>
-                    <CoverLetterPreview />
+
+                  {/* Form Sections - Conditionally rendered based on mode */}
+                  <div id="section-import-export">
+                    <CollapsibleSection
+                      title="Import / Export"
+                      icon={<ArrowDownUp className="h-4 w-4 text-amber-400" />}
+                      isExpanded={expandedSection === 'import-export'}
+                      onToggle={createToggleHandler('import-export')}
+                      variant="utility"
+                      tooltip={tooltips.sections.importExport}
+                    >
+                      <ImportExport preserveContent={mode === 'coverLetter'} />
+                    </CollapsibleSection>
                   </div>
-                </ResumeContext.Provider>
+
+                  <div id="section-ai-settings">
+                    <CollapsibleSection
+                      title="Generative AI Settings"
+                      icon={<Sparkles className="h-4 w-4 text-amber-400" />}
+                      isExpanded={expandedSection === 'ai-settings'}
+                      onToggle={createToggleHandler('ai-settings')}
+                      action={<AISettingsStatusIndicator />}
+                      variant="utility"
+                      tooltip={tooltips.sections.aiSettings}
+                    >
+                      <AISettings />
+                    </CollapsibleSection>
+                  </div>
+
+                  <div id="section-personal-info">
+                    <CollapsibleSection
+                      title="Personal Information"
+                      icon={<User className="h-4 w-4 text-blue-400" />}
+                      isExpanded={expandedSection === 'personal-info'}
+                      onToggle={createToggleHandler('personal-info')}
+                      tooltip={tooltips.sections.personalInfo}
+                    >
+                      <PersonalInformation />
+                    </CollapsibleSection>
+                  </div>
+
+                  <CollapsibleSection
+                    title="Social Media"
+                    icon={<Share2 className="h-4 w-4 text-blue-400" />}
+                    isExpanded={expandedSection === 'social-media'}
+                    onToggle={createToggleHandler('social-media')}
+                    tooltip={tooltips.sections.socialMedia}
+                  >
+                    <SocialMedia />
+                  </CollapsibleSection>
+
+                  {/* Resume-only sections */}
+                  {mode === 'resume' && (
+                    <>
+                      <CollapsibleSection
+                        title="Summary"
+                        icon={<FileText className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'summary'}
+                        onToggle={createToggleHandler('summary')}
+                        tooltip={tooltips.sections.summary}
+                      >
+                        <Summary />
+                      </CollapsibleSection>
+
+                      <CollapsibleSection
+                        title="Education"
+                        icon={
+                          <GraduationCap className="h-4 w-4 text-blue-400" />
+                        }
+                        isExpanded={expandedSection === 'education'}
+                        onToggle={createToggleHandler('education')}
+                        tooltip={tooltips.sections.education}
+                      >
+                        <Education />
+                      </CollapsibleSection>
+
+                      <div id="section-work-experience">
+                        <CollapsibleSection
+                          title="Experience"
+                          icon={<Briefcase className="h-4 w-4 text-blue-400" />}
+                          isExpanded={expandedSection === 'work-experience'}
+                          onToggle={createToggleHandler('work-experience')}
+                          tooltip={tooltips.sections.workExperience}
+                        >
+                          <WorkExperience />
+                        </CollapsibleSection>
+                      </div>
+
+                      {/* Skills Section - All groups in single collapsible */}
+                      <div id="section-skills">
+                        <CollapsibleSection
+                          title="Skills"
+                          icon={<Code className="h-4 w-4 text-blue-400" />}
+                          isExpanded={expandedSection === 'skills'}
+                          onToggle={createToggleHandler('skills')}
+                          tooltip={tooltips.sections.skills}
+                        >
+                          <SkillsSection />
+                        </CollapsibleSection>
+                      </div>
+
+                      <CollapsibleSection
+                        title="Additional Info"
+                        icon={<Layers className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'additional-info'}
+                        onToggle={createToggleHandler('additional-info')}
+                        tooltip={tooltips.sections.additionalInfo}
+                      >
+                        <AdditionalSections />
+                      </CollapsibleSection>
+                    </>
+                  )}
+
+                  {/* Cover Letter-only sections */}
+                  {mode === 'coverLetter' && (
+                    <CollapsibleSection
+                      title="Content"
+                      icon={<Mail className="h-4 w-4 text-blue-400" />}
+                      isExpanded={expandedSection === 'cover-letter'}
+                      onToggle={createToggleHandler('cover-letter')}
+                      tooltip={tooltips.sections.coverLetterContent}
+                    >
+                      <ResumeContext.Provider
+                        value={{
+                          resumeData: coverLetterData as ResumeData,
+                          setResumeData: setCoverLetterData as React.Dispatch<
+                            React.SetStateAction<ResumeData>
+                          >,
+                          handleProfilePicture:
+                            coverLetterHandlers.handleProfilePicture,
+                          handleChange: coverLetterHandlers.handleChange,
+                        }}
+                      >
+                        <CoverLetterContent />
+                      </ResumeContext.Provider>
+                    </CollapsibleSection>
+                  )}
+                </form>
+
+                {/* Preview Section */}
+                <div id="preview-pane" className="flex flex-col md:w-[8.5in]">
+                  {/* Both Previews - Toggle visibility with CSS */}
+                  <ResumeContext.Provider
+                    value={{
+                      resumeData,
+                      setResumeData,
+                      handleProfilePicture: resumeHandlers.handleProfilePicture,
+                      handleChange: resumeHandlers.handleChange,
+                    }}
+                  >
+                    <div className={mode === 'resume' ? 'block' : 'hidden'}>
+                      <Preview />
+                    </div>
+                  </ResumeContext.Provider>
+                  <ResumeContext.Provider
+                    value={{
+                      resumeData: coverLetterData as ResumeData,
+                      setResumeData: setCoverLetterData as React.Dispatch<
+                        React.SetStateAction<ResumeData>
+                      >,
+                      handleProfilePicture:
+                        coverLetterHandlers.handleProfilePicture,
+                      handleChange: coverLetterHandlers.handleChange,
+                    }}
+                  >
+                    <div
+                      className={mode === 'coverLetter' ? 'block' : 'hidden'}
+                    >
+                      <CoverLetterPreview />
+                    </div>
+                  </ResumeContext.Provider>
+                </div>
               </div>
-            </div>
-          </MainLayout>
-        </ResumeContext.Provider>
-      </AISettingsProvider>
+            </MainLayout>
+          </ResumeContext.Provider>
+        </AISettingsProvider>
+      </OnboardingProvider>
     </>
   )
 }
