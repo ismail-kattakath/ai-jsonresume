@@ -303,7 +303,7 @@ describe('Preview Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      expect(screen.getByText('Work Experience')).toBeInTheDocument()
+      expect(screen.getByText('Experience')).toBeInTheDocument()
       expect(screen.getByText('Senior Developer')).toBeInTheDocument()
       expect(screen.getByText('Tech Corp')).toBeInTheDocument()
     })
@@ -316,7 +316,7 @@ describe('Preview Component', () => {
         contextValue: { resumeData: mockData },
       })
 
-      expect(screen.queryByText('Work Experience')).not.toBeInTheDocument()
+      expect(screen.queryByText('Experience')).not.toBeInTheDocument()
     })
   })
 

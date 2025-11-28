@@ -36,7 +36,7 @@
       "url": "https://silvercreek.ai",
       "startDate": "2024-08-01",
       "endDate": "",
-      "summary": "Aloshy.ai: AI-as-a-Service platform providing B2B APIs for media manipulation and custom-trained generative AI pipelines tailored to specific business needs.",
+      "summary": "Worked on an AI-as-a-Service platform (aloshy.ai) providing B2B APIs for media manipulation and custom-trained generative AI pipelines tailored to specific business needs.",
       "highlights": [
         "Architected scalable GenAI inference infrastructure using Kubernetes/Containerization, vLLM etc. supporting multiple Diffusion and LLM models, and deployed on GCP/GKE and AWS/EKS for production.",
         "Implemented advanced techniques such as KV-cache, Distributed Inference, Multi-GPU/Node Scaling, CUDA optimization and memory/load management to reduce inference latency by 40%, and cutting operational costs by 25%.",
@@ -51,7 +51,7 @@
         "vLLM",
         "TGI",
         "Triton Inference Server",
-        "CUDA Optimization",
+        "CUDA",
         "OAuth2.0",
         "MCP Protocol",
         "Python",
@@ -64,7 +64,7 @@
       "url": "https://homewoodhealth.com",
       "startDate": "2017-10-01",
       "endDate": "2024-07-01",
-      "summary": "Homeweb.ca: Canada's leading digital mental health provider, delivering EFAP and CBT solutions to hundreds of thousands of employees nationwide.",
+      "summary": "Worked on Canada's leading digital mental health platform (homeweb.ca), delivering EFAP and CBT solutions to hundreds of thousands of employees nationwide.",
       "highlights": [
         "Inherited and revitalized an abandoned, undocumented MEAN stack application, transforming it into a maintainable, production-ready web platform with 99.5% uptime.",
         "Rebuilt authentication system implementing OAuth 2.0 PKCE flow for SSO integration with Microsoft Identity Platform.",
@@ -86,7 +86,6 @@
         "Microsoft Identity",
         "Docker",
         "AWS",
-        "CI/CD",
         "Terraform"
       ]
     },
@@ -96,7 +95,7 @@
       "url": "https://facebook.com/com.etuper",
       "startDate": "2016-04-01",
       "endDate": "2017-08-01",
-      "summary": "Brilliant Rewards: Complete hospitality software suite—dashboard, mobile and web apps—featuring loyalty programs, marketing automation, booking integration, and analytics.",
+      "summary": "Worked on a complete hospitality software suite (Brilliant Rewards)—dashboard, mobile and web apps—featuring loyalty programs, marketing automation, booking integration, and analytics.",
       "highlights": [
         "Collaborated with stakeholders to gather requirements, create user stories, design wireframes, and develop functional prototypes.",
         "Managed sprint planning, daily standups, backlog prioritization, and blocker resolution to ensure continuous delivery.",
@@ -112,7 +111,6 @@
         "MySQL",
         "MongoDB",
         "Docker",
-        "Microservices",
         "OpenAPI",
         "Ionic",
         "React Native"
@@ -124,7 +122,7 @@
       "url": "https://rmplc.com",
       "startDate": "2011-06-01",
       "endDate": "2016-03-01",
-      "summary": "RM Integris: School MIS system featuring student management, grade tracking, attendance monitoring, parent portals, and performance analytics.",
+      "summary": "Worked on a school MIS system (RM Integris) featuring student management, grade tracking, attendance monitoring, parent portals, and performance analytics.",
       "highlights": [
         "Implemented OpenAPI/Swagger bridging layer to modernize legacy SOAP APIs for RESTful client consumption.",
         "Prototyped AngularJS interface to decouple presentation layer from legacy Struts JSP architecture.",
@@ -151,7 +149,7 @@
       "url": "https://posibolt.com",
       "startDate": "2010-07-01",
       "endDate": "2011-01-01",
-      "summary": "Posibolt: Adaptable cloud ERP solution serving key retail businesses across global industry segments.",
+      "summary": "Worked on an adaptable cloud ERP solution (Posibolt) serving key retail businesses across global industry segments.",
       "highlights": [
         "Created UI mockups based on SRS specifications and converted approved designs into responsive HTML/CSS templates.",
         "Developed integration test cases and implemented browser automation using Selenium WebDriver.",

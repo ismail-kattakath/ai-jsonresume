@@ -83,7 +83,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
 
       // Step 3: Add work experience
       const addWorkButton = screen
-        .getByText(/Add Work Experience/i)
+        .getByText(/Add Experience/i)
         .closest('button')
       if (addWorkButton) {
         fireEvent.click(addWorkButton)
@@ -452,9 +452,9 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
         })
       }
 
-      // Step 3: Work Experience
+      // Step 3: Experience
       const addWorkButton = screen
-        .getByText(/Add Work Experience/i)
+        .getByText(/Add Experience/i)
         .closest('button')
       if (addWorkButton) {
         fireEvent.click(addWorkButton)
@@ -544,7 +544,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
           'Passionate developer with 5 years of experience'
         )
 
-        // Work Experience
+        // Experience
         expect(preview).toHaveTextContent('Tech Solutions Inc')
         expect(preview).toHaveTextContent('Senior Developer')
         expect(preview).toHaveTextContent(
@@ -675,7 +675,7 @@ describe('Integration: Complete Edit → Preview → Print Workflow', () => {
 
       // Add work experience
       const addWorkButton = screen
-        .getByText(/Add Work Experience/i)
+        .getByText(/Add Experience/i)
         .closest('button')
       if (addWorkButton) {
         fireEvent.click(addWorkButton)

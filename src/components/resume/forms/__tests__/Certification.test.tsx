@@ -269,13 +269,13 @@ describe('Certification Component', () => {
       expect(tag).toBeInTheDocument()
     })
 
-    it('should have violet focus color on input', () => {
+    it('should have purple focus color on input', () => {
       const mockData = createMockResumeData({ certifications: [] })
       const { container } = renderWithContext(<Certification />, {
         contextValue: { resumeData: mockData },
       })
 
-      const input = container.querySelector('.focus\\:border-violet-400')
+      const input = container.querySelector('.focus\\:border-purple-400')
       expect(input).toBeInTheDocument()
     })
   })

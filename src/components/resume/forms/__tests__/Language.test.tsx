@@ -251,13 +251,13 @@ describe('Language Component', () => {
       expect(tag).toBeInTheDocument()
     })
 
-    it('should have emerald focus color on input', () => {
+    it('should have purple focus color on input', () => {
       const mockData = createMockResumeData({ languages: [] })
       const { container } = renderWithContext(<Language />, {
         contextValue: { resumeData: mockData },
       })
 
-      const input = container.querySelector('.focus\\:border-emerald-400')
+      const input = container.querySelector('.focus\\:border-purple-400')
       expect(input).toBeInTheDocument()
     })
   })

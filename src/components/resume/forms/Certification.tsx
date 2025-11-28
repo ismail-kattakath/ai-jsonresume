@@ -11,11 +11,11 @@ const Certification = () => {
 
   return (
     <TagInput
-      items={data}
+      tags={data}
       onAdd={add}
       onRemove={remove}
       placeholder="Add certification..."
-      theme="violet"
+      variant="purple"
     />
   )
 }

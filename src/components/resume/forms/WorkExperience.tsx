@@ -12,6 +12,7 @@ import {
   DnDDraggable,
 } from '@/components/ui/DragAndDrop'
 import KeyAchievements from '@/components/resume/forms/KeyAchievements'
+import TagInput from '@/components/ui/TagInput'
 import type { DropResult } from '@hello-pangea/dnd'
 
 /**
@@ -55,6 +56,27 @@ const WorkExperience = () => {
     setResumeData({ ...resumeData, workExperience: newWorkExperience })
 
     updateAfterReorder(source.index, destination.index)
+  }
+
+  const handleAddTechnology = (index: number, technology: string) => {
+    const newWorkExperience = [...resumeData.workExperience]
+    const technologies = newWorkExperience[index].technologies || []
+    newWorkExperience[index] = {
+      ...newWorkExperience[index],
+      technologies: [...technologies, technology],
+    }
+    setResumeData({ ...resumeData, workExperience: newWorkExperience })
+  }
+
+  const handleRemoveTechnology = (index: number, techIndex: number) => {
+    const newWorkExperience = [...resumeData.workExperience]
+    const technologies = [...(newWorkExperience[index].technologies || [])]
+    technologies.splice(techIndex, 1)
+    newWorkExperience[index] = {
+      ...newWorkExperience[index],
+      technologies,
+    }
+    setResumeData({ ...resumeData, workExperience: newWorkExperience })
   }
 
   return (
@@ -161,6 +183,21 @@ const WorkExperience = () => {
                           className="flex-1"
                         />
                       </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-white">
+                          Technologies
+                        </label>
+                        <TagInput
+                          tags={workExperience.technologies || []}
+                          onAdd={(tech) => handleAddTechnology(index, tech)}
+                          onRemove={(techIndex) =>
+                            handleRemoveTechnology(index, techIndex)
+                          }
+                          placeholder="Add technology..."
+                          variant="teal"
+                        />
+                      </div>
                     </AccordionCard>
                   )}
                 </DnDDraggable>
@@ -171,7 +208,7 @@ const WorkExperience = () => {
         </DnDDroppable>
       </DnDContext>
 
-      <FormButton size={data.length} add={handleAdd} label="Work Experience" />
+      <FormButton size={data.length} add={handleAdd} label="Experience" />
     </div>
   )
 }

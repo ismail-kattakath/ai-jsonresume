@@ -136,14 +136,12 @@ describe('Integration: Form → Preview Synchronization', () => {
     })
   })
 
-  describe('Work Experience Sync', () => {
-    it('should update preview when work experience is added', async () => {
+  describe('Experience Sync', () => {
+    it('should update preview when experience is added', async () => {
       const { container } = render(<ResumeEditPage />)
 
-      // Find and click the "Add Work Experience" button
-      const addButton = screen
-        .getByText(/Add Work Experience/i)
-        .closest('button')
+      // Find and click the "Add Experience" button
+      const addButton = screen.getByText(/Add Experience/i).closest('button')
       expect(addButton).toBeInTheDocument()
 
       if (addButton) {
@@ -183,7 +181,7 @@ describe('Integration: Form → Preview Synchronization', () => {
       }
     }, 10000)
 
-    it('should update preview when work experience company name is changed', async () => {
+    it('should update preview when experience company name is changed', async () => {
       const { container } = render(<ResumeEditPage />)
 
       // Find the first company input
@@ -204,7 +202,7 @@ describe('Integration: Form → Preview Synchronization', () => {
       })
     })
 
-    it('should update preview when work experience description is changed', async () => {
+    it('should update preview when experience description is changed', async () => {
       const { container } = render(<ResumeEditPage />)
 
       // Find the first description textarea
@@ -227,7 +225,7 @@ describe('Integration: Form → Preview Synchronization', () => {
       })
     })
 
-    it('should update preview when work experience key achievements are changed', async () => {
+    it('should update preview when experience key achievements are changed', async () => {
       const { container } = render(<ResumeEditPage />)
 
       // Find the key achievements add input (dashed border input at bottom)

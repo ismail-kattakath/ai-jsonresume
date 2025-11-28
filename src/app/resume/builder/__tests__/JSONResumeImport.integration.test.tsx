@@ -83,7 +83,7 @@ describe('Integration: JSON Resume Import → Form Population', () => {
     })
   })
 
-  describe('Work Experience Import', () => {
+  describe('Experience Import', () => {
     it('should display work experience section in resume', async () => {
       const { container } = render(<ResumeEditPage />)
 

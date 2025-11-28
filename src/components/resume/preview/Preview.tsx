@@ -391,7 +391,7 @@ const Preview = () => {
                         contentEditable={editable}
                         suppressContentEditableWarning
                       >
-                        Work Experience
+                        Experience
                       </h2>
                       {resumeData.workExperience.map((item, index) => (
                         <Draggable
@@ -414,7 +414,7 @@ const Preview = () => {
                                   href={item.url ? formatUrl(item.url) : '#'}
                                   target={item.url ? '_blank' : '_self'}
                                   rel={item.url ? 'noreferrer' : undefined}
-                                  className="content i-bold editable text-blue-700 hover:underline"
+                                  className="content i-bold editable text-blue-700 uppercase hover:underline"
                                   contentEditable={editable}
                                   suppressContentEditableWarning
                                 >
@@ -483,6 +483,24 @@ const Preview = () => {
                                   </ul>
                                 )}
                               </Droppable>
+                              {item.technologies &&
+                                item.technologies.length > 0 && (
+                                  <div className="mt-1 flex flex-wrap items-center gap-1">
+                                    <span className="sub-content i-bold">
+                                      Technologies:
+                                    </span>
+                                    {item.technologies.map(
+                                      (tech, techIndex) => (
+                                        <span
+                                          key={techIndex}
+                                          className="sub-content rounded bg-gray-200 px-1.5 py-0.5"
+                                        >
+                                          {tech}
+                                        </span>
+                                      )
+                                    )}
+                                  </div>
+                                )}
                             </div>
                           )}
                         </Draggable>

@@ -136,7 +136,7 @@ describe('WorkExperience Component', () => {
     it('should render add button with FormButton', () => {
       renderWithContext(<WorkExperience />)
 
-      const addButton = screen.getByText(/Add Work Experience/i)
+      const addButton = screen.getByText(/Add Experience/i)
       expect(addButton).toBeInTheDocument()
     })
 
@@ -197,9 +197,7 @@ describe('WorkExperience Component', () => {
         },
       })
 
-      const addButton = screen
-        .getByText(/Add Work Experience/i)
-        .closest('button')
+      const addButton = screen.getByText(/Add Experience/i).closest('button')
 
       if (addButton) {
         fireEvent.click(addButton)
@@ -823,7 +821,7 @@ describe('WorkExperience Component', () => {
       })
 
       // Should still render the add button
-      expect(screen.getByText('Add Work Experience')).toBeInTheDocument()
+      expect(screen.getByText('Add Experience')).toBeInTheDocument()
     })
 
     it('should handle URLs with existing https:// protocol', () => {
@@ -1149,6 +1147,366 @@ describe('WorkExperience Component', () => {
           mockData.workExperience[2],
           mockData.workExperience[1],
         ],
+      })
+    })
+  })
+
+  describe('Technology Management', () => {
+    it('should render TagInput for technologies', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: ['React', 'TypeScript', 'Node.js'],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.getByText('React')).toBeInTheDocument()
+      expect(screen.getByText('TypeScript')).toBeInTheDocument()
+      expect(screen.getByText('Node.js')).toBeInTheDocument()
+    })
+
+    it('should render Technologies label', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: [],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.getByText('Technologies')).toBeInTheDocument()
+    })
+
+    it('should add technology when TagInput onAdd is called', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: ['React'],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const input = screen.getByPlaceholderText('Add technology...')
+
+      fireEvent.change(input, { target: { value: 'TypeScript' } })
+      fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
+
+      expect(mockSetResumeData).toHaveBeenCalledWith({
+        ...mockData,
+        workExperience: [
+          {
+            ...mockData.workExperience[0],
+            technologies: ['React', 'TypeScript'],
+          },
+        ],
+      })
+    })
+
+    it('should remove technology when TagInput onRemove is called', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: ['React', 'TypeScript', 'Node.js'],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const removeButtons = screen.getAllByTitle('Remove')
+
+      // Click the remove button for TypeScript (index 1)
+      fireEvent.click(removeButtons[1])
+
+      expect(mockSetResumeData).toHaveBeenCalledWith({
+        ...mockData,
+        workExperience: [
+          {
+            ...mockData.workExperience[0],
+            technologies: ['React', 'Node.js'],
+          },
+        ],
+      })
+    })
+
+    it('should handle empty technologies array', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: [],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      const input = screen.getByPlaceholderText('Add technology...')
+      expect(input).toBeInTheDocument()
+
+      // Should not render any remove buttons for technologies
+      const removeButtons = screen.queryAllByTitle('Remove')
+      expect(removeButtons.length).toBe(0)
+    })
+
+    it('should handle undefined technologies array', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test Company',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            // technologies field is undefined
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const input = screen.getByPlaceholderText('Add technology...')
+
+      fireEvent.change(input, { target: { value: 'React' } })
+      fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
+
+      expect(mockSetResumeData).toHaveBeenCalledWith({
+        ...mockData,
+        workExperience: [
+          {
+            ...mockData.workExperience[0],
+            technologies: ['React'],
+          },
+        ],
+      })
+    })
+
+    it('should add technologies to correct work experience entry', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Company 1',
+            url: 'company1.com',
+            position: 'Role 1',
+            description: 'Desc 1',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2021-01-01',
+            technologies: ['Vue'],
+          },
+          {
+            company: 'Company 2',
+            url: 'company2.com',
+            position: 'Role 2',
+            description: 'Desc 2',
+            keyAchievements: [],
+            startYear: '2021-01-01',
+            endYear: '2023-01-01',
+            technologies: ['React'],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const inputs = screen.getAllByPlaceholderText('Add technology...')
+
+      // Add technology to second entry
+      fireEvent.change(inputs[1], { target: { value: 'TypeScript' } })
+      fireEvent.keyDown(inputs[1], { key: 'Enter', code: 'Enter' })
+
+      expect(mockSetResumeData).toHaveBeenCalledWith({
+        ...mockData,
+        workExperience: [
+          mockData.workExperience[0], // Unchanged
+          {
+            ...mockData.workExperience[1],
+            technologies: ['React', 'TypeScript'],
+          },
+        ],
+      })
+    })
+
+    it('should remove technologies from correct work experience entry', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Company 1',
+            url: 'company1.com',
+            position: 'Role 1',
+            description: 'Desc 1',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2021-01-01',
+            technologies: ['Vue', 'Nuxt'],
+          },
+          {
+            company: 'Company 2',
+            url: 'company2.com',
+            position: 'Role 2',
+            description: 'Desc 2',
+            keyAchievements: [],
+            startYear: '2021-01-01',
+            endYear: '2023-01-01',
+            technologies: ['React', 'Next.js'],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      // Get all remove buttons
+      const removeButtons = screen.getAllByTitle('Remove')
+
+      // Remove "Next.js" from second entry (index would be after Vue, Nuxt, React)
+      fireEvent.click(removeButtons[3]) // Vue=0, Nuxt=1, React=2, Next.js=3
+
+      expect(mockSetResumeData).toHaveBeenCalledWith({
+        ...mockData,
+        workExperience: [
+          mockData.workExperience[0], // Unchanged
+          {
+            ...mockData.workExperience[1],
+            technologies: ['React'],
+          },
+        ],
+      })
+    })
+
+    it('should use teal variant for TagInput', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies: [],
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      const input = screen.getByPlaceholderText('Add technology...')
+      expect(input).toHaveClass('border-teal-400/30')
+    })
+
+    it('should display multiple technologies correctly', () => {
+      const technologies = [
+        'React',
+        'TypeScript',
+        'Node.js',
+        'Express',
+        'PostgreSQL',
+        'Docker',
+      ]
+
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            company: 'Test',
+            url: 'test.com',
+            position: 'Developer',
+            description: 'Test',
+            keyAchievements: [],
+            startYear: '2020-01-01',
+            endYear: '2023-01-01',
+            technologies,
+          },
+        ],
+      })
+
+      renderWithContext(<WorkExperience />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      technologies.forEach((tech) => {
+        expect(screen.getByText(tech)).toBeInTheDocument()
       })
     })
   })

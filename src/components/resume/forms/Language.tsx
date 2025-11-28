@@ -11,11 +11,11 @@ const Language = () => {
 
   return (
     <TagInput
-      items={data}
+      tags={data}
       onAdd={add}
       onRemove={remove}
       placeholder="Add language..."
-      theme="emerald"
+      variant="purple"
     />
   )
 }

@@ -48,7 +48,7 @@ describe('Resume Edit Page - Password Protection Integration', () => {
       render(<ResumeEditPage />)
 
       expect(screen.queryByText('Personal Information')).not.toBeInTheDocument()
-      expect(screen.queryByText('Work Experience')).not.toBeInTheDocument()
+      expect(screen.queryByText('Experience')).not.toBeInTheDocument()
     })
 
     it('should block access to resume forms without password', () => {
@@ -99,9 +99,7 @@ describe('Resume Edit Page - Password Protection Integration', () => {
           expect(screen.getAllByText('Social Media').length).toBeGreaterThan(0)
           expect(screen.getAllByText('Summary').length).toBeGreaterThan(0)
           expect(screen.getAllByText('Education').length).toBeGreaterThan(0)
-          expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(
-            0
-          )
+          expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
         },
         { timeout: 3000 }
       )
@@ -262,9 +260,9 @@ describe('Resume Edit Page - Password Protection Integration', () => {
       ).toBeGreaterThan(0)
     })
 
-    it('should allow editing work experience', () => {
-      // Work experience section should be visible (use getAllByText)
-      expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(0)
+    it('should allow editing experience', () => {
+      // Experience section should be visible (use getAllByText)
+      expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
     })
 
     it('should show preview updates', () => {
@@ -383,9 +381,7 @@ describe('Resume Edit Page - Password Protection Integration', () => {
           expect(
             screen.getAllByText('Personal Information').length
           ).toBeGreaterThan(0)
-          expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(
-            0
-          )
+          expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
         },
         { timeout: 3000 }
       )

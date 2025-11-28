@@ -63,7 +63,7 @@ describe('Password Protection - End-to-End Workflows', () => {
       )
 
       // 5. Verify full editor is accessible (use getAllByText since text appears in forms and preview)
-      expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Education').length).toBeGreaterThan(0)
       expect(
         screen.getByRole('button', { name: /logout/i })
@@ -235,7 +235,7 @@ describe('Password Protection - End-to-End Workflows', () => {
       expect(
         screen.getByRole('heading', { name: 'AI Resume Builder' })
       ).toBeInTheDocument()
-      expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Education').length).toBeGreaterThan(0)
 
       // 3. Switch to cover letter mode
@@ -254,7 +254,7 @@ describe('Password Protection - End-to-End Workflows', () => {
       fireEvent.click(resumeTab)
 
       // 6. Verify resume mode is active again
-      expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Experience').length).toBeGreaterThan(0)
     })
 
     it('should maintain session across mode switches', async () => {
@@ -301,7 +301,7 @@ describe('Password Protection - End-to-End Workflows', () => {
 
       // Should not be able to access any editor functionality
       expect(screen.queryByText('Personal Information')).not.toBeInTheDocument()
-      expect(screen.queryByText('Work Experience')).not.toBeInTheDocument()
+      expect(screen.queryByText('Experience')).not.toBeInTheDocument()
       expect(screen.queryByText('Print')).not.toBeInTheDocument()
     })
 

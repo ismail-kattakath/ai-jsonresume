@@ -1,40 +1,33 @@
 import React, { useState } from 'react'
 
-type ColorTheme = 'pink' | 'emerald' | 'violet' | 'teal' | 'blue'
-
-const themeClasses: Record<ColorTheme, string> = {
-  pink: 'focus:border-pink-400',
-  emerald: 'focus:border-emerald-400',
-  violet: 'focus:border-violet-400',
-  teal: 'focus:border-teal-400',
-  blue: 'focus:border-blue-400',
-}
-
 interface TagInputProps {
-  /** Array of string items to display as tags */
-  items: string[]
-  /** Called when a new item is added */
-  onAdd: (value: string) => void
-  /** Called when an item is removed */
+  tags: string[]
+  onAdd: (tag: string) => void
   onRemove: (index: number) => void
-  /** Placeholder text for the input */
   placeholder?: string
-  /** Color theme for focus states */
-  theme?: ColorTheme
+  variant?: 'purple' | 'pink' | 'teal' | 'blue'
 }
 
 /**
- * Reusable tag input component
- * Displays items as inline tags with an inline input for adding new items
+ * Reusable TagInput component for managing arrays of strings
+ * Used for skills, technologies, etc.
  */
-const TagInput = ({
-  items,
+const TagInput: React.FC<TagInputProps> = ({
+  tags,
   onAdd,
   onRemove,
   placeholder = 'Add item...',
-  theme = 'pink',
-}: TagInputProps) => {
+  variant = 'purple',
+}) => {
   const [inputValue, setInputValue] = useState('')
+
+  const variantStyles = {
+    purple:
+      'border-purple-400/30 focus:border-purple-400 hover:border-purple-400/50',
+    pink: 'border-pink-400/30 focus:border-pink-400 hover:border-pink-400/50',
+    teal: 'border-teal-400/30 focus:border-teal-400 hover:border-teal-400/50',
+    blue: 'border-blue-400/30 focus:border-blue-400 hover:border-blue-400/50',
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -55,12 +48,12 @@ const TagInput = ({
 
   return (
     <div className="flex flex-wrap gap-2">
-      {items.map((item, index) => (
+      {tags?.map((tag, index) => (
         <span
-          key={`TAG-${index}-${item}`}
+          key={`TAG-${index}`}
           className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-sm text-white"
         >
-          {item}
+          {tag}
           <button
             type="button"
             onClick={() => onRemove(index)}
@@ -78,7 +71,7 @@ const TagInput = ({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`rounded-full border border-dashed border-white/30 bg-transparent px-3 py-1 text-sm text-white outline-none placeholder:text-white/40 ${themeClasses[theme]}`}
+        className={`rounded-full border border-dashed bg-transparent px-3 py-1 text-sm text-white outline-none placeholder:text-white/40 ${variantStyles[variant]}`}
       />
     </div>
   )
