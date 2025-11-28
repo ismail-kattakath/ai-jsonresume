@@ -178,16 +178,40 @@ export function parseSkillsSortResponse(
         return null
       }
 
-      if (originalSkillTexts.size !== responseSkillTexts.length) {
-        console.error(`Skill count mismatch for group "${group.title}"`)
+      // Check for duplicates in AI response
+      const responseSkillSet = new Set(responseSkillTexts)
+      if (responseSkillSet.size !== responseSkillTexts.length) {
+        console.error(
+          `Duplicate skills found in AI response for group "${group.title}". Expected ${responseSkillTexts.length} unique skills but got ${responseSkillSet.size}.`,
+          {
+            original: Array.from(originalSkillTexts),
+            response: responseSkillTexts,
+          }
+        )
         return null
       }
 
-      const responseSkillSet = new Set(responseSkillTexts)
+      // Validate count matches
+      if (originalSkillTexts.size !== responseSkillSet.size) {
+        console.error(
+          `Skill count mismatch for group "${group.title}". Expected ${originalSkillTexts.size} skills but got ${responseSkillSet.size}.`,
+          {
+            original: Array.from(originalSkillTexts),
+            response: responseSkillTexts,
+          }
+        )
+        return null
+      }
+
+      // Validate all original skills are present in response
       for (const skillText of originalSkillTexts) {
         if (!responseSkillSet.has(skillText)) {
           console.error(
-            `Missing skill "${skillText}" in group "${group.title}"`
+            `Missing skill "${skillText}" in group "${group.title}"`,
+            {
+              original: Array.from(originalSkillTexts),
+              response: responseSkillTexts,
+            }
           )
           return null
         }
