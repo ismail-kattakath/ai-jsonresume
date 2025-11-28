@@ -28,6 +28,8 @@ interface CollapsibleSectionProps {
   // Controlled state props for accordion behavior
   isExpanded?: boolean
   onToggle?: () => void
+  // HTML id attribute for targeting (e.g., onboarding tour)
+  id?: string
 }
 
 const CollapsibleSection = ({
@@ -43,6 +45,7 @@ const CollapsibleSection = ({
   dragHandleProps,
   isExpanded: controlledIsExpanded,
   onToggle,
+  id,
 }: CollapsibleSectionProps) => {
   const [internalIsExpanded, setInternalIsExpanded] = useState(defaultExpanded)
 
@@ -103,6 +106,7 @@ const CollapsibleSection = ({
 
   return (
     <div
+      id={id}
       className={`overflow-hidden rounded-lg border backdrop-blur-sm transition-all ${variantClasses}`}
     >
       {/* Header - Clickable */}

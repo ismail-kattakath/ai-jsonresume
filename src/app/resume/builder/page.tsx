@@ -34,6 +34,7 @@ import { useSkillGroupsManagement } from '@/hooks/useSkillGroupsManagement'
 import { useAccordion } from '@/hooks/useAccordion'
 import PasswordProtection from '@/components/auth/PasswordProtection'
 import MainLayout from '@/components/layout/MainLayout'
+import { OnboardingTour } from '@/components/onboarding'
 import type { CoverLetterData, ResumeData } from '@/types'
 import {
   User,
@@ -470,7 +471,10 @@ function UnifiedEditor() {
           >
             <div className="relative flex flex-1 flex-col md:grid md:grid-cols-[1fr_auto]">
               {/* Floating Action Buttons (Capsule) - Hidden on print */}
-              <div className="exclude-print fixed top-8 right-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none">
+              <div
+                id="action-buttons"
+                className="exclude-print fixed top-8 right-8 z-50 flex animate-pulse flex-row items-center overflow-hidden rounded-full shadow-2xl hover:animate-none"
+              >
                 {mode === 'resume' && (
                   <div className="[&>button]:animate-none [&>button]:rounded-r-none [&>button]:shadow-none">
                     <ATSCheckButton name={resumeData.name} />
@@ -497,7 +501,10 @@ function UnifiedEditor() {
                 className="exclude-print flex-1 space-y-4 overflow-y-scroll p-4 md:h-0 md:min-h-full md:flex-none md:space-y-5 md:p-6 lg:p-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/30 [&::-webkit-scrollbar-track]:bg-white/5"
               >
                 {/* Header */}
-                <div className="space-y-3 border-b border-white/10 pb-4">
+                <div
+                  id="builder-header"
+                  className="space-y-3 border-b border-white/10 pb-4"
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
                       <span className="text-xl">🎯</span>
@@ -513,7 +520,10 @@ function UnifiedEditor() {
                   </div>
 
                   {/* Preview Mode Switcher */}
-                  <div className="flex overflow-hidden rounded-lg bg-white/5">
+                  <div
+                    id="mode-switcher"
+                    className="flex overflow-hidden rounded-lg bg-white/5"
+                  >
                     <button
                       type="button"
                       onClick={() => setMode('resume')}
@@ -543,6 +553,7 @@ function UnifiedEditor() {
 
                 {/* Form Sections - Conditionally rendered based on mode */}
                 <CollapsibleSection
+                  id="section-import-export"
                   title="Import / Export"
                   icon={<ArrowDownUp className="h-4 w-4 text-amber-400" />}
                   isExpanded={expandedSection === 'import-export'}
@@ -553,6 +564,7 @@ function UnifiedEditor() {
                 </CollapsibleSection>
 
                 <CollapsibleSection
+                  id="section-ai-settings"
                   title="Generative AI Settings"
                   icon={<Sparkles className="h-4 w-4 text-amber-400" />}
                   isExpanded={expandedSection === 'ai-settings'}
@@ -564,6 +576,7 @@ function UnifiedEditor() {
                 </CollapsibleSection>
 
                 <CollapsibleSection
+                  id="section-personal-info"
                   title="Personal Information"
                   icon={<User className="h-4 w-4 text-blue-400" />}
                   isExpanded={expandedSection === 'personal-info'}
@@ -573,6 +586,7 @@ function UnifiedEditor() {
                 </CollapsibleSection>
 
                 <CollapsibleSection
+                  id="section-social-media"
                   title="Social Media"
                   icon={<Share2 className="h-4 w-4 text-blue-400" />}
                   isExpanded={expandedSection === 'social-media'}
@@ -585,6 +599,7 @@ function UnifiedEditor() {
                 {mode === 'resume' && (
                   <>
                     <CollapsibleSection
+                      id="section-summary"
                       title="Summary"
                       icon={<FileText className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'summary'}
@@ -594,6 +609,7 @@ function UnifiedEditor() {
                     </CollapsibleSection>
 
                     <CollapsibleSection
+                      id="section-education"
                       title="Education"
                       icon={<GraduationCap className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'education'}
@@ -603,6 +619,7 @@ function UnifiedEditor() {
                     </CollapsibleSection>
 
                     <CollapsibleSection
+                      id="section-work-experience"
                       title="Experience"
                       icon={<Briefcase className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'work-experience'}
@@ -613,6 +630,7 @@ function UnifiedEditor() {
 
                     {/* Skills Section - All groups in single collapsible */}
                     <CollapsibleSection
+                      id="section-skills"
                       title="Skills"
                       icon={<Code className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'skills'}
@@ -622,6 +640,7 @@ function UnifiedEditor() {
                     </CollapsibleSection>
 
                     <CollapsibleSection
+                      id="section-additional-info"
                       title="Additional Info"
                       icon={<Layers className="h-4 w-4 text-blue-400" />}
                       isExpanded={expandedSection === 'additional-info'}
@@ -658,7 +677,7 @@ function UnifiedEditor() {
               </form>
 
               {/* Preview Section */}
-              <div className="flex flex-col md:w-[8.5in]">
+              <div id="preview-panel" className="flex flex-col md:w-[8.5in]">
                 {/* Both Previews - Toggle visibility with CSS */}
                 <ResumeContext.Provider
                   value={{
@@ -699,7 +718,9 @@ function UnifiedEditor() {
 export default function ResumeEditPage() {
   return (
     <PasswordProtection>
-      <UnifiedEditor />
+      <OnboardingTour>
+        <UnifiedEditor />
+      </OnboardingTour>
     </PasswordProtection>
   )
 }
