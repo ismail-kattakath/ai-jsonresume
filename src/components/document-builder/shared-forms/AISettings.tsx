@@ -62,8 +62,15 @@ const AISettings: React.FC = () => {
   // Fetch available models when API URL or API Key changes
   useEffect(() => {
     const fetchModels = async () => {
+      console.log('[AISettings] fetchModels triggered:', {
+        apiUrl: settings.apiUrl,
+        hasApiKey: !!settings.apiKey,
+        apiKeyPrefix: settings.apiKey.substring(0, 15),
+      })
+
       // Only fetch if we have both URL and key
       if (!settings.apiUrl.trim() || !settings.apiKey.trim()) {
+        console.log('[AISettings] Skipping fetch - missing URL or key')
         setAvailableModels([])
         setLoadingModels(false)
         setModelsError(null)
@@ -74,6 +81,7 @@ const AISettings: React.FC = () => {
       try {
         new URL(settings.apiUrl) // Throws if invalid URL
       } catch {
+        console.log('[AISettings] Invalid URL format')
         setAvailableModels([])
         setLoadingModels(false)
         setModelsError(null) // Don't show error for invalid URL - user might be typing
@@ -81,6 +89,7 @@ const AISettings: React.FC = () => {
       }
 
       // For custom providers, we'll try anyway
+      console.log('[AISettings] Starting model fetch...')
       setLoadingModels(true)
       setModelsError(null)
 
@@ -88,6 +97,11 @@ const AISettings: React.FC = () => {
         const models = await fetchAvailableModels({
           baseURL: settings.apiUrl,
           apiKey: settings.apiKey,
+        })
+
+        console.log('[AISettings] Fetch complete:', {
+          modelCount: models.length,
+          sampleModels: models.slice(0, 5),
         })
 
         if (models.length > 0) {
@@ -99,7 +113,7 @@ const AISettings: React.FC = () => {
           )
         }
       } catch (error) {
-        console.error('Failed to fetch models:', error)
+        console.error('[AISettings] Failed to fetch models:', error)
         setModelsError('Failed to fetch models from API')
         setAvailableModels([])
       } finally {
