@@ -440,6 +440,40 @@ export async function testConnection(config: OpenAIConfig): Promise<boolean> {
 }
 
 /**
+ * Fetches available models from the API
+ * Uses the standard OpenAI-compatible /v1/models endpoint
+ */
+export async function fetchAvailableModels(
+  config: Pick<OpenAIConfig, 'baseURL' | 'apiKey'>
+): Promise<string[]> {
+  try {
+    const response = await fetch(`${config.baseURL}/v1/models`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch models: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    // OpenAI format: { data: [{ id: "model-name" }, ...] }
+    if (data.data && Array.isArray(data.data)) {
+      return data.data.map((model: { id: string }) => model.id).sort()
+    }
+
+    return []
+  } catch (error) {
+    console.error('Failed to fetch available models:', error)
+    return []
+  }
+}
+
+/**
  * Validates if the provided text is a valid job description
  * Returns true if text is non-empty and has reasonable length
  */

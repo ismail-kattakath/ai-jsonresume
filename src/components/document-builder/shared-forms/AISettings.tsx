@@ -1,12 +1,131 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAISettings } from '@/lib/contexts/AISettingsContext'
 import { FormInput } from '@/components/ui/FormInput'
+import { FormSelect } from '@/components/ui/FormSelect'
 import { FormTextarea } from '@/components/ui/FormTextarea'
+import {
+  PROVIDER_PRESETS,
+  CUSTOM_PROVIDER,
+  getProviderByURL,
+} from '@/lib/ai/providers'
+import { fetchAvailableModels } from '@/lib/ai/openai-client'
+import { Loader2 } from 'lucide-react'
 
 const AISettings: React.FC = () => {
   const { settings, updateSettings } = useAISettings()
+
+  // State for provider selection
+  const [selectedProvider, setSelectedProvider] = useState<string>(() => {
+    const provider = getProviderByURL(settings.apiUrl)
+    return provider?.name || 'Custom'
+  })
+
+  // State for custom URL input
+  const [customURL, setCustomURL] = useState<string>(() => {
+    const provider = getProviderByURL(settings.apiUrl)
+    return provider ? '' : settings.apiUrl
+  })
+
+  // State for available models
+  const [availableModels, setAvailableModels] = useState<string[]>([])
+  const [loadingModels, setLoadingModels] = useState(false)
+  const [modelsError, setModelsError] = useState<string | null>(null)
+
+  // Handle provider change
+  const handleProviderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const providerName = e.target.value
+    setSelectedProvider(providerName)
+
+    if (providerName === 'Custom') {
+      // User selected custom - don't change URL yet
+      return
+    }
+
+    // Find the preset and update URL
+    const preset = PROVIDER_PRESETS.find((p) => p.name === providerName)
+    if (preset) {
+      updateSettings({ apiUrl: preset.baseURL })
+      setCustomURL('')
+      setAvailableModels([]) // Clear models when changing provider
+    }
+  }
+
+  // Handle custom URL change
+  const handleCustomURLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value
+    setCustomURL(url)
+    updateSettings({ apiUrl: url })
+  }
+
+  // Fetch available models when API URL or API Key changes
+  useEffect(() => {
+    const fetchModels = async () => {
+      // Only fetch if we have both URL and key
+      if (!settings.apiUrl.trim() || !settings.apiKey.trim()) {
+        setAvailableModels([])
+        return
+      }
+
+      // Check if provider supports model listing
+      const provider = getProviderByURL(settings.apiUrl)
+      const isCustomProvider = provider === null
+
+      // For custom providers, we'll try anyway
+      setLoadingModels(true)
+      setModelsError(null)
+
+      try {
+        const models = await fetchAvailableModels({
+          baseURL: settings.apiUrl,
+          apiKey: settings.apiKey,
+        })
+
+        if (models.length > 0) {
+          setAvailableModels(models)
+          setModelsError(null)
+        } else {
+          setModelsError(
+            'No models found or API does not support model listing'
+          )
+        }
+      } catch (error) {
+        console.error('Failed to fetch models:', error)
+        setModelsError('Failed to fetch models from API')
+        setAvailableModels([])
+      } finally {
+        setLoadingModels(false)
+      }
+    }
+
+    // Debounce the fetch
+    const timeoutId = setTimeout(fetchModels, 500)
+    return () => clearTimeout(timeoutId)
+  }, [settings.apiUrl, settings.apiKey])
+
+  // Provider dropdown options
+  const providerOptions = [
+    ...PROVIDER_PRESETS.map((p) => ({
+      value: p.name,
+      label: p.name,
+      description: p.description,
+    })),
+    {
+      value: CUSTOM_PROVIDER.name,
+      label: CUSTOM_PROVIDER.name,
+      description: CUSTOM_PROVIDER.description,
+    },
+  ]
+
+  // Model dropdown options
+  const modelOptions = availableModels.map((model) => ({
+    value: model,
+    label: model,
+  }))
+
+  const showCustomURL = selectedProvider === 'Custom'
+  const showModelDropdown = availableModels.length > 0 && !loadingModels
 
   return (
     <div className="flex flex-col gap-4">
@@ -15,52 +134,54 @@ const AISettings: React.FC = () => {
         and professional summaries based on the job description.
       </p>
 
-      {/* Provider Examples */}
-      <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-        <p className="mb-2 text-xs font-medium text-white/80">
-          Popular Providers:
-        </p>
-        <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-2">
-          <div>
-            <span className="text-white/60">OpenAI:</span>{' '}
-            <code className="text-blue-400">api.openai.com/v1</code>
-          </div>
-          <div>
-            <span className="text-white/60">OpenRouter (Gemini/Claude):</span>{' '}
-            <code className="text-blue-400">openrouter.ai/api/v1</code>
-          </div>
-          <div>
-            <span className="text-white/60">Groq:</span>{' '}
-            <code className="text-blue-400">api.groq.com/openai/v1</code>
-          </div>
-          <div>
-            <span className="text-white/60">Local (LM Studio):</span>{' '}
-            <code className="text-blue-400">localhost:1234/v1</code>
-          </div>
-        </div>
-      </div>
+      {/* Provider Selection */}
+      <FormSelect
+        label="AI Provider"
+        name="provider"
+        value={selectedProvider}
+        onChange={handleProviderChange}
+        options={providerOptions}
+        variant="blue"
+        helpText="Choose a preset provider or select Custom for your own URL"
+      />
 
-      {/* API URL, Key, and Model */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* API URL (only show if Custom is selected) */}
+      {showCustomURL && (
         <FormInput
-          label="API URL"
-          name="apiUrl"
-          value={settings.apiUrl}
-          onChange={(e) => updateSettings({ apiUrl: e.target.value })}
-          placeholder="https://api.openai.com/v1"
+          label="Custom API URL"
+          name="customApiUrl"
+          value={customURL}
+          onChange={handleCustomURLChange}
+          placeholder="https://api.example.com/v1"
           variant="blue"
-          helpText="For Gemini: use https://openrouter.ai/api/v1"
+          helpText="Enter the base URL for your OpenAI-compatible API"
         />
-        <FormInput
-          label="API Key"
-          name="apiKey"
-          type="password"
-          value={settings.apiKey}
-          onChange={(e) => updateSettings({ apiKey: e.target.value })}
-          placeholder="sk-..."
+      )}
+
+      {/* API Key */}
+      <FormInput
+        label="API Key"
+        name="apiKey"
+        type="password"
+        value={settings.apiKey}
+        onChange={(e) => updateSettings({ apiKey: e.target.value })}
+        placeholder="sk-..."
+        variant="blue"
+        helpText="Get from your AI provider (required for model fetching)"
+      />
+
+      {/* Model Selection */}
+      {showModelDropdown ? (
+        <FormSelect
+          label="Model"
+          name="model"
+          value={settings.model}
+          onChange={(e) => updateSettings({ model: e.target.value })}
+          options={modelOptions}
           variant="blue"
-          helpText="Get from your AI provider"
+          helpText={`${availableModels.length} models available from API`}
         />
+      ) : (
         <FormInput
           label="Model"
           name="model"
@@ -68,43 +189,23 @@ const AISettings: React.FC = () => {
           onChange={(e) => updateSettings({ model: e.target.value })}
           placeholder="gpt-4o-mini"
           variant="blue"
-          helpText="e.g., google/gemini-2.0-flash-exp"
+          helpText={
+            loadingModels
+              ? 'Loading models from API...'
+              : modelsError
+                ? 'Enter model name manually'
+                : 'Enter API key to load available models'
+          }
         />
-      </div>
+      )}
 
-      {/* Model Examples */}
-      <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-        <p className="mb-2 text-xs font-medium text-white/80">
-          Popular Models:
-        </p>
-        <div className="grid grid-cols-1 gap-2 text-xs md:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <span className="text-white/60">OpenAI:</span>{' '}
-            <code className="text-blue-400">gpt-4o-mini</code>,{' '}
-            <code className="text-blue-400">gpt-4o</code>
-          </div>
-          <div>
-            <span className="text-white/60">Gemini (via OpenRouter):</span>{' '}
-            <code className="text-blue-400">google/gemini-2.0-flash-exp</code>
-          </div>
-          <div>
-            <span className="text-white/60">Claude (via OpenRouter):</span>{' '}
-            <code className="text-blue-400">anthropic/claude-3.5-sonnet</code>
-          </div>
-          <div>
-            <span className="text-white/60">Groq:</span>{' '}
-            <code className="text-blue-400">llama-3.3-70b-versatile</code>
-          </div>
-          <div>
-            <span className="text-white/60">DeepSeek (via OpenRouter):</span>{' '}
-            <code className="text-blue-400">deepseek/deepseek-r1</code>
-          </div>
-          <div>
-            <span className="text-white/60">Local:</span>{' '}
-            <code className="text-blue-400">llama-3.1-8b-instruct</code>
-          </div>
+      {/* Loading indicator for models */}
+      {loadingModels && (
+        <div className="flex items-center gap-2 text-xs text-white/50">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          <span>Fetching available models from API...</span>
         </div>
-      </div>
+      )}
 
       {/* Job Description */}
       <FormTextarea
