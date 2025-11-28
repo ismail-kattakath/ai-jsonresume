@@ -5,24 +5,33 @@ import React from 'react'
 expect.extend(toHaveNoViolations)
 
 // Mock onborda library (ESM module that Jest can't transform)
-jest.mock('onborda', () => ({
-  OnbordaProvider: ({ children }) =>
-    React.createElement('div', { 'data-testid': 'onborda-provider' }, children),
-  Onborda: ({ children, showOnborda }) =>
-    React.createElement(
-      'div',
-      { 'data-testid': 'onborda', 'data-show': showOnborda },
-      children
-    ),
-  useOnborda: () => ({
-    startOnborda: jest.fn(),
-    closeOnborda: jest.fn(),
-    isOnbordaVisible: false,
-    currentStep: 0,
-    currentTour: null,
-    setCurrentStep: jest.fn(),
+// Using { virtual: true } to create a virtual mock that doesn't require the actual module
+jest.mock(
+  'onborda',
+  () => ({
+    OnbordaProvider: ({ children }) =>
+      React.createElement(
+        'div',
+        { 'data-testid': 'onborda-provider' },
+        children
+      ),
+    Onborda: ({ children, showOnborda }) =>
+      React.createElement(
+        'div',
+        { 'data-testid': 'onborda', 'data-show': showOnborda },
+        children
+      ),
+    useOnborda: () => ({
+      startOnborda: jest.fn(),
+      closeOnborda: jest.fn(),
+      isOnbordaVisible: false,
+      currentStep: 0,
+      currentTour: null,
+      setCurrentStep: jest.fn(),
+    }),
   }),
-}))
+  { virtual: true }
+)
 
 // Mock IntersectionObserver for framer-motion
 global.IntersectionObserver = class IntersectionObserver {
