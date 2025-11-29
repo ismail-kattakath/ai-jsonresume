@@ -14,6 +14,7 @@ import { contactInfo } from '@/lib/data/portfolio'
 import resumeData from '@/lib/resumeAdapter'
 import { Logo } from '@/components/Logo'
 import { navItems } from '@/config/navigation'
+import { analytics } from '@/lib/analytics'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
@@ -70,6 +71,7 @@ export default function Footer() {
                 href={`https://${contactInfo.github}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => analytics.socialMediaClick('github')}
                 whileHover={{ scale: 1.1, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 className="group relative overflow-hidden rounded-xl p-3"
@@ -83,6 +85,7 @@ export default function Footer() {
                 href={`https://${contactInfo.linkedin}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => analytics.socialMediaClick('linkedin')}
                 whileHover={{ scale: 1.1, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 className="group relative overflow-hidden rounded-xl p-3"
@@ -94,6 +97,7 @@ export default function Footer() {
 
               <motion.a
                 href={`mailto:${contactInfo.email}`}
+                onClick={() => analytics.contactClick('email')}
                 whileHover={{ scale: 1.1, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 className="group relative overflow-hidden rounded-xl p-3"

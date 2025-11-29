@@ -11,6 +11,7 @@ import {
   OpenAIAPIError,
   GeminiAPIError,
 } from '@/lib/ai/document-generator'
+import { analytics } from '@/lib/analytics'
 
 interface AITextAreaWithButtonProps {
   value: string
@@ -90,6 +91,10 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
 
     setIsGenerating(true)
     let streamedContent = ''
+    const startTime = Date.now()
+
+    // Track generation start
+    analytics.aiGenerationStart(settings.providerType, settings.model)
 
     try {
       const content = await currentConfig.generateFunction(
@@ -110,6 +115,14 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
       // Final update with complete content
       updateValue(content)
 
+      // Track generation success
+      const responseTimeMs = Date.now() - startTime
+      analytics.aiGenerationSuccess(
+        settings.providerType,
+        settings.model,
+        responseTimeMs
+      )
+
       toast.success(currentConfig.successMessage, {
         description: currentConfig.successDescription,
       })
@@ -119,13 +132,20 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
 
       /* istanbul ignore next */
       let errorMessage = currentConfig.errorMessage
+      let errorType = 'unknown'
 
       /* istanbul ignore next */
       if (err instanceof OpenAIAPIError || err instanceof GeminiAPIError) {
         errorMessage = err.message
+        errorType = err.constructor.name
       } else if (err instanceof Error) {
         errorMessage = err.message
+        errorType = err.name
       }
+
+      /* istanbul ignore next */
+      // Track generation error
+      analytics.aiGenerationError(settings.providerType, errorType)
 
       /* istanbul ignore next */
       toast.error('Generation failed', {

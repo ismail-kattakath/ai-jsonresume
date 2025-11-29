@@ -4,6 +4,7 @@ import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { convertToJSONResume, convertFromJSONResume } from '@/lib/jsonResume'
 import { validateJSONResume } from '@/lib/jsonResumeSchema'
 import { toast } from 'sonner'
+import { analytics } from '@/lib/analytics'
 import type { ResumeData } from '@/types/resume'
 
 interface ImportExportProps {
@@ -84,6 +85,7 @@ const ImportExport = ({ preserveContent = false }: ImportExportProps) => {
           toast.success('JSON Resume imported successfully!', {
             id: 'import-resume',
           })
+          analytics.resumeImport('JSON Resume', true)
         } else {
           // Handle internal format (legacy)
           const migratedData = migrateSkillsData(loadedData)
@@ -97,6 +99,7 @@ const ImportExport = ({ preserveContent = false }: ImportExportProps) => {
           toast.success('Resume data imported successfully!', {
             id: 'import-resume',
           })
+          analytics.resumeImport('Internal Format', true)
         }
       } catch (error) {
         toast.error(`Failed to import resume: ${(error as Error).message}`, {
@@ -131,6 +134,12 @@ const ImportExport = ({ preserveContent = false }: ImportExportProps) => {
       toast.success('JSON Resume exported successfully!', {
         id: 'export-resume',
       })
+
+      // Track export event
+      const sectionsCount = Object.keys(resumeData).filter(
+        (key) => resumeData[key as keyof ResumeData]
+      ).length
+      analytics.resumeExport('JSON', sectionsCount)
     } catch (error) {
       toast.error(`Failed to export resume: ${(error as Error).message}`, {
         id: 'export-resume',
