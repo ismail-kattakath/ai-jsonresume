@@ -78,13 +78,21 @@ Content: 319 characters ✅
 
 ### Current Implementation (✅ Already Applied)
 
-- **Cover Letters**: `maxTokens: 2000` (was 800)
-  - Allows ~1200 tokens for thinking
-  - Leaves ~800 tokens for actual cover letter content
+- **Cover Letters**: `maxTokens: 8192` (was 800 → 2000 → 8192)
+  - Allows ~1200-1500 tokens for thinking
+  - Leaves ~6500-6900 tokens for actual cover letter content
+  - Supports full-length professional cover letters without truncation
 
-- **Summaries**: `maxTokens: 1500` (was 300)
-  - Allows ~900-1000 tokens for thinking
-  - Leaves ~500 tokens for summary content
+- **Summaries**: `maxTokens: 4096` (was 300 → 1500 → 4096)
+  - Allows ~1200-1500 tokens for thinking
+  - Leaves ~2000-2800 tokens for summary content
+  - Supports comprehensive professional summaries without truncation
+
+**Why These Values**:
+
+- Previous limits (2000/1500) still caused truncation on longer responses
+- Gemini documentation recommends 4096 or 8192 for `max_output_tokens`
+- Test results confirm these values prevent truncation with `finish_reason: STOP`
 
 ### Error Handling
 
@@ -142,14 +150,38 @@ When users encounter empty responses with Gemini 2.5:
    - Gemini 1.5: 1000 tokens (no thinking mode)
    - OpenAI: 800 tokens (no thinking mode)
 
+## Additional Features Implemented
+
+### 1. Always Use Streaming
+
+- **Problem**: Non-streaming `generateContent` has response size limits
+- **Solution**: Always use `generateContentStream` for all Gemini requests
+- **Benefit**: Prevents truncation on long responses
+
+### 2. Retry Logic with Exponential Backoff
+
+- **Problem**: Intermittent 503/429 errors fail requests unnecessarily
+- **Solution**: Retry up to 3 times with exponential backoff (1s, 2s, 4s)
+- **Handles**: 503 (Service Unavailable) and 429 (Rate Limit) errors
+
+### 3. finish_reason Tracking
+
+- **Problem**: Can't diagnose why content is truncated or empty
+- **Solution**: Log `finish_reason` and provide specific error messages
+- **Error Types**:
+  - `MAX_TOKENS`: Suggest increasing maxTokens
+  - `SAFETY`: Blocked by safety filters
+  - `RECITATION`: Blocked due to copyright concerns
+
 ## References
 
-- Test scripts: `test-max-output-tokens.mjs`, `test-ui-scenario.mjs`
+- Test scripts: `test-max-output-tokens.mjs`, `test-ui-scenario.mjs`, `test-high-token-limits.mjs`
 - Implementation: `src/lib/ai/gemini-client.ts`
 - Document generation: `src/lib/ai/gemini-documents.ts`
 
 ---
 
 **Date**: 2025-11-28
+**Updated**: 2025-11-28 (increased token limits to 4096/8192)
 **Researched by**: Claude Code
 **Issue**: #41 - Native Gemini Support
