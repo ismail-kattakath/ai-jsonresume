@@ -197,14 +197,17 @@ describe('GeminiClient', () => {
     })
 
     it('should handle network errors', async () => {
-      ;(global.fetch as jest.Mock).mockRejectedValue(
-        new Error('fetch failed: network error')
-      )
+      // Mock all retry attempts to fail
+      ;(global.fetch as jest.Mock)
+        .mockRejectedValueOnce(new Error('fetch failed: network error'))
+        .mockRejectedValueOnce(new Error('fetch failed: network error'))
+        .mockRejectedValueOnce(new Error('fetch failed: network error'))
+        .mockRejectedValueOnce(new Error('fetch failed: network error'))
 
       await expect(client.generateContent(mockRequest)).rejects.toThrow(
         GeminiAPIError
       )
-    })
+    }, 10000)
 
     it('should handle timeout errors', async () => {
       const abortError = new DOMException(
@@ -212,12 +215,17 @@ describe('GeminiClient', () => {
         'AbortError'
       )
 
-      ;(global.fetch as jest.Mock).mockRejectedValue(abortError)
+      // Mock all retry attempts to fail
+      ;(global.fetch as jest.Mock)
+        .mockRejectedValueOnce(abortError)
+        .mockRejectedValueOnce(abortError)
+        .mockRejectedValueOnce(abortError)
+        .mockRejectedValueOnce(abortError)
 
       await expect(client.generateContent(mockRequest)).rejects.toThrow(
         GeminiAPIError
       )
-    })
+    }, 10000)
 
     it('should trim whitespace from content', async () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -262,6 +270,34 @@ describe('GeminiClient', () => {
       const response = await client.generateContent(mockRequest)
       expect(response.content).toBe('Part 1. Part 2. Part 3.')
     })
+
+    it('should retry on 503 errors and succeed', async () => {
+      // First two attempts fail with 503, third succeeds
+      ;(global.fetch as jest.Mock)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 503,
+          text: async () =>
+            JSON.stringify({
+              error: { message: 'Service unavailable' },
+            }),
+        })
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 503,
+          text: async () =>
+            JSON.stringify({
+              error: { message: 'Service unavailable' },
+            }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockSuccessResponse,
+        })
+
+      const response = await client.generateContent(mockRequest)
+      expect(response.content).toBe('Hello! How can I help you?')
+    }, 10000)
 
     it('should include generation config in request', async () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({
@@ -487,9 +523,12 @@ describe('GeminiClient', () => {
     })
 
     it('should return false on connection failure', async () => {
-      ;(global.fetch as jest.Mock).mockRejectedValueOnce(
-        new Error('Network error')
-      )
+      // Mock all retry attempts to fail
+      ;(global.fetch as jest.Mock)
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockRejectedValueOnce(new Error('Network error'))
 
       const consoleErrorSpy = jest
         .spyOn(console, 'error')
@@ -500,7 +539,7 @@ describe('GeminiClient', () => {
       expect(consoleErrorSpy).toHaveBeenCalled()
 
       consoleErrorSpy.mockRestore()
-    })
+    }, 10000)
 
     it('should use 100 maxTokens for thinking mode', async () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({

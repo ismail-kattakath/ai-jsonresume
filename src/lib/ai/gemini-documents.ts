@@ -53,15 +53,13 @@ export async function generateCoverLetterWithGemini(
     topP: 0.9,
   }
 
-  // Use streaming if callback provided, otherwise use regular request
-  let generatedContent: string
-
-  if (onProgress) {
-    generatedContent = await client.generateContentStream(request, onProgress)
-  } else {
-    const response = await client.generateContent(request)
-    generatedContent = response.content
-  }
+  // ALWAYS use streaming for Gemini to avoid truncation with long responses
+  // Provide a no-op callback if none was provided
+  const streamCallback: StreamCallback = onProgress || (() => {})
+  const generatedContent = await client.generateContentStream(
+    request,
+    streamCallback
+  )
 
   if (!generatedContent || generatedContent.trim().length === 0) {
     throw new GeminiAPIError(
@@ -122,15 +120,13 @@ export async function generateSummaryWithGemini(
     topP: 0.9,
   }
 
-  // Use streaming if callback provided, otherwise use regular request
-  let generatedContent: string
-
-  if (onProgress) {
-    generatedContent = await client.generateContentStream(request, onProgress)
-  } else {
-    const response = await client.generateContent(request)
-    generatedContent = response.content
-  }
+  // ALWAYS use streaming for Gemini to avoid truncation with long responses
+  // Provide a no-op callback if none was provided
+  const streamCallback: StreamCallback = onProgress || (() => {})
+  const generatedContent = await client.generateContentStream(
+    request,
+    streamCallback
+  )
 
   if (!generatedContent || generatedContent.trim().length === 0) {
     throw new GeminiAPIError(

@@ -15,6 +15,8 @@ import type { StreamCallback } from '@/types/openai'
 const DEFAULT_GEMINI_BASE_URL =
   'https://generativelanguage.googleapis.com/v1beta'
 const REQUEST_TIMEOUT = 120000 // 120 seconds
+const MAX_RETRIES = 3 // Retry up to 3 times for 503 errors
+const RETRY_DELAY_MS = 1000 // Start with 1 second delay
 
 /**
  * Gemini-specific types
@@ -73,6 +75,56 @@ export class GeminiAPIError extends Error {
     super(message)
     this.name = 'GeminiAPIError'
   }
+}
+
+/**
+ * Sleep utility for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * Retry wrapper for fetch calls with exponential backoff
+ * Retries on 503 (Service Unavailable) and 429 (Rate Limit) errors
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries: number = MAX_RETRIES
+): Promise<Response> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, options)
+
+      // Check for retryable errors
+      if (response.status === 503 || response.status === 429) {
+        if (attempt < retries) {
+          const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt) // Exponential backoff
+          console.warn(
+            `[Gemini] ${response.status} error, retrying in ${delayMs}ms (attempt ${attempt + 1}/${retries})...`
+          )
+          await sleep(delayMs)
+          continue
+        }
+      }
+
+      return response
+    } catch (error) {
+      if (attempt < retries) {
+        const delayMs = RETRY_DELAY_MS * Math.pow(2, attempt)
+        console.warn(
+          `[Gemini] Network error, retrying in ${delayMs}ms (attempt ${attempt + 1}/${retries})...`
+        )
+        await sleep(delayMs)
+        continue
+      }
+      throw error
+    }
+  }
+
+  // This shouldn't be reached, but TypeScript needs it
+  throw new Error('Retry logic error')
 }
 
 /**
@@ -150,7 +202,7 @@ export class GeminiClient implements IAIProvider {
         geminiRequest.systemInstruction = systemInstruction
       }
 
-      const response = await fetch(this.buildEndpoint(false), {
+      const response = await fetchWithRetry(this.buildEndpoint(false), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -270,7 +322,7 @@ export class GeminiClient implements IAIProvider {
         geminiRequest.systemInstruction = systemInstruction
       }
 
-      const response = await fetch(this.buildEndpoint(true), {
+      const response = await fetchWithRetry(this.buildEndpoint(true), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -304,6 +356,7 @@ export class GeminiClient implements IAIProvider {
       const decoder = new TextDecoder()
       let fullContent = ''
       let buffer = ''
+      let lastFinishReason: string | undefined
 
       while (true) {
         const { done, value } = await reader.read()
@@ -338,18 +391,47 @@ export class GeminiClient implements IAIProvider {
                 done: false,
               })
             }
+
+            // Track finish reason
+            const finishReason = chunk.candidates[0]?.finishReason
+            if (finishReason) {
+              lastFinishReason = finishReason
+              console.log('[Gemini] Finish reason:', finishReason)
+            }
           } catch {
             console.warn('Failed to parse SSE chunk:', jsonStr)
           }
         }
       }
 
+      // Check for empty content and provide context
       if (!fullContent || fullContent.trim().length === 0) {
+        if (lastFinishReason === 'MAX_TOKENS') {
+          throw new GeminiAPIError(
+            'Response exceeded max tokens. The model ran out of space to generate content. Try a simpler prompt or increase maxTokens.',
+            'max_tokens_exceeded'
+          )
+        } else if (lastFinishReason === 'SAFETY') {
+          throw new GeminiAPIError(
+            'Response was blocked by safety filters. Try rephrasing your request.',
+            'safety_filter'
+          )
+        } else if (lastFinishReason === 'RECITATION') {
+          throw new GeminiAPIError(
+            'Response was blocked due to potential copyright concerns. Try rephrasing your request.',
+            'recitation_blocked'
+          )
+        }
         throw new GeminiAPIError(
-          'Gemini generated an empty response. Please try again.',
+          `Gemini generated an empty response (finish_reason: ${lastFinishReason || 'unknown'}). Please try again.`,
           'empty_response'
         )
       }
+
+      // Log successful completion
+      console.log(
+        `[Gemini] Streaming complete: ${fullContent.length} chars (finish_reason: ${lastFinishReason || 'STOP'})`
+      )
 
       return fullContent
     } catch (error) {
