@@ -55,11 +55,14 @@ export interface OpenAIError {
   }
 }
 
+import type { AIProviderType } from './ai-provider'
+
 export interface StoredCredentials {
   apiUrl: string
   apiKey: string
   model?: string
   providerName?: string
+  providerType?: AIProviderType // Type of provider (openai-compatible or gemini)
   rememberCredentials: boolean
   lastJobDescription?: string
 }

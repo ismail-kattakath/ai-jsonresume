@@ -81,7 +81,7 @@ describe('AISettings Component', () => {
       expect(select.value).toBe('OpenRouter')
     })
 
-    it('updates URL when provider is changed', () => {
+    it('updates URL and provider type when provider is changed', () => {
       render(<AISettings />)
       const select = screen.getByLabelText('AI Provider')
 
@@ -89,6 +89,7 @@ describe('AISettings Component', () => {
 
       expect(mockUpdateSettings).toHaveBeenCalledWith({
         apiUrl: 'https://openrouter.ai/api/v1',
+        providerType: 'openai-compatible',
       })
     })
 

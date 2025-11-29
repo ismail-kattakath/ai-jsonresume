@@ -43,6 +43,7 @@ describe('AISettingsContext', () => {
         apiUrl: 'https://api.openai.com/v1',
         apiKey: '',
         model: 'gpt-4o-mini',
+        providerType: 'openai-compatible',
         jobDescription: expect.any(String),
         rememberCredentials: true,
       })

@@ -2,15 +2,29 @@
 
 ## Overview
 
-The AI Content Generator is a client-side feature that allows users to automatically generate AI-powered content for their portfolio. It integrates with OpenAI-compatible APIs to create professional, tailored content including:
+The AI Content Generator is a client-side feature that allows users to automatically generate AI-powered content for their portfolio. It supports multiple AI providers to create professional, tailored content including:
 
 - **Cover Letters**: Customized cover letters based on resume data and job descriptions
 - **Professional Summaries**: Compelling resume summaries highlighting key strengths and experience
 
+**Supported AI Providers:**
+
+1. **Google Gemini** (Recommended)
+   - Native integration with Gemini API
+   - Models: `gemini-2.5-flash`, `gemini-2.5-pro`, `gemini-1.5-flash`, `gemini-1.5-pro`
+   - Free tier available at [aistudio.google.com](https://aistudio.google.com)
+   - Best for: High-quality, fast responses with thinking mode
+
+2. **OpenAI-Compatible APIs**
+   - OpenAI (GPT-4, GPT-3.5)
+   - OpenRouter (access to multiple providers)
+   - xAI (Grok models)
+   - Azure OpenAI
+   - Local LLM servers (LM Studio, Ollama, etc.)
+
 **Requirements:**
 
-- OpenAI API credentials (API key)
-- OpenAI-compatible API endpoint (OpenAI, Azure OpenAI, or local LLM servers like LM Studio)
+- API credentials (API key) for your chosen provider
 - Internet connection (for remote APIs) or local AI server running
 
 ## Features
@@ -358,56 +372,62 @@ Full model list: https://openrouter.ai/models
    - API Key: Your Azure API key
    - Model: Your deployment name
 
-### Option 3: Google Gemini
+### Option 3: Google Gemini (Native Support) ⭐
 
-You have **two options** for using Google Gemini models:
+**Direct Google Gemini API integration** - no intermediaries required!
 
-#### **Option 3A: Via OpenRouter (Recommended - Works Now)**
+1. **Get Gemini API Key** (Free!)
+   - Visit https://aistudio.google.com/apikey
+   - Sign in with Google account
+   - Create API key (starts with `AIza...`)
+   - Free tier: 15 requests per minute, 1 million tokens per day
 
-The easiest way to use Gemini with this application. OpenRouter provides OpenAI-compatible access to Gemini and 100+ other models.
+2. **Configure in Application**
+   - Provider: Select **"Google Gemini"** from dropdown
+   - API Key: Your Gemini API key (e.g., `AIzaSy...`)
+   - Model: Choose from:
+     - `gemini-2.5-flash` - **Recommended** - Fast, high-quality, with thinking mode
+     - `gemini-2.5-pro` - Most capable, deeper reasoning
+     - `gemini-1.5-flash` - Fast and efficient (no thinking mode)
+     - `gemini-1.5-pro` - Previous generation, still very capable
 
-**Setup:**
+3. **Features**
+   - ✨ **Thinking Mode**: Gemini 2.5 models use internal reasoning for better quality
+   - 🚀 **Streaming**: Real-time content generation
+   - 🔄 **Auto-Retry**: Handles temporary 503/429 errors automatically
+   - 📊 **Smart Tokens**: Optimized limits (4096-8192 tokens) for complete responses
+   - 🆓 **Free Tier**: Very generous free quota for personal use
+
+**Why Gemini?**
+
+- ✅ Excellent quality, especially for professional writing
+- ✅ Free tier with high limits
+- ✅ No credit card required to start
+- ✅ Native integration (direct API, no intermediary)
+- ✅ Automatic handling of thinking mode token consumption
+
+**Alternative: Via OpenRouter**
+
+You can also access Gemini through OpenRouter if you prefer:
 
 1. Create account at https://openrouter.ai
 2. Get API key from https://openrouter.ai/keys (starts with `sk-or-v1-...`)
 3. Configure in application:
+   - Provider: Select **"OpenAI Compatible"**
    - API URL: `https://openrouter.ai/api/v1`
    - API Key: Your OpenRouter key
    - Model: `google/gemini-2.0-flash-exp` (or any Gemini model)
 
-**Available Gemini Models:**
+**Pros of OpenRouter:**
 
-- `google/gemini-2.0-flash-exp` - Latest experimental (free tier!)
-- `google/gemini-2.0-flash-thinking-exp:free` - Thinking mode (free)
-- `google/gemini-1.5-pro` - Most capable
-- `google/gemini-1.5-flash` - Fast and efficient
+- Access to 100+ models (Claude, GPT, Llama, etc.) with one API key
+- Unified billing across providers
 
-**Pros:**
+**Pros of Direct Gemini:**
 
-- ✅ Works immediately with existing integration
-- ✅ No code changes needed
-- ✅ Access to 100+ other models (Claude, GPT, Llama, etc.)
-- ✅ Gemini free tier passed through
-- ✅ Still BYOK (you manage your OpenRouter account)
-
-**Cons:**
-
-- ⚠️ Adds OpenRouter as intermediary (still secure and private)
-
-#### **Option 3B: Direct Google API (Coming Soon)**
-
-For users who prefer direct Google API access without intermediaries:
-
-**Future Implementation:**
-
-- Get API key from https://aistudio.google.com/apikey
-- Use `https://generativelanguage.googleapis.com/v1beta` as base URL
-- Native Gemini API support is planned
-
-**Status:**
-
-- 📋 Track progress: See GitHub Issues
-- 🔧 For now, use Option 3A (OpenRouter) for immediate Gemini access
+- No intermediary
+- Free tier directly from Google
+- Native API features (thinking mode, optimal streaming)
 
 ### Option 4: Local AI Server (LM Studio)
 
