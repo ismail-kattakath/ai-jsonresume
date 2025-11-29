@@ -43,6 +43,7 @@ jest.mock('@/lib/resumeAdapter', () => ({
 describe('ResumePage', () => {
   let originalPrint: () => void
   let printSpy: jest.Mock
+  let mockURLSearchParams: jest.SpyInstance
 
   beforeEach(() => {
     originalPrint = window.print
@@ -53,12 +54,20 @@ describe('ResumePage', () => {
     // Mock localStorage
     Storage.prototype.getItem = jest.fn()
     Storage.prototype.setItem = jest.fn()
+
+    // Default mock for URLSearchParams (no autoprint)
+    mockURLSearchParams = jest
+      .spyOn(window, 'URLSearchParams' as any)
+      .mockReturnValue({
+        get: jest.fn().mockReturnValue(null),
+      } as any)
   })
 
   afterEach(() => {
     window.print = originalPrint
     jest.useRealTimers()
     jest.clearAllMocks()
+    mockURLSearchParams.mockRestore()
   })
 
   it('should render resume preview', () => {
@@ -75,7 +84,12 @@ describe('ResumePage', () => {
     expect(printButton).toHaveTextContent('Print Resume for John Doe')
   })
 
-  it('should auto-trigger print dialog after delay', () => {
+  it('should auto-trigger print dialog when autoprint param is true', () => {
+    // Mock URLSearchParams to return 'true' for autoprint
+    mockURLSearchParams.mockReturnValue({
+      get: jest.fn((key: string) => (key === 'autoprint' ? 'true' : null)),
+    } as any)
+
     render(<ResumePage />)
 
     expect(printSpy).not.toHaveBeenCalled()
@@ -83,6 +97,22 @@ describe('ResumePage', () => {
     jest.advanceTimersByTime(500)
 
     expect(printSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should NOT auto-trigger print dialog when autoprint param is missing', () => {
+    // Mock URLSearchParams to return null (default setup in beforeEach)
+    mockURLSearchParams.mockReturnValue({
+      get: jest.fn().mockReturnValue(null),
+    } as any)
+
+    render(<ResumePage />)
+
+    expect(printSpy).not.toHaveBeenCalled()
+
+    jest.advanceTimersByTime(500)
+
+    // Should still not be called
+    expect(printSpy).not.toHaveBeenCalled()
   })
 
   it('should set document title with formatted name', () => {

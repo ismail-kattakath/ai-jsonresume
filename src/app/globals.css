@@ -408,6 +408,14 @@ body {
   background-position: right 12px center;
 }
 
+/* iOS Safe Area Support for Floating Buttons */
+@supports (padding: max(0px)) {
+  .safe-area-inset {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px) !important;
+    padding-right: max(env(safe-area-inset-right), 0px) !important;
+  }
+}
+
 /* Print Styles - Override screen-specific layout for printing */
 @media print {
   .preview {

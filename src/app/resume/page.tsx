@@ -34,12 +34,14 @@ export default function ResumeDownloadPage() {
       document.title = `${formatName(loadedData.name)}-Resume`
     }
 
-    // Auto-trigger print dialog after a short delay
-    const timer = setTimeout(() => {
-      window.print()
-    }, 500)
-
-    return () => clearTimeout(timer)
+    // Auto-trigger print dialog only if URL param is present
+    const searchParams = new URLSearchParams(window.location.search)
+    if (searchParams.get('autoprint') === 'true') {
+      const timer = setTimeout(() => {
+        window.print()
+      }, 500)
+      return () => clearTimeout(timer)
+    }
   }, [])
 
   return (
@@ -54,7 +56,7 @@ export default function ResumeDownloadPage() {
     >
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 print:bg-white">
         {/* Floating Print Button - Hidden on print */}
-        <div className="exclude-print fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 md:top-auto md:right-8 md:bottom-8 md:left-auto md:translate-x-0 md:translate-y-0">
+        <div className="exclude-print safe-area-inset fixed right-4 bottom-16 z-50 md:right-8 md:bottom-8">
           <PrintButton name={resumeData.name} documentType="Resume" />
         </div>
 
