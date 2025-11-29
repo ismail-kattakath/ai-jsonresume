@@ -20,3 +20,8 @@ coverage/
 # TypeScript
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Test scripts (use tests/ directory instead)
+# Prevent committing ad-hoc test files to project root
+test-*.mjs
+test-*.js
