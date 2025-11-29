@@ -2,12 +2,15 @@
  * AI Provider presets for easy configuration
  */
 
+import type { AIProviderType } from '@/types/ai-provider'
+
 export interface ProviderPreset {
   name: string
   baseURL: string
   description: string
   supportsModels: boolean // Whether it supports /v1/models endpoint
   requiresAuth: boolean // Whether it requires API key to list models
+  providerType: AIProviderType // Type of provider (openai-compatible or gemini)
   commonModels?: string[] // Common models for this provider (fallback)
 }
 
@@ -18,6 +21,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     description: 'Official OpenAI API (GPT-4, GPT-4o, GPT-4o-mini)',
     supportsModels: true,
     requiresAuth: true,
+    providerType: 'openai-compatible',
     commonModels: [
       'gpt-4o',
       'gpt-4o-mini',
@@ -32,6 +36,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     description: 'Access 100+ models (Gemini, Claude, GPT, Llama, etc.)',
     supportsModels: true,
     requiresAuth: true,
+    providerType: 'openai-compatible',
     commonModels: [
       'google/gemini-2.0-flash-exp',
       'google/gemini-2.0-flash-thinking-exp:free',
@@ -41,11 +46,26 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     ],
   },
   {
+    name: 'Google Gemini',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta',
+    description: 'Direct Google Gemini API (native, not via OpenRouter)',
+    supportsModels: false, // Gemini doesn't have a models list endpoint
+    requiresAuth: true,
+    providerType: 'gemini',
+    commonModels: [
+      'gemini-2.5-flash',
+      'gemini-2.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-pro',
+    ],
+  },
+  {
     name: 'xAI (Grok)',
     baseURL: 'https://api.x.ai/v1',
     description: 'xAI Grok models',
     supportsModels: true,
     requiresAuth: true,
+    providerType: 'openai-compatible',
     commonModels: ['grok-beta', 'grok-vision-beta'],
   },
   {
@@ -54,6 +74,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     description: 'Local AI server (LM Studio, Ollama, etc.)',
     supportsModels: true,
     requiresAuth: false,
+    providerType: 'openai-compatible',
     commonModels: [
       'llama-3.1-8b-instruct',
       'llama-3.3-70b-instruct',
@@ -67,6 +88,8 @@ export const CUSTOM_PROVIDER: ProviderPreset = {
   baseURL: '',
   description: 'Enter your own API URL',
   supportsModels: false,
+  requiresAuth: true,
+  providerType: 'openai-compatible', // Default to OpenAI-compatible for custom
 }
 
 /**

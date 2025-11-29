@@ -57,7 +57,10 @@ const AISettings: React.FC = () => {
     // Find the preset and update URL
     const preset = PROVIDER_PRESETS.find((p) => p.name === providerName)
     if (preset) {
-      updateSettings({ apiUrl: preset.baseURL })
+      updateSettings({
+        apiUrl: preset.baseURL,
+        providerType: preset.providerType,
+      })
       setCustomURL('')
       setAvailableModels([]) // Clear models when changing provider
 

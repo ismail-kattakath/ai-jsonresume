@@ -172,10 +172,14 @@ describe('AI Providers', () => {
       })
     })
 
-    it('all base URLs end with /v1 or /api/v1', () => {
+    it('all base URLs end with /v1, /api/v1, or /v1beta (Gemini)', () => {
       PROVIDER_PRESETS.forEach((provider) => {
         const url = provider.baseURL.toLowerCase()
-        expect(url.endsWith('/v1') || url.endsWith('/api/v1')).toBe(true)
+        const isValid =
+          url.endsWith('/v1') ||
+          url.endsWith('/api/v1') ||
+          url.endsWith('/v1beta')
+        expect(isValid).toBe(true)
       })
     })
   })

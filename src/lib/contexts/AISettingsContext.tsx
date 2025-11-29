@@ -9,6 +9,7 @@ import {
   useRef,
   ReactNode,
 } from 'react'
+import type { AIProviderType } from '@/types/ai-provider'
 import {
   loadCredentials,
   saveCredentials,
@@ -70,6 +71,7 @@ export interface AISettings {
   apiUrl: string
   apiKey: string
   model: string
+  providerType: AIProviderType
   jobDescription: string
   rememberCredentials: boolean
 }
@@ -89,6 +91,7 @@ const defaultSettings: AISettings = {
   apiUrl: DEFAULT_API_URL,
   apiKey: DEFAULT_API_KEY,
   model: DEFAULT_MODEL,
+  providerType: 'openai-compatible',
   jobDescription: DEFAULT_JOB_DESCRIPTION,
   rememberCredentials: true,
 }
@@ -161,6 +164,7 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
         apiUrl: saved.apiUrl || DEFAULT_API_URL,
         apiKey: saved.apiKey || DEFAULT_API_KEY,
         model: saved.model || DEFAULT_MODEL,
+        providerType: saved.providerType || 'openai-compatible',
         rememberCredentials: true,
         jobDescription: saved.lastJobDescription || DEFAULT_JOB_DESCRIPTION,
       }))
@@ -207,6 +211,7 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
       apiUrl: settings.apiUrl,
       apiKey: settings.apiKey,
       model: settings.model,
+      providerType: settings.providerType,
       rememberCredentials: settings.rememberCredentials,
       lastJobDescription: settings.jobDescription,
     })
