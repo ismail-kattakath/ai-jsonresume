@@ -55,7 +55,7 @@ export default function ResumeDownloadPage() {
     >
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 print:bg-white">
         {/* Floating Print Button - Hidden on print */}
-        <div className="exclude-print fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 md:top-auto md:right-8 md:bottom-8 md:left-auto md:translate-x-0 md:translate-y-0">
+        <div className="exclude-print fixed right-8 bottom-8 z-50">
           <PrintButton name={resumeData.name} documentType="Resume" />
         </div>
 
