@@ -60,7 +60,7 @@ export default function ResumeDownloadPage() {
         </div>
 
         {/* Resume Content */}
-        <div className="flex min-h-screen items-start justify-center px-4 py-8 md:px-4 print:px-0 print:py-0">
+        <div className="flex min-h-screen items-start justify-center py-8 md:px-4 print:px-0 print:py-0">
           <ScaledPreviewWrapper>
             <Preview />
           </ScaledPreviewWrapper>
