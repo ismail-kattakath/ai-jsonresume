@@ -49,7 +49,7 @@ export async function generateCoverLetterWithGemini(
   const request: AIRequest = {
     messages,
     temperature: 0.7,
-    maxTokens: 2000, // Increased for Gemini 2.5 thinking mode (uses ~1200 tokens for thinking)
+    maxTokens: 8192, // High limit for Gemini 2.5 (thinking mode uses 1200-1500 tokens, leaving plenty for actual content)
     topP: 0.9,
   }
 
@@ -116,7 +116,7 @@ export async function generateSummaryWithGemini(
   const request: AIRequest = {
     messages,
     temperature: 0.7,
-    maxTokens: 1500, // Increased for Gemini 2.5 thinking mode (uses ~1200 tokens for thinking)
+    maxTokens: 4096, // High limit for Gemini 2.5 (thinking mode uses 1200-1500 tokens, leaving plenty for actual content)
     topP: 0.9,
   }
 
