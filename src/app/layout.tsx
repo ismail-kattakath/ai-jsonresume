@@ -4,7 +4,6 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import BackgroundImage from '@/components/BackgroundImage'
 import { generateSiteMetadata } from '@/config/metadata'
-import { ThemeProvider } from '@/components/ThemeProvider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <meta name="theme-color" content="#1a182a" />
         <meta
@@ -36,7 +35,7 @@ export default function RootLayout({
         <meta
           name="theme-color"
           media="(prefers-color-scheme: light)"
-          content="#fffbfe"
+          content="#1a182a"
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
@@ -54,13 +53,11 @@ export default function RootLayout({
           minHeight: '100vh',
         }}
       >
-        <ThemeProvider>
-          <BackgroundImage withBlur withOverlay />
-          {children}
-          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
-            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-          )}
-        </ThemeProvider>
+        <BackgroundImage withBlur withOverlay />
+        {children}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+        )}
       </body>
     </html>
   )
