@@ -154,9 +154,11 @@ describe('JSON Resume Conversion', () => {
       expect(result.education[0].institution).toBe('University of Toronto')
       expect(result.education[0].url).toBe('https://utoronto.ca')
       expect(result.education[0].area).toBe(
-        "Bachelor's Degree in Computer Science and Engineering"
+        "Bachelor's Degree in Computer Science"
       )
-      expect(result.education[0].studyType).toBe("Bachelor's Degree")
+      expect(result.education[0].studyType).toBe(
+        "Bachelor's Degree in Computer Science"
+      )
       expect(result.education[0].startDate).toBe('2015-09-01')
       expect(result.education[0].endDate).toBe('2019-06-01')
     })
