@@ -47,7 +47,8 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
   const education = (jsonResume.education || []).map((edu) => ({
     school: edu.institution || '',
     url: stripProtocol(edu.url || ''),
-    degree: edu.studyType || '',
+    studyType: edu.studyType || '',
+    area: edu.area || '',
     startYear: edu.startDate || '',
     endYear: edu.endDate || '',
   }))

@@ -321,7 +321,9 @@ const Preview = () => {
                           contentEditable={editable}
                           suppressContentEditableWarning
                         >
-                          {item.degree}
+                          {item.studyType && item.area
+                            ? `${item.studyType} in ${item.area}`
+                            : item.studyType || item.area}
                         </p>
                         {item.url ? (
                           <a

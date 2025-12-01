@@ -28,7 +28,8 @@ export interface WorkExperience {
 export interface Education {
   school: string
   url: string
-  degree: string
+  studyType: string
+  area: string
   startYear: string
   endYear: string
 }

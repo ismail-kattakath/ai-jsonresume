@@ -41,12 +41,12 @@ export function convertToJSONResume(customData?: ResumeData) {
     keywords: job.technologies || [],
   }))
 
-  // Convert education
+  // Convert education - split degree back into studyType and area
   const education = data.education.map((edu: Education) => ({
     institution: edu.school,
     url: edu.url ? ensureProtocol(edu.url) : undefined,
-    area: 'Computer Science and Engineering',
-    studyType: "Bachelor's Degree",
+    area: edu.area,
+    studyType: edu.studyType,
     startDate: edu.startYear,
     endDate: edu.endYear,
   }))
@@ -188,7 +188,8 @@ export function convertFromJSONResume(
     const education = (jsonResume.education || []).map((edu) => ({
       school: edu.institution || '',
       url: edu.url?.replace(/^https?:\/\//, '') || '',
-      degree: edu.studyType || '',
+      studyType: edu.studyType || '',
+      area: edu.area || '',
       startYear: edu.startDate || '',
       endYear: edu.endDate || '',
     }))

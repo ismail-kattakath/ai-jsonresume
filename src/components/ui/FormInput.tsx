@@ -43,8 +43,8 @@ export function FormInput({
   const inputId = `input-${name}`
 
   return (
-    <div className="space-y-1">
-      <div className={`floating-label-group ${className}`}>
+    <div className={`space-y-1 ${className}`}>
+      <div className="floating-label-group">
         <input
           id={inputId}
           type={inputType}

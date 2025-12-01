@@ -77,7 +77,8 @@ describe('Education Component', () => {
           {
             school: 'Test University',
             url: 'test.edu',
-            degree: 'Bachelor of Science',
+            studyType: "Bachelor's Degree",
+            area: 'Science',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -90,7 +91,8 @@ describe('Education Component', () => {
 
       expect(screen.getByText('Institution Name')).toBeInTheDocument()
       expect(screen.getByText('Website URL')).toBeInTheDocument()
-      expect(screen.getByText('Degree / Program')).toBeInTheDocument()
+      expect(screen.getByText('Degree Type')).toBeInTheDocument()
+      expect(screen.getByText('Field of Study')).toBeInTheDocument()
       expect(screen.getAllByText('Start Date')[0]).toBeInTheDocument()
       expect(screen.getAllByText('End Date')[0]).toBeInTheDocument()
     })
@@ -102,7 +104,8 @@ describe('Education Component', () => {
           {
             school: 'MIT',
             url: 'mit.edu',
-            degree: 'Computer Science',
+            studyType: "Bachelor's Degree",
+            area: 'Computer Science',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -119,13 +122,17 @@ describe('Education Component', () => {
       const urlInput = container.querySelector(
         'input[name="url"]'
       ) as HTMLInputElement
-      const degreeInput = container.querySelector(
-        'input[name="degree"]'
+      const studyTypeInput = container.querySelector(
+        'input[name="studyType"]'
+      ) as HTMLInputElement
+      const areaInput = container.querySelector(
+        'input[name="area"]'
       ) as HTMLInputElement
 
       expect(schoolInput?.value).toBe('MIT')
       expect(urlInput?.value).toBe('mit.edu')
-      expect(degreeInput?.value).toBe('Computer Science')
+      expect(studyTypeInput?.value).toBe("Bachelor's Degree")
+      expect(areaInput?.value).toBe('Computer Science')
     })
 
     it('should render add button with FormButton', () => {
@@ -141,14 +148,16 @@ describe('Education Component', () => {
           {
             school: 'University 1',
             url: 'uni1.edu',
-            degree: 'Degree 1',
+            studyType: "Bachelor's Degree",
+            area: 'Field 1',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
           {
             school: 'University 2',
             url: 'uni2.edu',
-            degree: 'Degree 2',
+            studyType: "Master's Degree",
+            area: 'Field 2',
             startYear: '2019-09-01',
             endYear: '2021-06-01',
           },
@@ -172,7 +181,8 @@ describe('Education Component', () => {
           {
             school: 'Existing University',
             url: 'existing.edu',
-            degree: 'Existing Degree',
+            studyType: "Bachelor's Degree",
+            area: 'Existing Field',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -195,7 +205,14 @@ describe('Education Component', () => {
           ...mockData,
           education: [
             ...mockData.education,
-            { school: '', url: '', degree: '', startYear: '', endYear: '' },
+            {
+              school: '',
+              url: '',
+              studyType: '',
+              area: '',
+              startYear: '',
+              endYear: '',
+            },
           ],
         })
       }
@@ -209,7 +226,8 @@ describe('Education Component', () => {
           {
             school: 'Test University',
             url: 'test.edu',
-            degree: 'Test Degree',
+            studyType: "Bachelor's Degree",
+            area: 'Test Field',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -240,7 +258,8 @@ describe('Education Component', () => {
           {
             school: 'Test University',
             url: 'test.edu',
-            degree: 'Test Degree',
+            studyType: "Bachelor's Degree",
+            area: 'Test Field',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -268,14 +287,16 @@ describe('Education Component', () => {
           {
             school: 'University 1',
             url: 'uni1.edu',
-            degree: 'Degree 1',
+            studyType: "Bachelor's Degree",
+            area: 'Field 1',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
           {
             school: 'University 2',
             url: 'uni2.edu',
-            degree: 'Degree 2',
+            studyType: "Master's Degree",
+            area: 'Field 2',
             startYear: '2019-09-01',
             endYear: '2021-06-01',
           },
@@ -314,7 +335,8 @@ describe('Education Component', () => {
           {
             school: '',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -346,7 +368,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -372,14 +395,15 @@ describe('Education Component', () => {
       }
     })
 
-    it('should handle degree changes', () => {
+    it('should handle studyType changes', () => {
       const mockSetResumeData = jest.fn()
       const mockData = createMockResumeData({
         education: [
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -393,11 +417,44 @@ describe('Education Component', () => {
         },
       })
 
-      const degreeInput = container.querySelector('input[name="degree"]')
+      const studyTypeInput = container.querySelector('input[name="studyType"]')
 
-      if (degreeInput) {
-        fireEvent.change(degreeInput, {
-          target: { name: 'degree', value: 'Master of Science' },
+      if (studyTypeInput) {
+        fireEvent.change(studyTypeInput, {
+          target: { name: 'studyType', value: "Master's Degree" },
+        })
+
+        expect(mockSetResumeData).toHaveBeenCalled()
+      }
+    })
+
+    it('should handle area changes', () => {
+      const mockSetResumeData = jest.fn()
+      const mockData = createMockResumeData({
+        education: [
+          {
+            school: 'Test',
+            url: '',
+            studyType: '',
+            area: '',
+            startYear: '',
+            endYear: '',
+          },
+        ],
+      })
+
+      const { container } = renderWithContext(<Education />, {
+        contextValue: {
+          resumeData: mockData,
+          setResumeData: mockSetResumeData,
+        },
+      })
+
+      const areaInput = container.querySelector('input[name="area"]')
+
+      if (areaInput) {
+        fireEvent.change(areaInput, {
+          target: { name: 'area', value: 'Computer Science' },
         })
 
         expect(mockSetResumeData).toHaveBeenCalled()
@@ -411,7 +468,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -443,7 +501,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '2015-09-01',
             endYear: '',
           },
@@ -476,7 +535,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -491,8 +551,8 @@ describe('Education Component', () => {
         '.floating-label-group'
       )
 
-      // Should have 5 groups per entry (school, url, degree, startYear, endYear)
-      expect(floatingLabelGroups.length).toBe(5)
+      // Should have 6 groups per entry (school, url, studyType, area, startYear, endYear)
+      expect(floatingLabelGroups.length).toBe(6)
     })
 
     it('should have floating-label class on all labels', () => {
@@ -501,7 +561,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -514,8 +575,8 @@ describe('Education Component', () => {
 
       const floatingLabels = container.querySelectorAll('.floating-label')
 
-      // Should have 5 labels per entry
-      expect(floatingLabels.length).toBe(5)
+      // Should have 6 labels per entry
+      expect(floatingLabels.length).toBe(6)
     })
   })
 
@@ -526,7 +587,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -549,7 +611,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -577,7 +640,8 @@ describe('Education Component', () => {
           {
             school: 'Test University',
             url: 'test.edu',
-            degree: 'Computer Science',
+            studyType: "Bachelor's Degree",
+            area: 'Computer Science',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -605,7 +669,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -629,7 +694,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -669,7 +735,8 @@ describe('Education Component', () => {
           {
             school: 'Test',
             url: '',
-            degree: '',
+            studyType: '',
+            area: '',
             startYear: '',
             endYear: '',
           },
@@ -702,7 +769,8 @@ describe('Education Component', () => {
           {
             school: "St. Mary's College",
             url: 'stmarys.edu',
-            degree: "Bachelor's Degree (Honours)",
+            studyType: "Bachelor's Degree",
+            area: 'Honours',
             startYear: '2015-09-01',
             endYear: '2019-06-01',
           },
@@ -716,12 +784,16 @@ describe('Education Component', () => {
       const schoolInput = container.querySelector(
         'input[name="school"]'
       ) as HTMLInputElement
-      const degreeInput = container.querySelector(
-        'input[name="degree"]'
+      const studyTypeInput = container.querySelector(
+        'input[name="studyType"]'
+      ) as HTMLInputElement
+      const areaInput = container.querySelector(
+        'input[name="area"]'
       ) as HTMLInputElement
 
       expect(schoolInput?.value).toBe("St. Mary's College")
-      expect(degreeInput?.value).toBe("Bachelor's Degree (Honours)")
+      expect(studyTypeInput?.value).toBe("Bachelor's Degree")
+      expect(areaInput?.value).toBe('Honours')
     })
   })
 
@@ -804,21 +876,24 @@ describe('Education Component', () => {
             {
               school: 'University A',
               url: 'ua.edu',
-              degree: 'BS Computer Science',
+              studyType: "Bachelor's Degree",
+              area: 'Computer Science',
               startYear: '2015-09-01',
               endYear: '2019-06-01',
             },
             {
               school: 'University B',
               url: 'ub.edu',
-              degree: 'MS Software Engineering',
+              studyType: "Master's Degree",
+              area: 'Software Engineering',
               startYear: '2019-09-01',
               endYear: '2021-06-01',
             },
             {
               school: 'University C',
               url: 'uc.edu',
-              degree: 'PhD Computer Science',
+              studyType: 'PhD',
+              area: 'Computer Science',
               startYear: '2021-09-01',
               endYear: '2024-06-01',
             },
@@ -895,28 +970,32 @@ describe('Education Component', () => {
             {
               school: 'A',
               url: '',
-              degree: 'Degree A',
+              studyType: 'Degree Type A',
+              area: 'Field A',
               startYear: '',
               endYear: '',
             },
             {
               school: 'B',
               url: '',
-              degree: 'Degree B',
+              studyType: 'Degree Type B',
+              area: 'Field B',
               startYear: '',
               endYear: '',
             },
             {
               school: 'C',
               url: '',
-              degree: 'Degree C',
+              studyType: 'Degree Type C',
+              area: 'Field C',
               startYear: '',
               endYear: '',
             },
             {
               school: 'D',
               url: '',
-              degree: 'Degree D',
+              studyType: 'Degree Type D',
+              area: 'Field D',
               startYear: '',
               endYear: '',
             },

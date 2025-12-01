@@ -23,7 +23,8 @@ const Education = () => {
     {
       school: '',
       url: '',
-      degree: '',
+      studyType: '',
+      area: '',
       startYear: '',
       endYear: '',
     },
@@ -78,7 +79,11 @@ const Education = () => {
                       header={
                         <AccordionHeader
                           title={education.school}
-                          subtitle={education.degree}
+                          subtitle={
+                            education.studyType && education.area
+                              ? `${education.studyType} in ${education.area}`
+                              : education.studyType || education.area
+                          }
                           placeholder="New Education"
                           isExpanded={isExpanded(index)}
                           onToggle={() => toggleExpanded(index)}
@@ -107,14 +112,24 @@ const Education = () => {
                       />
 
                       <FormInput
-                        label="Degree / Program"
-                        name="degree"
-                        value={education.degree}
+                        label="Degree Type"
+                        name="studyType"
+                        placeholder="e.g., Bachelor's Degree, Master's Degree"
+                        value={education.studyType}
                         onChange={(e) => handleChange(e, index)}
                         variant="indigo"
                       />
 
-                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                      <FormInput
+                        label="Field of Study"
+                        name="area"
+                        placeholder="e.g., Computer Science and Engineering"
+                        value={education.area}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="indigo"
+                      />
+
+                      <div className="flex w-full flex-col gap-3 sm:flex-row">
                         <FormInput
                           label="Start Date"
                           name="startYear"

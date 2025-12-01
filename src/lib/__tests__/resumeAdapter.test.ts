@@ -67,7 +67,8 @@ describe('Resume Adapter', () => {
     if (resumeData.education.length > 0) {
       const firstEdu = resumeData.education[0]
       expect(firstEdu).toHaveProperty('school')
-      expect(firstEdu).toHaveProperty('degree')
+      expect(firstEdu).toHaveProperty('studyType')
+      expect(firstEdu).toHaveProperty('area')
       expect(firstEdu).toHaveProperty('startYear')
       expect(firstEdu).toHaveProperty('endYear')
     }
@@ -316,7 +317,8 @@ describe('convertFromJSONResume - Edge Cases', () => {
       expect(result.education[0]).toEqual({
         school: '',
         url: '',
-        degree: '',
+        studyType: '',
+        area: '',
         startYear: '',
         endYear: '',
       })

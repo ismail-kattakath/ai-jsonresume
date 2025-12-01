@@ -23,7 +23,8 @@ describe('JSON Resume Conversion', () => {
         {
           school: 'University of Toronto',
           url: 'utoronto.ca',
-          degree: "Bachelor's Degree in Computer Science",
+          studyType: "Bachelor's Degree",
+          area: 'Computer Science',
           startYear: '2015-09-01',
           endYear: '2019-06-01',
         },
@@ -153,7 +154,7 @@ describe('JSON Resume Conversion', () => {
       expect(result.education).toHaveLength(1)
       expect(result.education[0].institution).toBe('University of Toronto')
       expect(result.education[0].url).toBe('https://utoronto.ca')
-      expect(result.education[0].area).toBe('Computer Science and Engineering')
+      expect(result.education[0].area).toBe('Computer Science')
       expect(result.education[0].studyType).toBe("Bachelor's Degree")
       expect(result.education[0].startDate).toBe('2015-09-01')
       expect(result.education[0].endDate).toBe('2019-06-01')
@@ -364,6 +365,47 @@ describe('JSON Resume Conversion', () => {
       // Calendar link is not in JSON Resume standard, so no assertion needed
       expect(result).toBeDefined()
     })
+
+    it('should handle projects with URLs', () => {
+      const mockData: ResumeData = {
+        ...mockResumeData,
+        projects: [
+          {
+            name: 'Open Source Project',
+            link: 'github.com/project',
+            description: 'A great project',
+            keyAchievements: [{ text: 'Achievement 1' }],
+            startYear: '2020-01',
+            endYear: '2021-12',
+          },
+        ],
+      }
+
+      const result = convertToJSONResume(mockData)
+      expect(result.projects).toHaveLength(1)
+      expect(result.projects[0].url).toBe('https://github.com/project')
+      expect(result.projects[0].name).toBe('Open Source Project')
+    })
+
+    it('should handle projects without URLs', () => {
+      const mockData: ResumeData = {
+        ...mockResumeData,
+        projects: [
+          {
+            name: 'Internal Project',
+            link: '',
+            description: 'Internal project',
+            keyAchievements: [],
+            startYear: '2020-01',
+            endYear: '2021-12',
+          },
+        ],
+      }
+
+      const result = convertToJSONResume(mockData)
+      expect(result.projects).toHaveLength(1)
+      expect(result.projects[0].url).toBeUndefined()
+    })
   })
 
   describe('convertFromJSONResume', () => {
@@ -519,7 +561,8 @@ describe('JSON Resume Conversion', () => {
       expect(result.education).toHaveLength(1)
       expect(result.education[0].school).toBe('University of British Columbia')
       expect(result.education[0].url).toBe('ubc.ca')
-      expect(result.education[0].degree).toBe('MBA')
+      expect(result.education[0].studyType).toBe('MBA')
+      expect(result.education[0].area).toBe('Business Administration')
       expect(result.education[0].startYear).toBe('2015-09-01')
       expect(result.education[0].endYear).toBe('2017-06-01')
     })
@@ -805,6 +848,27 @@ describe('JSON Resume Conversion', () => {
 
       expect(result).not.toBeNull()
       expect(result.education[0].url).toBe('')
+    })
+
+    it('should convert projects from JSON Resume with URLs', () => {
+      const jsonResume = {
+        ...mockJSONResume,
+        projects: [
+          {
+            name: 'Sample Project',
+            url: 'https://example.com/project',
+            description: 'Description',
+            highlights: ['Highlight 1'],
+            startDate: '2020-01',
+            endDate: '2021-12',
+          },
+        ],
+      }
+
+      const result = convertFromJSONResume(jsonResume)
+      expect(result?.projects).toHaveLength(1)
+      expect(result?.projects[0].link).toBe('example.com/project')
+      expect(result?.projects[0].name).toBe('Sample Project')
     })
   })
 })
