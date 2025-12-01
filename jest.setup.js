@@ -44,6 +44,11 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() {}
 }
 
+// Mock performance API for Next.js third-party scripts (Google Analytics)
+global.performance.mark = jest.fn()
+global.performance.measure = jest.fn()
+global.performance.getEntriesByName = jest.fn(() => [])
+
 // Mock DragAndDrop wrapper components for testing
 jest.mock('@/components/ui/DragAndDrop', () => ({
   DnDContext: ({ children, onDragEnd }) => (
