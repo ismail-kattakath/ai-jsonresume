@@ -1,4 +1,4 @@
-import { convertResumeToText, downloadResumeAsText } from '../txtExporter'
+import { convertResumeToText } from '../txtExporter'
 import { ResumeData } from '@/types/resume'
 
 describe('txtExporter', () => {
@@ -144,51 +144,6 @@ describe('txtExporter', () => {
       expect(result).toContain('Developer')
       expect(result).not.toContain('PROFESSIONAL SUMMARY')
       expect(result).not.toContain('WORK EXPERIENCE')
-    })
-  })
-
-  describe('downloadResumeAsText', () => {
-    beforeEach(() => {
-      // Mock DOM methods
-      document.body.appendChild = jest.fn()
-      document.body.removeChild = jest.fn()
-      global.URL.createObjectURL = jest.fn(() => 'blob:mock-url')
-      global.URL.revokeObjectURL = jest.fn()
-    })
-
-    it('should trigger download with correct filename', () => {
-      const clickSpy = jest.fn()
-      const createElementSpy = jest
-        .spyOn(document, 'createElement')
-        .mockReturnValue({
-          click: clickSpy,
-          href: '',
-          download: '',
-        } as unknown as HTMLAnchorElement)
-
-      downloadResumeAsText(mockResumeData, 'John_Doe_Resume')
-
-      expect(createElementSpy).toHaveBeenCalledWith('a')
-      expect(clickSpy).toHaveBeenCalled()
-      expect(document.body.appendChild).toHaveBeenCalled()
-      expect(document.body.removeChild).toHaveBeenCalled()
-
-      createElementSpy.mockRestore()
-    })
-
-    it('should create blob with correct type', () => {
-      const mockBlob = { size: 1000, type: 'text/plain;charset=utf-8' }
-      const BlobConstructor = jest.fn(() => mockBlob)
-      global.Blob = BlobConstructor as unknown as typeof Blob
-
-      downloadResumeAsText(mockResumeData, 'Test_Resume')
-
-      expect(BlobConstructor).toHaveBeenCalledWith(
-        expect.any(Array),
-        expect.objectContaining({
-          type: 'text/plain;charset=utf-8',
-        })
-      )
     })
   })
 })

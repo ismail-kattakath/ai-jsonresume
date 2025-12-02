@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { MdPictureAsPdf, MdTextFields, MdArrowDropDown } from 'react-icons/md'
+import { MdPictureAsPdf, MdContentCopy } from 'react-icons/md'
 import { generatePDFFilename } from '@/lib/filenameGenerator'
-import { downloadResumeAsText } from '@/lib/exporters/txtExporter'
+import { convertResumeToText } from '@/lib/exporters/txtExporter'
 import { ResumeData } from '@/types/resume'
+import { toast } from 'sonner'
 
 interface PrintButtonProps {
   name?: string
@@ -19,28 +19,7 @@ export default function PrintButton({
   documentType = 'Resume',
   resumeData,
 }: PrintButtonProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
   const handlePrint = () => {
-    setIsOpen(false)
     // Set document title for PDF filename
     if (name && position) {
       const originalTitle = document.title
@@ -65,60 +44,46 @@ export default function PrintButton({
     }
   }
 
-  const handleTextExport = () => {
-    setIsOpen(false)
-    if (resumeData && name && position) {
-      const filename = generatePDFFilename(
-        name,
-        position,
-        documentType
-      ).replace('.pdf', '')
-      downloadResumeAsText(resumeData, filename)
+  const handleCopyText = async () => {
+    if (!resumeData) {
+      toast.error('No resume data available to copy')
+      return
+    }
+
+    try {
+      const textContent = convertResumeToText(resumeData)
+      await navigator.clipboard.writeText(textContent)
+      toast.success('Resume copied to clipboard!')
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error)
+      toast.error('Failed to copy to clipboard')
     }
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <div className="flex rounded-full shadow-2xl">
-        {/* Main Print Button */}
-        <button
-          type="button"
-          onClick={handlePrint}
-          aria-label="Print to PDF"
-          className="group inline-flex cursor-pointer items-center gap-2 rounded-l-full bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3 text-sm font-medium text-white transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98] md:px-6"
-        >
-          <MdPictureAsPdf className="text-lg transition-transform group-hover:scale-110" />
-          <span className="hidden md:inline">Print</span>
-        </button>
+    <div className="flex rounded-full shadow-2xl">
+      {/* Print to PDF Button */}
+      <button
+        type="button"
+        onClick={handlePrint}
+        aria-label="Print to PDF"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-l-full bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3 text-sm font-medium text-white transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98] md:px-6"
+      >
+        <MdPictureAsPdf className="text-lg transition-transform group-hover:scale-110" />
+        <span className="hidden md:inline">Print</span>
+      </button>
 
-        {/* Dropdown Toggle */}
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Export options"
-          aria-expanded={isOpen}
-          className="rounded-r-full border-l border-purple-700/50 bg-gradient-to-r from-purple-600 to-pink-600 px-2 py-3 text-white transition-all hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98]"
-        >
-          <MdArrowDropDown
-            className={`text-xl transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-      </div>
-
-      {/* Dropdown Menu */}
-      {isOpen && (
-        <div className="absolute top-full right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border border-white/20 bg-gray-900 shadow-xl">
-          <button
-            type="button"
-            onClick={handleTextExport}
-            disabled={!resumeData}
-            className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent"
-          >
-            <MdTextFields className="text-lg text-green-400" />
-            <span>Export as Text</span>
-          </button>
-        </div>
-      )}
+      {/* Copy to Clipboard Button */}
+      <button
+        type="button"
+        onClick={handleCopyText}
+        disabled={!resumeData}
+        aria-label="Copy text to clipboard"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-r-full border-l border-purple-700/50 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3 text-sm font-medium text-white transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 md:px-6"
+      >
+        <MdContentCopy className="text-lg transition-transform group-hover:scale-110" />
+        <span className="hidden md:inline">Copy</span>
+      </button>
     </div>
   )
 }

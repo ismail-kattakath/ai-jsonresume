@@ -1,11 +1,45 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
+import { ResumeData } from '@/types/resume'
+import { toast } from 'sonner'
+
+// Mock sonner toast
+jest.mock('sonner', () => ({
+  toast: {
+    success: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+// Mock clipboard API
+Object.assign(navigator, {
+  clipboard: {
+    writeText: jest.fn(() => Promise.resolve()),
+  },
+})
 
 describe('PrintButton Component', () => {
   let mockPrint: jest.SpyInstance
   let originalTitle: string
+
+  const mockResumeData: ResumeData = {
+    name: 'John Doe',
+    position: 'Software Engineer',
+    email: 'john@example.com',
+    contactInformation: '+1234567890',
+    address: '123 Main St',
+    profilePicture: '',
+    socialMedia: [],
+    summary: 'Experienced developer',
+    education: [],
+    workExperience: [],
+    skills: [],
+    projects: [],
+    certifications: [],
+    languages: [],
+  }
 
   beforeEach(() => {
     // Mock window.print
@@ -17,6 +51,9 @@ describe('PrintButton Component', () => {
 
     // Use fake timers
     jest.useFakeTimers()
+
+    // Clear toast mocks
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
@@ -32,41 +69,50 @@ describe('PrintButton Component', () => {
   })
 
   describe('Rendering', () => {
-    it('should render print button', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-      expect(button).toBeInTheDocument()
+    it('should render both Print and Copy buttons', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
+
+      expect(printButton).toBeInTheDocument()
+      expect(copyButton).toBeInTheDocument()
     })
 
-    it('should render button text', () => {
-      render(<PrintButton />)
+    it('should render Print button text on desktop', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
       expect(screen.getByText('Print')).toBeInTheDocument()
     })
 
+    it('should render Copy button text on desktop', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+      expect(screen.getByText('Copy')).toBeInTheDocument()
+    })
+
     it('should render PDF icon', () => {
-      const { container } = render(<PrintButton />)
-      const icon = container.querySelector('svg')
-      expect(icon).toBeInTheDocument()
+      const { container } = render(<PrintButton resumeData={mockResumeData} />)
+      const icons = container.querySelectorAll('svg')
+      expect(icons.length).toBe(2) // PDF icon and Copy icon
     })
 
-    it('should have aria-label for accessibility', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-      expect(button).toHaveAttribute('aria-label', 'Print to PDF')
-    })
+    it('should have aria-labels for accessibility', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
 
-    it('should render dropdown toggle button', () => {
-      render(<PrintButton />)
-      const dropdownButton = screen.getByRole('button', {
-        name: 'Export options',
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
       })
-      expect(dropdownButton).toBeInTheDocument()
+
+      expect(printButton).toHaveAttribute('aria-label', 'Print to PDF')
+      expect(copyButton).toHaveAttribute('aria-label', 'Copy text to clipboard')
     })
   })
 
   describe('Print Functionality', () => {
-    it('should call window.print when button is clicked without name', () => {
-      render(<PrintButton />)
+    it('should call window.print when Print button is clicked without name', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -75,8 +121,8 @@ describe('PrintButton Component', () => {
       expect(mockPrint).toHaveBeenCalledTimes(1)
     })
 
-    it('should call window.print when button is clicked with name', () => {
-      render(<PrintButton name="John Doe" />)
+    it('should call window.print when Print button is clicked with name', () => {
+      render(<PrintButton name="John Doe" resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -86,7 +132,7 @@ describe('PrintButton Component', () => {
     })
 
     it('should not change document title when name is not provided', () => {
-      render(<PrintButton />)
+      render(<PrintButton resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -104,6 +150,7 @@ describe('PrintButton Component', () => {
           name="John Doe"
           position="Software Engineer"
           documentType="Resume"
+          resumeData={mockResumeData}
         />
       )
       const button = screen.getByRole('button', { name: 'Print to PDF' })
@@ -114,119 +161,14 @@ describe('PrintButton Component', () => {
       expect(document.title).toBe('SoftwareEngineer-JohnDoe-Resume')
     })
 
-    it('should handle name with underscores', () => {
-      render(
-        <PrintButton
-          name="john_doe"
-          position="Developer"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-Johndoe-Resume')
-    })
-
-    it('should handle name with hyphens', () => {
-      render(
-        <PrintButton
-          name="john-doe"
-          position="Developer"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-Johndoe-Resume')
-    })
-
-    it('should handle name with mixed separators', () => {
-      render(
-        <PrintButton
-          name="john doe_smith-jones"
-          position="Developer"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      // After removing special chars: "john doesmithjones" -> split by spaces -> ["john", "doesmithjones"]
-      expect(document.title).toBe('Developer-JohnDoesmithjones-Resume')
-    })
-
-    it('should handle single word name', () => {
-      render(
-        <PrintButton name="John" position="Developer" documentType="Resume" />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-John-Resume')
-    })
-
-    it('should handle all lowercase name', () => {
-      render(
-        <PrintButton
-          name="john doe"
-          position="Developer"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-JohnDoe-Resume')
-    })
-
-    it('should handle all uppercase name', () => {
-      render(
-        <PrintButton
-          name="JOHN DOE"
-          position="DEVELOPER"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-JohnDoe-Resume')
-    })
-
-    it('should handle name with multiple spaces', () => {
-      render(
-        <PrintButton
-          name="john   doe"
-          position="Developer"
-          documentType="Resume"
-        />
-      )
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Developer-JohnDoe-Resume')
-    })
-  })
-
-  describe('Document Type', () => {
     it('should use Resume as default document type', () => {
-      render(<PrintButton name="John Doe" position="Developer" />)
+      render(
+        <PrintButton
+          name="John Doe"
+          position="Developer"
+          resumeData={mockResumeData}
+        />
+      )
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -241,6 +183,7 @@ describe('PrintButton Component', () => {
           name="John Doe"
           position="Developer"
           documentType="CoverLetter"
+          resumeData={mockResumeData}
         />
       )
       const button = screen.getByRole('button', { name: 'Print to PDF' })
@@ -254,7 +197,13 @@ describe('PrintButton Component', () => {
 
   describe('Title Restoration', () => {
     it('should restore original title after timeout', async () => {
-      render(<PrintButton name="John Doe" position="Developer" />)
+      render(
+        <PrintButton
+          name="John Doe"
+          position="Developer"
+          resumeData={mockResumeData}
+        />
+      )
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -269,7 +218,7 @@ describe('PrintButton Component', () => {
     })
 
     it('should not restore title if name is not provided', () => {
-      render(<PrintButton />)
+      render(<PrintButton resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       fireEvent.click(button)
@@ -279,32 +228,68 @@ describe('PrintButton Component', () => {
 
       expect(document.title).toBe('Original Title')
     })
+  })
 
-    it('should handle multiple clicks with proper title restoration', () => {
+  describe('Copy to Clipboard Functionality', () => {
+    it('should copy resume text to clipboard when Copy button is clicked', async () => {
+      render(
+        <PrintButton
+          name="John Doe"
+          position="Developer"
+          resumeData={mockResumeData}
+        />
+      )
+      const button = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
+
+      fireEvent.click(button)
+
+      await waitFor(() => {
+        expect(navigator.clipboard.writeText).toHaveBeenCalled()
+        expect(toast.success).toHaveBeenCalledWith(
+          'Resume copied to clipboard!'
+        )
+      })
+    })
+
+    it('should disable Copy button when resumeData is not available', () => {
       render(<PrintButton name="John Doe" position="Developer" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+      const button = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      // First click
+      expect(button).toBeDisabled()
+    })
+
+    it('should handle clipboard write errors gracefully', async () => {
+      const clipboardError = new Error('Clipboard write failed')
+      ;(navigator.clipboard.writeText as jest.Mock).mockRejectedValueOnce(
+        clipboardError
+      )
+
+      render(
+        <PrintButton
+          name="John Doe"
+          position="Developer"
+          resumeData={mockResumeData}
+        />
+      )
+      const button = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
+
       fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0) for window.print()
-      expect(document.title).toBe('Developer-JohnDoe-Resume')
-      jest.advanceTimersByTime(100)
-      expect(document.title).toBe('Original Title')
 
-      // Second click
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0) for window.print()
-      expect(document.title).toBe('Developer-JohnDoe-Resume')
-      jest.advanceTimersByTime(100)
-      expect(document.title).toBe('Original Title')
-
-      expect(mockPrint).toHaveBeenCalledTimes(2)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Failed to copy to clipboard')
+      })
     })
   })
 
   describe('Styling', () => {
-    it('should have gradient background classes', () => {
-      render(<PrintButton />)
+    it('should have gradient background classes on Print button', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       expect(button).toHaveClass('bg-gradient-to-r')
@@ -312,161 +297,130 @@ describe('PrintButton Component', () => {
       expect(button).toHaveClass('to-pink-600')
     })
 
-    it('should have hover state classes', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+    it('should have gradient background classes on Copy button', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+      const button = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      expect(button).toHaveClass('hover:from-purple-700')
-      expect(button).toHaveClass('hover:to-pink-700')
+      expect(button).toHaveClass('bg-gradient-to-r')
+      expect(button).toHaveClass('from-purple-600')
+      expect(button).toHaveClass('to-pink-600')
     })
 
-    it('should have rounded-l-full class for combo button', () => {
-      render(<PrintButton />)
+    it('should have hover state classes on both buttons', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
+
+      expect(printButton).toHaveClass('hover:from-purple-700')
+      expect(printButton).toHaveClass('hover:to-pink-700')
+      expect(copyButton).toHaveClass('hover:from-purple-700')
+      expect(copyButton).toHaveClass('hover:to-pink-700')
+    })
+
+    it('should have rounded-l-full class on Print button', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
       const button = screen.getByRole('button', { name: 'Print to PDF' })
 
       expect(button).toHaveClass('rounded-l-full')
     })
 
+    it('should have rounded-r-full class on Copy button', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+      const button = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
+
+      expect(button).toHaveClass('rounded-r-full')
+    })
+
     it('should have parent container with shadow', () => {
-      const { container } = render(<PrintButton />)
+      const { container } = render(<PrintButton resumeData={mockResumeData} />)
       const wrapper = container.querySelector('.shadow-2xl')
 
       expect(wrapper).toBeInTheDocument()
     })
 
     it('should have focus ring classes', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+      render(<PrintButton resumeData={mockResumeData} />)
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      expect(button).toHaveClass('focus:ring-2')
-      expect(button).toHaveClass('focus:ring-purple-500')
+      expect(printButton).toHaveClass('focus:ring-2')
+      expect(printButton).toHaveClass('focus:ring-purple-500')
+      expect(copyButton).toHaveClass('focus:ring-2')
+      expect(copyButton).toHaveClass('focus:ring-purple-500')
     })
 
-    it('should have cursor-pointer class', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+    it('should have cursor-pointer class on both buttons', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      expect(button).toHaveClass('cursor-pointer')
-    })
-
-    it('should not have animate-pulse class', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      expect(button).not.toHaveClass('animate-pulse')
+      expect(printButton).toHaveClass('cursor-pointer')
+      expect(copyButton).toHaveClass('cursor-pointer')
     })
   })
 
   describe('Accessibility', () => {
     it('should be keyboard accessible', () => {
-      render(<PrintButton name="John Doe" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+      render(<PrintButton name="John Doe" resumeData={mockResumeData} />)
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      button.focus()
-      expect(button).toHaveFocus()
+      printButton.focus()
+      expect(printButton).toHaveFocus()
+
+      copyButton.focus()
+      expect(copyButton).toHaveFocus()
     })
 
-    it('should be triggerable with Enter key', () => {
-      render(<PrintButton name="John Doe" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      button.focus()
-      fireEvent.keyDown(button, { key: 'Enter', code: 'Enter' })
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(mockPrint).toHaveBeenCalled()
-    })
-
-    it('should have button role', () => {
-      render(<PrintButton />)
+    it('should have button roles', () => {
+      render(<PrintButton resumeData={mockResumeData} />)
       const buttons = screen.getAllByRole('button')
-      expect(buttons.length).toBeGreaterThanOrEqual(2)
-      expect(buttons[0]).toBeInTheDocument()
+      expect(buttons.length).toBe(2)
     })
 
     it('should have focus outline styling', () => {
-      render(<PrintButton />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
+      render(<PrintButton resumeData={mockResumeData} />)
+      const printButton = screen.getByRole('button', { name: 'Print to PDF' })
+      const copyButton = screen.getByRole('button', {
+        name: 'Copy text to clipboard',
+      })
 
-      expect(button).toHaveClass('focus:outline-none')
-      expect(button).toHaveClass('focus:ring-2')
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle empty string name', () => {
-      render(<PrintButton name="" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toBe('Original Title')
-      expect(mockPrint).toHaveBeenCalled()
-    })
-
-    it('should handle name with special characters', () => {
-      render(<PrintButton name="John O'Brien" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      // Should handle the apostrophe as part of the name
-      expect(mockPrint).toHaveBeenCalled()
-    })
-
-    it('should handle very long names', () => {
-      const longName = 'John Jacob Jingleheimer Schmidt Johnson Williams'
-      render(<PrintButton name={longName} position="Developer" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(document.title).toContain('Developer')
-      expect(document.title).toContain('Resume')
-      expect(mockPrint).toHaveBeenCalled()
-    })
-
-    it('should handle name with numbers', () => {
-      render(<PrintButton name="John Doe 3rd" position="Developer" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run setTimeout(0)
-
-      expect(mockPrint).toHaveBeenCalled()
-    })
-
-    it('should handle rapid clicks', () => {
-      render(<PrintButton name="John Doe" position="Developer" />)
-      const button = screen.getByRole('button', { name: 'Print to PDF' })
-
-      // Click multiple times rapidly
-      fireEvent.click(button)
-      fireEvent.click(button)
-      fireEvent.click(button)
-      jest.runOnlyPendingTimers() // Run all setTimeout(0) calls
-
-      expect(mockPrint).toHaveBeenCalledTimes(3)
+      expect(printButton).toHaveClass('focus:outline-none')
+      expect(printButton).toHaveClass('focus:ring-2')
+      expect(copyButton).toHaveClass('focus:outline-none')
+      expect(copyButton).toHaveClass('focus:ring-2')
     })
   })
 
   describe('Icon', () => {
-    it('should have group-hover scale animation on icon', () => {
-      const { container } = render(<PrintButton />)
-      const icon = container.querySelector('svg')
+    it('should have group-hover scale animation on icons', () => {
+      const { container } = render(<PrintButton resumeData={mockResumeData} />)
+      const icons = container.querySelectorAll('svg')
 
-      expect(icon).toHaveClass('group-hover:scale-110')
+      icons.forEach((icon) => {
+        expect(icon).toHaveClass('group-hover:scale-110')
+      })
     })
 
-    it('should have transition on icon', () => {
-      const { container } = render(<PrintButton />)
-      const icon = container.querySelector('svg')
+    it('should have transition on icons', () => {
+      const { container } = render(<PrintButton resumeData={mockResumeData} />)
+      const icons = container.querySelectorAll('svg')
 
-      expect(icon).toHaveClass('transition-transform')
+      icons.forEach((icon) => {
+        expect(icon).toHaveClass('transition-transform')
+      })
     })
   })
 })

@@ -162,21 +162,3 @@ export function convertResumeToText(data: ResumeData): string {
 
   return lines.join('\n')
 }
-
-/**
- * Download resume as text file
- * @param data - Resume data structure
- * @param filename - Desired filename (without extension)
- */
-export function downloadResumeAsText(data: ResumeData, filename: string): void {
-  const textContent = convertResumeToText(data)
-  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${filename}.txt`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
