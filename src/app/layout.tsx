@@ -1,19 +1,8 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import './globals.css'
 import BackgroundImage from '@/components/BackgroundImage'
 import { generateSiteMetadata } from '@/config/metadata'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
 
 // Generate metadata from resumeData (single source of truth)
 export const metadata: Metadata = generateSiteMetadata()
@@ -48,7 +37,7 @@ export default function RootLayout({
         <link rel="manifest" href="/favicon/site.webmanifest" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className="antialiased"
         style={{
           minHeight: '100vh',
         }}

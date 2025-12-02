@@ -106,7 +106,7 @@ describe('RootLayout', () => {
     expect(manifest).toHaveAttribute('href', '/favicon/site.webmanifest')
   })
 
-  it('should apply font variables and antialiased to body', () => {
+  it('should apply antialiased to body', () => {
     render(
       <RootLayout>
         <div>Test</div>
@@ -115,9 +115,7 @@ describe('RootLayout', () => {
 
     const body = document.body
     expect(body).toHaveClass('antialiased')
-    // Font variables are applied via Next.js font optimization
-    // They're transformed to "variable" class names in test env
-    expect(body.className).toContain('variable')
+    // System fonts are used, no custom font variables needed
   })
 
   it('should apply minHeight style to body', () => {
