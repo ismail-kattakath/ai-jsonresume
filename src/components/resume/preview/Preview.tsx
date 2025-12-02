@@ -488,20 +488,13 @@ const Preview = () => {
                               {item.showTechnologies !== false &&
                                 item.technologies &&
                                 item.technologies.length > 0 && (
-                                  <div className="mt-1 flex flex-wrap items-center gap-1">
+                                  <div className="mt-1">
                                     <span className="sub-content i-bold">
-                                      Technologies:
+                                      Technologies:{' '}
                                     </span>
-                                    {item.technologies.map(
-                                      (tech, techIndex) => (
-                                        <span
-                                          key={techIndex}
-                                          className="sub-content rounded bg-gray-200 px-1.5 py-0.5"
-                                        >
-                                          {tech}
-                                        </span>
-                                      )
-                                    )}
+                                    <span className="sub-content select-all">
+                                      {item.technologies.join(', ')}
+                                    </span>
                                   </div>
                                 )}
                             </div>

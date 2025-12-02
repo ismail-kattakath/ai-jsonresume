@@ -325,6 +325,101 @@ describe('Preview Component', () => {
 
       expect(screen.queryByText('Experience')).not.toBeInTheDocument()
     })
+
+    it('should render technologies as comma-separated values', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            organization: 'Tech Corp',
+            position: 'Senior Developer',
+            url: 'techcorp.com',
+            description: 'Led development',
+            keyAchievements: [{ text: 'Achievement 1' }],
+            startYear: '2020-01-01',
+            endYear: 'Present',
+            technologies: ['React', 'Node.js', 'TypeScript', 'Docker'],
+          },
+        ],
+      })
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.getByText('Technologies:')).toBeInTheDocument()
+      expect(
+        screen.getByText('React, Node.js, TypeScript, Docker')
+      ).toBeInTheDocument()
+    })
+
+    it('should not render technologies when showTechnologies is false', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            organization: 'Tech Corp',
+            position: 'Senior Developer',
+            url: 'techcorp.com',
+            description: 'Led development',
+            keyAchievements: [{ text: 'Achievement 1' }],
+            startYear: '2020-01-01',
+            endYear: 'Present',
+            technologies: ['React', 'Node.js'],
+            showTechnologies: false,
+          },
+        ],
+      })
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.queryByText('Technologies:')).not.toBeInTheDocument()
+      expect(screen.queryByText('React, Node.js')).not.toBeInTheDocument()
+    })
+
+    it('should not render technologies when technologies array is empty', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            organization: 'Tech Corp',
+            position: 'Senior Developer',
+            url: 'techcorp.com',
+            description: 'Led development',
+            keyAchievements: [{ text: 'Achievement 1' }],
+            startYear: '2020-01-01',
+            endYear: 'Present',
+            technologies: [],
+          },
+        ],
+      })
+      renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      expect(screen.queryByText('Technologies:')).not.toBeInTheDocument()
+    })
+
+    it('should apply select-all class to technologies text', () => {
+      const mockData = createMockResumeData({
+        workExperience: [
+          {
+            organization: 'Tech Corp',
+            position: 'Senior Developer',
+            url: 'techcorp.com',
+            description: 'Led development',
+            keyAchievements: [{ text: 'Achievement 1' }],
+            startYear: '2020-01-01',
+            endYear: 'Present',
+            technologies: ['React', 'Node.js'],
+          },
+        ],
+      })
+      const { container } = renderWithContext(<Preview />, {
+        contextValue: { resumeData: mockData },
+      })
+
+      const techText = container.querySelector('.select-all')
+      expect(techText).toBeInTheDocument()
+      expect(techText).toHaveTextContent('React, Node.js')
+    })
   })
 
   describe('Skills Section', () => {
