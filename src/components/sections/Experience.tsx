@@ -137,26 +137,11 @@ export default function Experience() {
                     {/* Technologies section */}
                     <div className="border-t border-[var(--md-sys-color-outline-variant)]/30 pt-4">
                       <h5 className="md3-label-large mb-3 tracking-wider text-[var(--md-sys-color-on-surface-variant)] uppercase">
-                        Tech Stack
+                        Technologies
                       </h5>
-                      <div className="flex flex-wrap gap-2">
-                        {exp.technologies.map((tech, techIndex) => (
-                          <motion.span
-                            key={tech}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            transition={{
-                              duration: 0.3,
-                              delay: techIndex * 0.03,
-                            }}
-                            viewport={{ once: true }}
-                            whileHover={{ scale: 1.05, y: -2 }}
-                            className="md3-label-medium relative cursor-default rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-3 py-1.5 font-medium text-[var(--md-sys-color-on-surface-variant)] shadow-sm transition-colors hover:bg-[var(--md-sys-color-surface-container-highest)]"
-                          >
-                            {tech}
-                          </motion.span>
-                        ))}
-                      </div>
+                      <p className="md3-body-medium leading-relaxed text-[var(--md-sys-color-on-surface)] select-all">
+                        {exp.technologies.join(', ')}
+                      </p>
                     </div>
                   </div>
                 </motion.div>

@@ -123,23 +123,11 @@ export default function Skills() {
                   ></div>
                 </div>
 
-                {/* Skills tags */}
+                {/* Skills list */}
                 <div className="p-6 pt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {skillCategory.items.map((skill, skillIndex) => (
-                      <motion.span
-                        key={skill}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3, delay: skillIndex * 0.02 }}
-                        viewport={{ once: true }}
-                        whileHover={{ scale: 1.05, y: -2 }}
-                        className="md3-label-small cursor-default rounded-lg bg-[var(--md-sys-color-surface-container-high)] px-3 py-1.5 font-medium text-[var(--md-sys-color-on-surface-variant)] shadow-sm transition-colors hover:bg-[var(--md-sys-color-surface-container-highest)]"
-                      >
-                        {skill}
-                      </motion.span>
-                    ))}
-                  </div>
+                  <p className="md3-body-medium leading-relaxed text-[var(--md-sys-color-on-surface)] select-all">
+                    {skillCategory.items.join(', ')}
+                  </p>
                 </div>
               </motion.div>
             )

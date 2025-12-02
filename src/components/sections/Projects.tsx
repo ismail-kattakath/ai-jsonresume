@@ -61,32 +61,12 @@ export default function Projects() {
                 </div>
 
                 <div>
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.slice(0, 4).map((tech) => (
-                      <span
-                        key={tech}
-                        className="md3-label-small md3-on-surface-variant rounded-full px-3 py-1.5"
-                        style={{
-                          background: 'var(--md-sys-color-surface-container)',
-                          border:
-                            '1px solid var(--md-sys-color-outline-variant)',
-                        }}
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                    {project.technologies.length > 4 && (
-                      <span
-                        className="md3-label-small md3-on-surface-variant rounded-full px-3 py-1.5 font-medium"
-                        style={{
-                          background:
-                            'var(--md-sys-color-surface-container-high)',
-                        }}
-                      >
-                        +{project.technologies.length - 4} more
-                      </span>
-                    )}
-                  </div>
+                  <h4 className="md3-label-large mb-2 tracking-wider text-[var(--md-sys-color-on-surface-variant)] uppercase">
+                    Technologies
+                  </h4>
+                  <p className="md3-body-medium leading-relaxed text-[var(--md-sys-color-on-surface)] select-all">
+                    {project.technologies.join(', ')}
+                  </p>
                 </div>
               </div>
             </motion.div>
