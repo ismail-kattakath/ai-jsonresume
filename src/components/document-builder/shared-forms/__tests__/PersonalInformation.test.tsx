@@ -6,7 +6,16 @@ import {
   createMockResumeData,
   screen,
   fireEvent,
+  waitFor,
 } from '@/lib/__tests__/test-utils'
+
+// Mock the AI generation module
+jest.mock('@/lib/ai/document-generator', () => ({
+  ...jest.requireActual('@/lib/ai/document-generator'),
+  generateJobTitleWithProvider: jest.fn(),
+  OpenAIAPIError: class OpenAIAPIError extends Error {},
+  GeminiAPIError: class GeminiAPIError extends Error {},
+}))
 
 describe('PersonalInformation Component', () => {
   describe('Rendering', () => {
@@ -296,6 +305,200 @@ describe('PersonalInformation Component', () => {
       expect(nameInput?.value).toBe("O'Brien-Smith")
       expect(emailInput?.value).toBe('test+tag@example.com')
       expect(addressInput?.value).toBe('123 "Main" St., Apt #4-B')
+    })
+  })
+
+  describe('AI Generate Job Title Button', () => {
+    const {
+      generateJobTitleWithProvider,
+    } = require('@/lib/ai/document-generator')
+
+    beforeEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should render AI button for job title field', () => {
+      renderWithContext(<PersonalInformation />, {
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Test job description',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const aiButton = screen.getByRole('button', { name: /generate with ai/i })
+      expect(aiButton).toBeInTheDocument()
+    })
+
+    it('should show sparkles icon when not generating', () => {
+      const { container } = renderWithContext(<PersonalInformation />, {
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Test job',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const sparklesIcon = container.querySelector('svg.lucide-sparkles')
+      expect(sparklesIcon).toBeInTheDocument()
+    })
+
+    it('should generate job title when button clicked with valid AI settings', async () => {
+      generateJobTitleWithProvider.mockResolvedValue('Senior Software Engineer')
+
+      const mockData = createMockResumeData({ position: 'Developer' })
+      const mockSetResumeData = jest.fn()
+
+      renderWithContext(<PersonalInformation />, {
+        resumeData: mockData,
+        setResumeData: mockSetResumeData,
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Senior Software Engineer position',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const aiButton = screen.getByRole('button', { name: /generate with ai/i })
+      fireEvent.click(aiButton)
+
+      await waitFor(() => {
+        expect(generateJobTitleWithProvider).toHaveBeenCalled()
+      })
+
+      await waitFor(() => {
+        expect(mockSetResumeData).toHaveBeenCalledWith(
+          expect.objectContaining({
+            position: 'Senior Software Engineer',
+          })
+        )
+      })
+    })
+
+    it('should be disabled when AI is not configured', () => {
+      renderWithContext(<PersonalInformation />, {
+        aiSettingsValue: {
+          isConfigured: false,
+          settings: {
+            apiUrl: '',
+            apiKey: '',
+            model: '',
+            jobDescription: '',
+          },
+        },
+      })
+
+      const aiButton = screen.getByRole('button')
+      expect(aiButton).toBeDisabled()
+      expect(aiButton).toHaveAttribute('title', 'Configure AI settings first')
+    })
+
+    it('should show loading state while generating', async () => {
+      generateJobTitleWithProvider.mockImplementation(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve('Senior Developer'), 50)
+          )
+      )
+
+      renderWithContext(<PersonalInformation />, {
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Senior Developer position',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const aiButton = screen.getByRole('button', { name: /generate with ai/i })
+
+      // Verify button is initially enabled
+      expect(aiButton).not.toBeDisabled()
+
+      fireEvent.click(aiButton)
+
+      // Button should be disabled during generation
+      expect(aiButton).toBeDisabled()
+
+      // Wait for generation to complete
+      await waitFor(() => {
+        expect(aiButton).not.toBeDisabled()
+      })
+    })
+
+    it('should handle generation errors gracefully', async () => {
+      generateJobTitleWithProvider.mockRejectedValue(new Error('API Error'))
+
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {})
+
+      renderWithContext(<PersonalInformation />, {
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Software Engineer position',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const aiButton = screen.getByRole('button', { name: /generate with ai/i })
+      fireEvent.click(aiButton)
+
+      await waitFor(() => {
+        expect(generateJobTitleWithProvider).toHaveBeenCalled()
+      })
+
+      // Button should be re-enabled after error
+      await waitFor(() => {
+        expect(aiButton).not.toBeDisabled()
+      })
+
+      consoleErrorSpy.mockRestore()
+    })
+
+    it('should update job title field with generated content', async () => {
+      generateJobTitleWithProvider.mockResolvedValue('Lead Frontend Developer')
+
+      const mockData = createMockResumeData({ position: '' })
+      const mockSetResumeData = jest.fn()
+
+      renderWithContext(<PersonalInformation />, {
+        resumeData: mockData,
+        setResumeData: mockSetResumeData,
+        aiSettings: {
+          apiUrl: 'https://api.test.com',
+          apiKey: 'test-key',
+          model: 'gpt-4',
+          jobDescription: 'Lead Frontend Developer position',
+          providerType: 'openai-compatible',
+          rememberCredentials: true,
+        },
+      })
+
+      const aiButton = screen.getByRole('button', { name: /generate with ai/i })
+      fireEvent.click(aiButton)
+
+      await waitFor(() => {
+        expect(mockSetResumeData).toHaveBeenCalledWith(
+          expect.objectContaining({
+            position: 'Lead Frontend Developer',
+          })
+        )
+      })
     })
   })
 })

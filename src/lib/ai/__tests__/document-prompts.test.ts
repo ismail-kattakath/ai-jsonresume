@@ -2,6 +2,9 @@ import {
   buildCoverLetterPrompt,
   validateCoverLetter,
   postProcessCoverLetter,
+  buildJobTitlePrompt,
+  validateJobTitle,
+  postProcessJobTitle,
 } from '@/lib/ai/document-prompts'
 import type { ResumeData } from '@/types'
 
@@ -308,6 +311,263 @@ describe('Cover Letter Prompt Engineering', () => {
       const result = postProcessCoverLetter(content)
 
       expect(result).toBe(content)
+    })
+  })
+})
+
+describe('Job Title Prompt Engineering', () => {
+  describe('buildJobTitlePrompt', () => {
+    it('includes candidate current position', () => {
+      const prompt = buildJobTitlePrompt(
+        mockResumeData,
+        'Looking for a Senior Full Stack Engineer'
+      )
+
+      expect(prompt).toContain('Senior Developer')
+    })
+
+    it('includes recent positions', () => {
+      const prompt = buildJobTitlePrompt(
+        mockResumeData,
+        'Software Engineering role'
+      )
+
+      expect(prompt).toContain('Lead Engineer')
+      expect(prompt).toContain('Frontend Developer')
+    })
+
+    it('limits recent positions to top 3', () => {
+      const dataWithManyJobs: ResumeData = {
+        ...mockResumeData,
+        workExperience: [
+          ...mockResumeData.workExperience,
+          {
+            organization: 'Company3',
+            url: '',
+            position: 'Position3',
+            description: '',
+            keyAchievements: [],
+            startYear: '2015',
+            endYear: '2018',
+            technologies: [],
+          },
+          {
+            organization: 'Company4',
+            url: '',
+            position: 'Position4',
+            description: '',
+            keyAchievements: [],
+            startYear: '2012',
+            endYear: '2015',
+            technologies: [],
+          },
+        ],
+      }
+
+      const prompt = buildJobTitlePrompt(dataWithManyJobs, 'Job description')
+
+      expect(prompt).toContain('Position3')
+      expect(prompt).not.toContain('Position4')
+    })
+
+    it('includes key skills', () => {
+      const prompt = buildJobTitlePrompt(mockResumeData, 'Job description')
+
+      expect(prompt).toContain('JavaScript')
+      expect(prompt).toContain('TypeScript')
+      expect(prompt).toContain('React')
+    })
+
+    it('limits skills to top 10', () => {
+      const dataWithManySkills: ResumeData = {
+        ...mockResumeData,
+        skills: [
+          {
+            title: 'Programming',
+            skills: Array.from({ length: 15 }, (_, i) => ({
+              text: `Skill${i + 1}`,
+              highlight: false,
+            })),
+          },
+        ],
+      }
+
+      const prompt = buildJobTitlePrompt(dataWithManySkills, 'Job description')
+
+      expect(prompt).toContain('Skill1')
+      expect(prompt).toContain('Skill10')
+      expect(prompt).not.toContain('Skill11')
+    })
+
+    it('includes job description', () => {
+      const jobDesc = 'Senior Full Stack Engineer with React and Node.js'
+      const prompt = buildJobTitlePrompt(mockResumeData, jobDesc)
+
+      expect(prompt).toContain(jobDesc)
+    })
+
+    it('includes generation instructions', () => {
+      const prompt = buildJobTitlePrompt(mockResumeData, 'Job description')
+
+      expect(prompt).toContain('2-6 words maximum')
+      expect(prompt).toContain('ONLY the job title')
+      expect(prompt).toContain('Title case')
+      expect(prompt).toContain('Maximum 60 characters')
+    })
+
+    it('handles empty work experience', () => {
+      const dataWithNoExperience: ResumeData = {
+        ...mockResumeData,
+        workExperience: [],
+      }
+
+      const prompt = buildJobTitlePrompt(
+        dataWithNoExperience,
+        'Entry level position'
+      )
+
+      expect(prompt).toContain('No experience provided')
+      expect(prompt).toBeTruthy()
+    })
+
+    it('handles empty skills', () => {
+      const dataWithNoSkills: ResumeData = {
+        ...mockResumeData,
+        skills: [],
+      }
+
+      const prompt = buildJobTitlePrompt(dataWithNoSkills, 'Job description')
+
+      expect(prompt).toContain('No skills provided')
+      expect(prompt).toBeTruthy()
+    })
+  })
+
+  describe('validateJobTitle', () => {
+    it('validates correct job title', () => {
+      const title = 'Senior Software Engineer'
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(true)
+      expect(result.errors).toHaveLength(0)
+    })
+
+    it('validates multi-word titles', () => {
+      const titles = [
+        'Lead Frontend Developer',
+        'Principal Full Stack Engineer',
+        'Staff Software Engineer',
+        'Engineering Manager',
+      ]
+
+      titles.forEach((title) => {
+        const result = validateJobTitle(title)
+        expect(result.isValid).toBe(true)
+      })
+    })
+
+    it('rejects title that is too short', () => {
+      const title = 'De'
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors).toContain('Job title is too short')
+    })
+
+    it('rejects title that is too long', () => {
+      const title = 'A'.repeat(70)
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors).toContain('Job title exceeds 60 character limit')
+    })
+
+    it('detects placeholder brackets', () => {
+      const title = '[Position Title]'
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors.some((e) => e.includes('placeholder'))).toBe(true)
+    })
+
+    it('detects quotes in title', () => {
+      const title = '"Senior Developer"'
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors.some((e) => e.includes('quotes'))).toBe(true)
+    })
+
+    it('detects multiple lines', () => {
+      const title = 'Senior Developer\nFull Stack'
+
+      const result = validateJobTitle(title)
+
+      expect(result.isValid).toBe(false)
+      expect(result.errors.some((e) => e.includes('single line'))).toBe(true)
+    })
+  })
+
+  describe('postProcessJobTitle', () => {
+    it('trims whitespace', () => {
+      const title = '  Senior Developer  '
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Developer')
+    })
+
+    it('removes leading/trailing quotes', () => {
+      const title = '"Senior Developer"'
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Developer')
+    })
+
+    it('removes trailing periods', () => {
+      const title = 'Senior Developer.'
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Developer')
+    })
+
+    it('applies title case', () => {
+      const title = 'senior software engineer'
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Software Engineer')
+    })
+
+    it('handles mixed case input', () => {
+      const title = 'sEnIoR sOfTwArE eNgInEeR'
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('SEnIoR SOfTwArE ENgInEeR')
+    })
+
+    it('handles single quotes', () => {
+      const title = "'Lead Developer'"
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Lead Developer')
+    })
+
+    it('handles multiple trailing periods', () => {
+      const title = 'Senior Developer...'
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Developer')
+    })
+
+    it('handles complex cleanup', () => {
+      const title = '  "senior full stack engineer"...  '
+      const result = postProcessJobTitle(title)
+
+      expect(result).toBe('Senior Full Stack Engineer')
     })
   })
 })

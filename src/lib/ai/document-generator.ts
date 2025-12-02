@@ -80,6 +80,43 @@ export async function generateSummaryWithProvider(
 }
 
 /**
+ * Generate job title using the appropriate provider
+ */
+export async function generateJobTitleWithProvider(
+  resumeData: ResumeData,
+  jobDescription: string,
+  apiUrl: string,
+  apiKey: string,
+  model: string,
+  providerType: 'openai-compatible' | 'gemini',
+  onProgress?: StreamCallback
+): Promise<string> {
+  // Import the job title generation functions
+  const { generateJobTitle: generateJobTitleOpenAI } = await import(
+    './openai-client'
+  )
+  const { generateJobTitleWithGemini } = await import('./gemini-documents')
+
+  if (providerType === 'gemini') {
+    return generateJobTitleWithGemini(
+      resumeData,
+      jobDescription,
+      apiKey,
+      model,
+      onProgress
+    )
+  }
+
+  // OpenAI-compatible
+  return generateJobTitleOpenAI(
+    { baseURL: apiUrl, apiKey, model },
+    resumeData,
+    jobDescription,
+    onProgress
+  )
+}
+
+/**
  * Determine provider type from provider preset
  */
 export function getProviderTypeFromPreset(

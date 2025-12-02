@@ -14,6 +14,9 @@ import {
   postProcessCoverLetter,
   buildSummaryPrompt,
   validateSummary,
+  buildJobTitlePrompt,
+  validateJobTitle,
+  postProcessJobTitle,
 } from '@/lib/ai/document-prompts'
 
 const STORAGE_KEY = 'ai_cover_letter_credentials'
@@ -362,6 +365,81 @@ export async function generateSummary(
   }
 
   return generatedContent
+}
+
+/**
+ * Generates a job title using OpenAI API with streaming support
+ */
+export async function generateJobTitle(
+  config: OpenAIConfig,
+  resumeData: ResumeData,
+  jobDescription: string,
+  onProgress?: StreamCallback
+): Promise<string> {
+  // Build the prompt
+  const prompt = buildJobTitlePrompt(resumeData, jobDescription)
+
+  // Prepare the request
+  const request: OpenAIRequest = {
+    model: config.model,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are a professional resume writer specializing in job title optimization. You generate concise, professional job titles that match target roles.',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+    temperature: 0.5, // Lower temperature for more consistent titles
+    max_tokens: 50, // Job titles are short
+    top_p: 0.9,
+  }
+
+  // Use streaming if callback provided, otherwise use regular request
+  let generatedContent: string
+
+  if (onProgress) {
+    generatedContent = await makeOpenAIStreamRequest(
+      config,
+      request,
+      onProgress
+    )
+  } else {
+    // Make the API request (non-streaming for backward compatibility)
+    const response = await makeOpenAIRequest(config, request)
+
+    // Extract the generated text
+    if (!response.choices || response.choices.length === 0) {
+      throw new OpenAIAPIError(
+        'AI generated an empty response. Please try again.',
+        'empty_response'
+      )
+    }
+
+    generatedContent = response.choices[0].message.content
+
+    if (!generatedContent || generatedContent.trim().length === 0) {
+      throw new OpenAIAPIError(
+        'AI generated an empty response. Please try again.',
+        'empty_content'
+      )
+    }
+  }
+
+  // Post-process the content
+  const processedContent = postProcessJobTitle(generatedContent)
+
+  // Validate the content
+  const validation = validateJobTitle(processedContent)
+  if (!validation.isValid) {
+    console.warn('Job title validation warnings:', validation.errors)
+    // Still return the content, but log warnings
+  }
+
+  return processedContent
 }
 
 /**

@@ -78,6 +78,16 @@ export const createMockAISettingsContext = (
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   contextValue?: Partial<DocumentContextType>
   aiSettingsValue?: Partial<AISettingsContextType>
+  resumeData?: Partial<ResumeData>
+  setResumeData?: jest.Mock
+  aiSettings?: {
+    apiUrl: string
+    apiKey: string
+    model: string
+    jobDescription: string
+    providerType: 'openai-compatible' | 'gemini'
+    rememberCredentials: boolean
+  }
 }
 
 /**
@@ -87,10 +97,41 @@ export const renderWithContext = (
   ui: ReactElement,
   options?: CustomRenderOptions
 ) => {
-  const { contextValue, aiSettingsValue, ...renderOptions } = options || {}
+  const {
+    contextValue,
+    aiSettingsValue,
+    resumeData: resumeDataOverride,
+    setResumeData,
+    aiSettings,
+    ...renderOptions
+  } = options || {}
 
-  const mockContextValue = createMockDocumentContext(contextValue)
-  const mockAISettingsValue = createMockAISettingsContext(aiSettingsValue)
+  // Build context value with resume data override
+  const contextOverrides: Partial<DocumentContextType> = {
+    ...contextValue,
+  }
+  if (resumeDataOverride) {
+    contextOverrides.resumeData = createMockResumeData(resumeDataOverride)
+  }
+  if (setResumeData) {
+    contextOverrides.setResumeData = setResumeData
+  }
+
+  // Build AI settings with custom settings
+  const aiSettingsOverrides: Partial<AISettingsContextType> = {
+    ...aiSettingsValue,
+  }
+  if (aiSettings) {
+    aiSettingsOverrides.settings = aiSettings
+    aiSettingsOverrides.isConfigured =
+      !!aiSettings.apiUrl &&
+      !!aiSettings.apiKey &&
+      !!aiSettings.model &&
+      !!aiSettings.jobDescription
+  }
+
+  const mockContextValue = createMockDocumentContext(contextOverrides)
+  const mockAISettingsValue = createMockAISettingsContext(aiSettingsOverrides)
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <AISettingsContext.Provider value={mockAISettingsValue}>
@@ -106,6 +147,11 @@ export const renderWithContext = (
     mockAISettingsValue,
   }
 }
+
+/**
+ * Alias for renderWithContext - provides a more intuitive name for tests
+ */
+export const renderWithProviders = renderWithContext
 
 /**
  * Helper to get form elements by their floating labels

@@ -1,8 +1,14 @@
 import React, { useContext } from 'react'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import AIInputWithButton from './AIInputWithButton'
+
 const PersonalInformation = ({}) => {
-  const { resumeData, handleProfilePicture, handleChange } =
+  const { resumeData, handleProfilePicture, handleChange, setResumeData } =
     useContext(ResumeContext)
+
+  const handleJobTitleGenerate = (generatedTitle: string) => {
+    setResumeData({ ...resumeData, position: generatedTitle })
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -18,17 +24,14 @@ const PersonalInformation = ({}) => {
           />
           <label className="floating-label">Full Name</label>
         </div>
-        <div className="floating-label-group">
-          <input
-            type="text"
-            placeholder="Job Title"
-            name="position"
-            className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
-            value={resumeData.position}
-            onChange={handleChange}
-          />
-          <label className="floating-label">Job Title</label>
-        </div>
+        <AIInputWithButton
+          value={resumeData.position}
+          onChange={handleChange}
+          onGenerated={handleJobTitleGenerate}
+          placeholder="Job Title"
+          name="position"
+          label="Job Title"
+        />
         <div className="floating-label-group">
           <input
             type="text"
