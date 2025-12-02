@@ -489,10 +489,10 @@ const Preview = () => {
                                 item.technologies &&
                                 item.technologies.length > 0 && (
                                   <div className="mt-1">
-                                    <span className="sub-content i-bold">
+                                    <span className="content i-bold">
                                       Technologies:{' '}
                                     </span>
-                                    <span className="sub-content select-all">
+                                    <span className="content select-all">
                                       {item.technologies.join(', ')}
                                     </span>
                                   </div>

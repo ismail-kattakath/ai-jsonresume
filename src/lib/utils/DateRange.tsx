@@ -11,24 +11,24 @@ const DateRange = ({ startYear, endYear, id, showOnlyEndDate = false }) => {
     const end = parseDate(endYear)
     if (end && end != 'Invalid Date') {
       return (
-        <p id={id} className="sub-content whitespace-nowrap">
+        <p id={id} className="content whitespace-nowrap">
           {end.toLocaleString('default', { month: 'short' })},{' '}
           {end.getFullYear()}
         </p>
       )
     }
-    return <p id={id} className="sub-content"></p>
+    return <p id={id} className="content"></p>
   }
 
   // Original behavior for work experience (show date range)
   if (!startYear) {
-    return <p id={id} className="sub-content"></p>
+    return <p id={id} className="content"></p>
   }
 
   const start = parseDate(startYear)
   const end = parseDate(endYear)
   return (
-    <p id={id} className="sub-content whitespace-nowrap">
+    <p id={id} className="content whitespace-nowrap">
       {start.toLocaleString('default', { month: 'short' })},{' '}
       {start.getFullYear()} -{' '}
       {end && end != 'Invalid Date'

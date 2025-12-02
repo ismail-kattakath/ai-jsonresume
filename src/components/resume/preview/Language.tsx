@@ -5,7 +5,7 @@ const Language = ({ title, languages }) => {
         <h2 className="section-title mb-1 border-b-2 border-dashed border-gray-300">
           {title}
         </h2>
-        <p className="sub-content">{languages.join(', ')}</p>
+        <p className="content">{languages.join(', ')}</p>
       </div>
     )
   )

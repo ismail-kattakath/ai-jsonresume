@@ -5,7 +5,7 @@ const Certification = ({ title, certifications }) => {
         <h2 className="section-title mb-1 border-b-2 border-dashed border-gray-300">
           {title}
         </h2>
-        <ul className="sub-content list-disc ps-3.5">
+        <ul className="content list-disc ps-3.5">
           {certifications.map((certification, index) => (
             <li key={index}>{certification}</li>
           ))}

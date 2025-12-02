@@ -44,7 +44,7 @@ const Skills = ({ title, skills }) => {
         >
           {title}
         </h2>
-        <p className="sub-content">
+        <p className="content">
           {skills.map((skill, index) => (
             <span key={index}>
               {index > 0 && ', '}

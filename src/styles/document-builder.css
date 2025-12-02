@@ -131,11 +131,6 @@ textarea::-moz-placeholder {
   font-weight: 400;
 }
 
-.sub-content {
-  font-size: 0.75rem; /* 12px = 0.75rem (text-xs) */
-  font-weight: 400;
-}
-
 .i-bold {
   font-weight: 700 !important;
 }
