@@ -387,5 +387,46 @@ describe('Integration: Shared Fields Synchronization Between Tabs', () => {
         expect(clNameInput.value).toBe("O'Brien-Smith Jr.")
       })
     }, 10000)
+
+    it('should handle rapid consecutive updates without infinite loops', async () => {
+      const { container } = render(<ResumeEditPage />)
+
+      const modeSwitcher = container.querySelector('#mode-switcher')
+      const coverLetterTab = modeSwitcher?.querySelector(
+        'button:nth-child(2)'
+      ) as HTMLButtonElement
+
+      const positionInput = container.querySelector(
+        'input[name="position"]'
+      ) as HTMLInputElement
+
+      // Simulate rapid updates like AI might generate
+      fireEvent.change(positionInput, {
+        target: { name: 'position', value: 'Software' },
+      })
+      fireEvent.change(positionInput, {
+        target: { name: 'position', value: 'Software Engineer' },
+      })
+      fireEvent.change(positionInput, {
+        target: { name: 'position', value: 'Senior Software Engineer' },
+      })
+
+      // Should complete without crashing
+      await waitFor(
+        () => {
+          expect(positionInput.value).toBe('Senior Software Engineer')
+        },
+        { timeout: 2000 }
+      )
+
+      // Verify sync to cover letter
+      fireEvent.click(coverLetterTab)
+      await waitFor(() => {
+        const clPositionInput = container.querySelector(
+          'input[name="position"]'
+        ) as HTMLInputElement
+        expect(clPositionInput.value).toBe('Senior Software Engineer')
+      })
+    }, 10000)
   })
 })

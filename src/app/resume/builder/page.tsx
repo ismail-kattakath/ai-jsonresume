@@ -539,38 +539,71 @@ function UnifiedEditor() {
   }, [])
 
   // Synchronize shared fields between resume and cover letter
-  // Shared fields: personal information and social media
+  // Use refs to track the last synced values and prevent infinite loops
+  const lastSyncedResumeData = useRef({
+    name: resumeData.name,
+    position: resumeData.position,
+    email: resumeData.email,
+    contactInformation: resumeData.contactInformation,
+    address: resumeData.address,
+    profileImage: resumeData.profileImage,
+    socialMedia: resumeData.socialMedia,
+  })
+  const lastSyncedCoverLetterData = useRef({
+    name: coverLetterData.name,
+    position: coverLetterData.position,
+    email: coverLetterData.email,
+    contactInformation: coverLetterData.contactInformation,
+    address: coverLetterData.address,
+    profileImage: coverLetterData.profileImage,
+    socialMedia: coverLetterData.socialMedia,
+  })
+
+  // Sync from resume to cover letter
   useEffect(() => {
-    // Sync from resume to cover letter
-    setCoverLetterData((prev) => {
-      const sharedFields = {
-        name: resumeData.name,
-        position: resumeData.position,
-        email: resumeData.email,
-        contactInformation: resumeData.contactInformation,
-        address: resumeData.address,
-        profileImage: resumeData.profileImage,
-        socialMedia: resumeData.socialMedia,
-      }
+    const currentResumeFields = {
+      name: resumeData.name,
+      position: resumeData.position,
+      email: resumeData.email,
+      contactInformation: resumeData.contactInformation,
+      address: resumeData.address,
+      profileImage: resumeData.profileImage,
+      socialMedia: resumeData.socialMedia,
+    }
 
-      // Only update if there are actual changes to avoid infinite loops
-      const hasChanges = Object.keys(sharedFields).some(
-        (key) =>
-          JSON.stringify(sharedFields[key as keyof typeof sharedFields]) !==
-          JSON.stringify(
-            prev[key as keyof typeof sharedFields] as
-              | string
-              | { socialMedia: string; link: string }[]
-          )
-      )
+    // Check if resume data actually changed (not just synced from cover letter)
+    const resumeChanged = Object.keys(currentResumeFields).some(
+      (key) =>
+        JSON.stringify(
+          currentResumeFields[key as keyof typeof currentResumeFields]
+        ) !==
+        JSON.stringify(
+          lastSyncedResumeData.current[key as keyof typeof currentResumeFields]
+        )
+    )
 
-      if (!hasChanges) return prev
-
-      return {
-        ...prev,
-        ...sharedFields,
-      }
-    })
+    if (resumeChanged) {
+      // Update cover letter with resume data
+      setCoverLetterData((prev) => {
+        const updated = {
+          ...prev,
+          ...currentResumeFields,
+        }
+        // Update last synced cover letter data
+        lastSyncedCoverLetterData.current = {
+          name: updated.name,
+          position: updated.position,
+          email: updated.email,
+          contactInformation: updated.contactInformation,
+          address: updated.address,
+          profileImage: updated.profileImage,
+          socialMedia: updated.socialMedia,
+        }
+        return updated
+      })
+      // Update last synced resume data
+      lastSyncedResumeData.current = currentResumeFields
+    }
   }, [
     resumeData.name,
     resumeData.position,
@@ -581,37 +614,53 @@ function UnifiedEditor() {
     resumeData.socialMedia,
   ])
 
+  // Sync from cover letter to resume
   useEffect(() => {
-    // Sync from cover letter to resume
-    setResumeData((prev) => {
-      const sharedFields = {
-        name: coverLetterData.name,
-        position: coverLetterData.position,
-        email: coverLetterData.email,
-        contactInformation: coverLetterData.contactInformation,
-        address: coverLetterData.address,
-        profileImage: coverLetterData.profileImage,
-        socialMedia: coverLetterData.socialMedia,
-      }
+    const currentCoverLetterFields = {
+      name: coverLetterData.name,
+      position: coverLetterData.position,
+      email: coverLetterData.email,
+      contactInformation: coverLetterData.contactInformation,
+      address: coverLetterData.address,
+      profileImage: coverLetterData.profileImage,
+      socialMedia: coverLetterData.socialMedia,
+    }
 
-      // Only update if there are actual changes to avoid infinite loops
-      const hasChanges = Object.keys(sharedFields).some(
-        (key) =>
-          JSON.stringify(sharedFields[key as keyof typeof sharedFields]) !==
-          JSON.stringify(
-            prev[key as keyof typeof sharedFields] as
-              | string
-              | { socialMedia: string; link: string }[]
-          )
-      )
+    // Check if cover letter data actually changed (not just synced from resume)
+    const coverLetterChanged = Object.keys(currentCoverLetterFields).some(
+      (key) =>
+        JSON.stringify(
+          currentCoverLetterFields[key as keyof typeof currentCoverLetterFields]
+        ) !==
+        JSON.stringify(
+          lastSyncedCoverLetterData.current[
+            key as keyof typeof currentCoverLetterFields
+          ]
+        )
+    )
 
-      if (!hasChanges) return prev
-
-      return {
-        ...prev,
-        ...sharedFields,
-      }
-    })
+    if (coverLetterChanged) {
+      // Update resume with cover letter data
+      setResumeData((prev) => {
+        const updated = {
+          ...prev,
+          ...currentCoverLetterFields,
+        }
+        // Update last synced resume data
+        lastSyncedResumeData.current = {
+          name: updated.name,
+          position: updated.position,
+          email: updated.email,
+          contactInformation: updated.contactInformation,
+          address: updated.address,
+          profileImage: updated.profileImage,
+          socialMedia: updated.socialMedia,
+        }
+        return updated
+      })
+      // Update last synced cover letter data
+      lastSyncedCoverLetterData.current = currentCoverLetterFields
+    }
   }, [
     coverLetterData.name,
     coverLetterData.position,
