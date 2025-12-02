@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+/* Only load Google Fonts for screen, not print - prevents font embedding in PDFs */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap')
+screen;
 @import 'tailwindcss';
 
 /* Material Design 3 Dark Theme Tokens */
@@ -416,8 +418,17 @@ body {
     position: static !important;
   }
 
-  /* Force system fonts for ATS compatibility - Issue #69 */
-  * {
+  /* Force system fonts for ATS compatibility - Issue #69, #74 */
+  /* Use widely-supported system fonts to prevent font embedding errors in ATS checkers */
+  *,
+  *::before,
+  *::after {
     font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  /* Disable web fonts in print to prevent embedding */
+  @font-face {
+    font-family: 'Roboto';
+    src: local('Arial');
   }
 }
