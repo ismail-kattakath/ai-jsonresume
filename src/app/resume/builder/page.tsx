@@ -690,7 +690,7 @@ function UnifiedEditor() {
               {/* Floating Action Button - Hidden on print */}
               <div
                 id="print-button"
-                className="exclude-print fixed right-8 bottom-8 z-50 flex flex-row items-center overflow-hidden rounded-full shadow-2xl md:top-8 md:bottom-auto"
+                className="exclude-print fixed right-8 bottom-8 z-50 md:top-8 md:bottom-auto"
               >
                 <PrintButton
                   name={
@@ -702,6 +702,11 @@ function UnifiedEditor() {
                       : coverLetterData.position
                   }
                   documentType={mode === 'resume' ? 'Resume' : 'CoverLetter'}
+                  resumeData={
+                    mode === 'resume'
+                      ? resumeData
+                      : (coverLetterData as ResumeData)
+                  }
                 />
               </div>
 
