@@ -70,10 +70,7 @@ import {
   parseSkillsSortResponse,
   applySortedSkills,
 } from '@/lib/ai/sorting-prompts'
-
-// Default cover letter content
-const DEFAULT_COVER_LETTER_CONTENT =
-  "I'm a Toronto-based Principal Software Engineer with 7+ years delivering production-ready full-stack applications using React, React Native, Node.js, and MongoDB—the exact stack you're seeking. At Homewood Health, I transformed an abandoned MEAN application into a nationally-deployed platform serving 100,000+ users with 99.5% uptime, implemented enterprise OAuth/SAML authentication, and led the AngularJS-to-Next.js migration while reducing deployment time by 92%. My experience architecting REST APIs with Express.js, integrating external SDKs, implementing security protocols, and managing agile sprints directly aligns with your requirements. Having built FDA-compliant healthcare systems and worked with cross-functional teams across multiple countries, I understand the rigorous standards and fast-paced environment of innovative startups like Speer. I'm excited to leverage my proven track record in building scalable, testable code to help deliver your groundbreaking technologies—let's discuss how I can contribute to your mission this week."
+import { DEFAULT_COVER_LETTER_CONTENT } from '@/data/cover-letter'
 
 type EditorMode = 'resume' | 'coverLetter'
 
