@@ -27,6 +27,8 @@ import dynamic from 'next/dynamic'
 import Language from '@/components/resume/preview/Language'
 import Certification from '@/components/resume/preview/Certification'
 import useKeyboardShortcut from '@/hooks/useKeyboardShortcut'
+import { useAISettings } from '@/lib/contexts/AISettingsContext'
+import { Highlight } from '@/components/ui/Highlight'
 
 const DragDropContext = dynamic(
   () =>
@@ -58,6 +60,7 @@ const HighlightMenu = dynamic(
 )
 
 const Preview = () => {
+  const { settings } = useAISettings()
   const {
     resumeData,
     setResumeData,
@@ -236,7 +239,10 @@ const Preview = () => {
               contentEditable={editable}
               suppressContentEditableWarning
             >
-              {resumeData.position}
+              <Highlight
+                text={resumeData.position}
+                keywords={settings.skillsToHighlight}
+              />
             </h2>
             <ContactInfo
               mainclass="flex flex-row gap-1 mb-1 contact"
@@ -300,7 +306,10 @@ const Preview = () => {
                     contentEditable={editable}
                     suppressContentEditableWarning
                   >
-                    {resumeData.summary}
+                    <Highlight
+                      text={resumeData.summary}
+                      keywords={settings.skillsToHighlight}
+                    />
                   </p>
                 </div>
               )}
@@ -420,7 +429,10 @@ const Preview = () => {
                                   contentEditable={editable}
                                   suppressContentEditableWarning
                                 >
-                                  {item.organization}
+                                  <Highlight
+                                    text={item.organization}
+                                    keywords={settings.skillsToHighlight}
+                                  />
                                 </a>
                                 <DateRange
                                   startYear={item.startYear}
@@ -433,14 +445,20 @@ const Preview = () => {
                                 contentEditable={editable}
                                 suppressContentEditableWarning
                               >
-                                {item.position}
+                                <Highlight
+                                  text={item.position}
+                                  keywords={settings.skillsToHighlight}
+                                />
                               </p>
                               <p
                                 className="content editable"
                                 contentEditable={editable}
                                 suppressContentEditableWarning
                               >
-                                {item.description}
+                                <Highlight
+                                  text={item.description}
+                                  keywords={settings.skillsToHighlight}
+                                />
                               </p>
                               <Droppable
                                 droppableId={`WORK_EXPERIENCE_KEY_ACHIEVEMENT-${index}`}
@@ -493,7 +511,10 @@ const Preview = () => {
                                       Technologies:{' '}
                                     </span>
                                     <span className="content italic select-all">
-                                      {item.technologies.join(', ')}
+                                      <Highlight
+                                        text={item.technologies.join(', ')}
+                                        keywords={settings.skillsToHighlight}
+                                      />
                                     </span>
                                   </div>
                                 )}

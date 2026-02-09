@@ -64,6 +64,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { tooltips } from '@/config/tooltips'
 import { OnboardingTour } from '@/components/onboarding'
 import AISortButton from '@/components/ui/AISortButton'
+import { FormTextarea } from '@/components/ui/FormTextarea'
 import { requestAISort } from '@/lib/ai/openai-client'
 import {
   buildSkillsSortPrompt,
@@ -71,6 +72,7 @@ import {
   applySortedSkills,
 } from '@/lib/ai/sorting-prompts'
 import { DEFAULT_COVER_LETTER_CONTENT } from '@/data/cover-letter'
+import { generateSkillsToHighlightWithProvider } from '@/lib/ai/document-generator'
 
 type EditorMode = 'resume' | 'coverLetter'
 
@@ -247,8 +249,9 @@ function SkillGroupHeader({
  */
 function SkillsSection() {
   const context = useContext(ResumeContext)
-  const { settings, isConfigured } = useAISettings()
+  const { settings, updateSettings, isConfigured } = useAISettings()
   const [isSorting, setIsSorting] = useState(false)
+  const [isExtractingSkills, setIsExtractingSkills] = useState(false)
 
   if (!context) return null
 
@@ -327,6 +330,50 @@ function SkillsSection() {
     } finally {
       setIsSorting(false)
     }
+  }
+
+  const handleAIExtractSkills = async () => {
+    if (!isConfigured) {
+      toast.error('AI not configured', {
+        description:
+          'Please fill in the API settings and job description in the Generative AI Settings section above.',
+      })
+      return
+    }
+
+    if (
+      !settings.jobDescription ||
+      settings.jobDescription.trim().length < 50
+    ) {
+      toast.error('Job description too short', {
+        description: 'Please provide a more detailed job description first.',
+      })
+      return
+    }
+
+    setIsExtractingSkills(true)
+    toast.promise(
+      generateSkillsToHighlightWithProvider(
+        context.resumeData,
+        settings.jobDescription,
+        settings.apiUrl,
+        settings.apiKey,
+        settings.model,
+        settings.providerType
+      ),
+      {
+        loading: 'Extracting key skills from JD...',
+        success: (skills) => {
+          updateSettings({ skillsToHighlight: skills })
+          setIsExtractingSkills(false)
+          return 'Skills extracted successfully!'
+        },
+        error: (err) => {
+          setIsExtractingSkills(false)
+          return `Failed: ${err.message || 'Unknown error'}`
+        },
+      }
+    )
   }
 
   return (
@@ -431,6 +478,28 @@ function SkillsSection() {
           />
         </div>
       )}
+
+      {/* Skills to Highlight textarea */}
+      <div className="pt-2">
+        <FormTextarea
+          label="Skills to highlight"
+          name="skillsToHighlight"
+          value={settings.skillsToHighlight}
+          onChange={(e) =>
+            updateSettings({ skillsToHighlight: e.target.value })
+          }
+          placeholder="E.g. Focus on cloud architecture, mention leadership experience..."
+          variant="blue"
+          minHeight="80px"
+          helpText="Specify skills to highlight (comma-separated)"
+          onAIAction={handleAIExtractSkills}
+          isAILoading={isExtractingSkills}
+          aiButtonTitle="Extract skills from JD"
+          aiShowLabel={false}
+          isAIConfigured={isConfigured}
+          showCounter={false}
+        />
+      </div>
     </div>
   )
 }
@@ -524,9 +593,8 @@ function UnifiedEditor() {
         // Always merge with default data to ensure all fields exist
         setCoverLetterData({
           ...defaultResumeData,
-          content: DEFAULT_COVER_LETTER_CONTENT,
           ...parsedData,
-          // Ensure content is never empty - use default if saved content is empty
+          // Ensure content is never empty - use default if saved content or current is empty
           content:
             parsedData.content && parsedData.content.trim()
               ? parsedData.content

@@ -9,11 +9,13 @@ import type { ProviderPreset } from './providers'
 import {
   generateCoverLetter as generateCoverLetterOpenAI,
   generateSummary as generateSummaryOpenAI,
+  generateSkillsToHighlight as generateSkillsToHighlightOpenAI,
   OpenAIAPIError,
 } from './openai-client'
 import {
   generateCoverLetterWithGemini,
   generateSummaryWithGemini,
+  generateSkillsToHighlightWithGemini,
 } from './gemini-documents'
 import { GeminiAPIError } from './gemini-client'
 
@@ -109,6 +111,37 @@ export async function generateJobTitleWithProvider(
 
   // OpenAI-compatible
   return generateJobTitleOpenAI(
+    { baseURL: apiUrl, apiKey, model },
+    resumeData,
+    jobDescription,
+    onProgress
+  )
+}
+
+/**
+ * Generate skills to highlight using the appropriate provider
+ */
+export async function generateSkillsToHighlightWithProvider(
+  resumeData: ResumeData,
+  jobDescription: string,
+  apiUrl: string,
+  apiKey: string,
+  model: string,
+  providerType: 'openai-compatible' | 'gemini',
+  onProgress?: StreamCallback
+): Promise<string> {
+  if (providerType === 'gemini') {
+    return generateSkillsToHighlightWithGemini(
+      resumeData,
+      jobDescription,
+      apiKey,
+      model,
+      onProgress
+    )
+  }
+
+  // OpenAI-compatible
+  return generateSkillsToHighlightOpenAI(
     { baseURL: apiUrl, apiKey, model },
     resumeData,
     jobDescription,

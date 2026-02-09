@@ -15,6 +15,7 @@ import {
   buildJobTitlePrompt,
   validateJobTitle,
   postProcessJobTitle,
+  buildSkillsToHighlightPrompt,
 } from './document-prompts'
 
 /**
@@ -234,4 +235,60 @@ export async function testGeminiConnection(
     console.error('Gemini connection test failed:', error)
     return false
   }
+}
+
+/**
+ * Generates skills to highlight based on JD using Gemini
+ */
+export async function generateSkillsToHighlightWithGemini(
+  resumeData: ResumeData,
+  jobDescription: string,
+  apiKey: string,
+  model: string,
+  onProgress?: StreamCallback
+): Promise<string> {
+  const client = new GeminiClient({
+    providerType: 'gemini',
+    apiKey,
+    model,
+  })
+
+  // Build the prompt
+  const prompt = buildSkillsToHighlightPrompt(resumeData, jobDescription)
+
+  // Prepare the request
+  const messages: AIMessage[] = [
+    {
+      role: 'system',
+      content:
+        'You are a professional resume writer specializing in technical skills optimization. You identify key keywords from job descriptions to highlight on a resume.',
+    },
+    {
+      role: 'user',
+      content: prompt,
+    },
+  ]
+
+  const request: AIRequest = {
+    messages,
+    temperature: 0.5,
+    maxTokens: 500,
+    topP: 0.9,
+  }
+
+  // Provide a no-op callback if none was provided
+  const streamCallback: StreamCallback = onProgress || (() => {})
+  const generatedContent = await client.generateContentStream(
+    request,
+    streamCallback
+  )
+
+  if (!generatedContent || generatedContent.trim().length === 0) {
+    throw new GeminiAPIError(
+      'Gemini generated an empty response. Please try again.',
+      'empty_content'
+    )
+  }
+
+  return generatedContent.trim()
 }

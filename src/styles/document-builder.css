@@ -12,8 +12,10 @@
 }
 
 ::-webkit-scrollbar {
-  width: 0.625rem; /* 10px = 0.625rem */
-  height: 0.625rem; /* 10px = 0.625rem */
+  width: 0.625rem;
+  /* 10px = 0.625rem */
+  height: 0.625rem;
+  /* 10px = 0.625rem */
 }
 
 ::-webkit-scrollbar-track {
@@ -101,33 +103,39 @@ textarea::-moz-placeholder {
 }
 
 .name {
-  font-size: 2rem; /* 32px = 2rem */
+  font-size: 2rem;
+  /* 32px = 2rem */
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .profession {
-  font-size: 1.5rem; /* 24px = 1.5rem */
+  font-size: 1.5rem;
+  /* 24px = 1.5rem */
   text-transform: capitalize;
 }
 
 .contact {
-  font-size: 0.875rem; /* 14px = 0.875rem (text-sm) */
+  font-size: 0.875rem;
+  /* 14px = 0.875rem (text-sm) */
   font-weight: 400;
 }
 
 .social-media {
-  font-size: 0.75rem; /* 12px = 0.75rem (text-xs) */
+  font-size: 0.75rem;
+  /* 12px = 0.75rem (text-xs) */
   font-weight: 400;
 }
 
 .section-title {
-  font-size: 1rem; /* 16px = 1rem (text-base) */
+  font-size: 1rem;
+  /* 16px = 1rem (text-base) */
   font-weight: 700;
 }
 
 .content {
-  font-size: 0.875rem; /* 14px = 0.875rem (text-sm) */
+  font-size: 0.875rem;
+  /* 14px = 0.875rem (text-sm) */
   font-weight: 400;
 }
 

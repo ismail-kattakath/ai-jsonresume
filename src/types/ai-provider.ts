@@ -4,6 +4,7 @@
  */
 
 import type { StreamCallback } from './openai'
+export type { StreamCallback }
 
 /**
  * Supported AI provider types

@@ -2,6 +2,7 @@
 
 import React, { useState, useContext } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
+import AISortButton from '@/components/ui/AISortButton'
 import { toast } from 'sonner'
 import { useAISettings } from '@/lib/contexts/AISettingsContext'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
@@ -160,26 +161,13 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
     <div className={`space-y-2 ${className}`}>
       {/* Generate by JD button - positioned above textarea */}
       <div className="flex justify-end">
-        <button
-          type="button"
+        <AISortButton
+          isConfigured={isConfigured}
+          isLoading={isGenerating}
           onClick={handleGenerate}
-          disabled={isGenerating || !isConfigured}
-          title={
-            isConfigured ? 'Generate with AI' : 'Configure AI settings first'
-          }
-          className={`inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs transition-all ${
-            isGenerating || !isConfigured
-              ? 'cursor-not-allowed bg-white/5 text-white/30'
-              : 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 hover:from-purple-500/30 hover:to-blue-500/30 hover:text-purple-200'
-          }`}
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Sparkles className="h-3 w-3" />
-          )}
-          <span>Generate by JD</span>
-        </button>
+          label="Generate by JD"
+          size="sm"
+        />
       </div>
 
       {/* Textarea with character count */}

@@ -17,6 +17,7 @@ import {
   buildJobTitlePrompt,
   validateJobTitle,
   postProcessJobTitle,
+  buildSkillsToHighlightPrompt,
 } from '@/lib/ai/document-prompts'
 
 const STORAGE_KEY = 'ai_cover_letter_credentials'
@@ -440,6 +441,59 @@ export async function generateJobTitle(
   }
 
   return processedContent
+}
+
+/**
+ * Generates skills to highlight based on JD using OpenAI-compatible API
+ */
+export async function generateSkillsToHighlight(
+  config: OpenAIConfig,
+  resumeData: ResumeData,
+  jobDescription: string,
+  onProgress?: StreamCallback
+): Promise<string> {
+  // Build the prompt
+  const prompt = buildSkillsToHighlightPrompt(resumeData, jobDescription)
+
+  // Prepare the request
+  const request: OpenAIRequest = {
+    model: config.model,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are a professional resume writer specializing in technical skills optimization. You identify key keywords from job descriptions to highlight on a resume.',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+    temperature: 0.5,
+    max_tokens: 200, // Comma separated list is short
+    top_p: 0.9,
+  }
+
+  // Use streaming if callback provided, otherwise use regular request
+  if (onProgress) {
+    return await makeOpenAIStreamRequest(config, request, onProgress)
+  } else {
+    const response = await makeOpenAIRequest(config, request)
+    if (!response.choices || response.choices.length === 0) {
+      throw new OpenAIAPIError(
+        'AI generated an empty response. Please try again.',
+        'empty_response'
+      )
+    }
+    const content = response.choices[0].message.content
+    if (!content || content.trim().length === 0) {
+      throw new OpenAIAPIError(
+        'AI generated an empty response. Please try again.',
+        'empty_content'
+      )
+    }
+    return content.trim()
+  }
 }
 
 /**

@@ -16,6 +16,8 @@ interface AISortButtonProps {
   size?: 'sm' | 'md'
   /** Optional custom label */
   label?: string
+  /** Whether to show the text label */
+  showLabel?: boolean
 }
 
 /**
@@ -34,6 +36,7 @@ export default function AISortButton({
   disabledTooltip = 'Configure AI settings first',
   size = 'sm',
   label = 'Sort by JD',
+  showLabel = true,
 }: AISortButtonProps) {
   const sizeClasses =
     size === 'sm' ? 'px-2 py-1 text-xs gap-1' : 'px-3 py-1.5 text-sm gap-1.5'
@@ -41,13 +44,17 @@ export default function AISortButton({
   const iconSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
 
   const isDisabled = !isConfigured || isLoading
+  const showTooltip = !showLabel || (isDisabled && !isLoading)
+  const tooltipText = isDisabled && !isLoading ? disabledTooltip : label
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={isDisabled}
-      title={isDisabled && !isLoading ? disabledTooltip : `AI ${label}`}
+      title={showTooltip ? tooltipText : undefined}
+      data-tooltip-id={showTooltip ? 'app-tooltip' : undefined}
+      data-tooltip-content={showTooltip ? tooltipText : undefined}
       className={`inline-flex cursor-pointer items-center rounded transition-all ${sizeClasses} ${
         isDisabled
           ? 'cursor-not-allowed bg-white/5 text-white/30'
@@ -59,7 +66,7 @@ export default function AISortButton({
       ) : (
         <Sparkles className={iconSize} />
       )}
-      <span>{label}</span>
+      {showLabel && <span>{label}</span>}
     </button>
   )
 }

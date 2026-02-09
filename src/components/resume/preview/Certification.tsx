@@ -1,4 +1,8 @@
+import { useAISettings } from '@/lib/contexts/AISettingsContext'
+import { Highlight } from '@/components/ui/Highlight'
+
 const Certification = ({ title, certifications }) => {
+  const { settings } = useAISettings()
   return (
     certifications.length > 0 && (
       <div>
@@ -7,7 +11,26 @@ const Certification = ({ title, certifications }) => {
         </h2>
         <ul className="content list-disc ps-3.5">
           {certifications.map((certification, index) => (
-            <li key={index}>{certification}</li>
+            <li key={index}>
+              <Highlight
+                text={
+                  typeof certification === 'string'
+                    ? certification
+                    : certification.name
+                }
+                keywords={settings.skillsToHighlight}
+              />
+              {typeof certification !== 'string' && certification.issuer && (
+                <span>
+                  {' '}
+                  -{' '}
+                  <Highlight
+                    text={certification.issuer}
+                    keywords={settings.skillsToHighlight}
+                  />
+                </span>
+              )}
+            </li>
           ))}
         </ul>
       </div>

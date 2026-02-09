@@ -13,8 +13,11 @@ import { formatUrl } from '@/lib/utils/formatUrl'
 import Image from 'next/image'
 import { useContext } from 'react'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import { useAISettings } from '@/lib/contexts/AISettingsContext'
+import { Highlight } from '@/components/ui/Highlight'
 
 const ProfileHeader = () => {
+  const { settings } = useAISettings()
   const {
     resumeData,
     setResumeData,

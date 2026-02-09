@@ -1,7 +1,10 @@
 import React, { useContext } from 'react'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import { useAISettings } from '@/lib/contexts/AISettingsContext'
+import { Highlight } from '@/components/ui/Highlight'
 
 const Skills = ({ title, skills }) => {
+  const { settings } = useAISettings()
   const {
     resumeData,
     setResumeData,
@@ -54,7 +57,10 @@ const Skills = ({ title, skills }) => {
                 suppressContentEditableWarning
                 onBlur={(e) => handleSkillChange(e, index)}
               >
-                {skill.text}
+                <Highlight
+                  text={skill.text}
+                  keywords={settings.skillsToHighlight}
+                />
               </span>
             </span>
           ))}
