@@ -2,16 +2,14 @@
   "$schema": "https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json",
   "basics": {
     "name": "Ismail Kattakath",
-    "label": "GenAI & AgenticAI Architect | Full Stack Developer",
+    "label": "Full Stack Developer | Tech Lead | LLMOps",
     "image": "",
     "email": "ismail@kattakath.com",
     "phone": "+1 (647) 225-2878",
     "url": "https://ismail.kattakath.com",
-    "calendar": "https://calendar.app.google/djSRHAdTuSEanoea7",
+    "calendar": "https://ismail.kattakath.com/book",
     "summary": "Lead Full Stack Engineer with extensive experience in React/Next.js, TypeScript, and modern web development. Led a Next.js green-field migration at Homewood Health Inc., transforming an abandoned MEAN stack into a production platform with 99.5% uptime, reducing deployment time from 4 hours to 20 minutes through CI/CD automation; served hundreds of thousands of users across multiple federated vendors. At Etuper Technologies Pvt. Ltd., steered cross-functional teams in building micro-frontend solutions, delivering reusable component libraries and shared design systems while maintaining a 65% reduction in production incidents. Currently architecting scalable GenAI inference infrastructure at Silver Creek Insights Inc., yet focused on frontend ownership and stakeholder collaboration. Proven ability to own end-to-end delivery, mentor junior engineers, enforce coding standards, and drive performance optimization. Deep expertise in React.js, Next.js App Router, TypeScript, Tailwind CSS, module federation, Jest, Playwright, GitHub Actions, Docker, and cloud platforms (AWS, GCP).",
     "location": {
-      "address": "24-242 John Garland Blvd",
-      "postalCode": "M9V 1N8",
       "city": "Toronto",
       "countryCode": "CA",
       "region": "ON"
@@ -34,8 +32,7 @@
       "name": "Silver Creek Insights Inc.",
       "position": "Principal Software Engineer",
       "url": "https://silvercreek.ai",
-      "startDate": "2024-08-01",
-      "endDate": "",
+      "startDate": "2024-08",
       "summary": "Worked on an AI-as-a-Service platform (aloshy.ai) providing B2B APIs for media manipulation and custom-trained generative AI pipelines tailored to specific business needs.",
       "highlights": [
         "Built enterprise-grade secured API architecture using centralized gateway/aggregator for serving internal and curated third-party MCP servers/tools.",
@@ -62,8 +59,8 @@
       "name": "Homewood Health Inc.",
       "position": "Senior Software Engineer",
       "url": "https://homewoodhealth.com",
-      "startDate": "2017-10-01",
-      "endDate": "2024-07-01",
+      "startDate": "2017-10",
+      "endDate": "2024-07",
       "summary": "Worked on Canada's leading digital mental health platform (homeweb.ca), delivering EFAP and CBT solutions to hundreds of thousands of employees nationwide.",
       "highlights": [
         "Led complete frontend migration from AngularJS to Next.js upon framework EOL, preserving existing UI/UX and API compatibility.",
@@ -93,8 +90,8 @@
       "name": "Scotiabank",
       "position": "IT Consultant",
       "url": "https://scotiabank.com",
-      "startDate": "2019-02-01",
-      "endDate": "2019-06-01",
+      "startDate": "2019-02",
+      "endDate": "2019-06",
       "summary": "Contracted for professional scheduled maintenance of business-critical legacy IBM systems, executing upgrades and infrastructure improvements with zero downtime.",
       "highlights": [
         "Implemented Business Unit Hierarchy user interface using Angular 6.",
@@ -121,9 +118,9 @@
       "name": "Etuper Technologies Pvt. Ltd.",
       "position": "Lead Software Engineer",
       "url": "https://facebook.com/com.etuper",
-      "startDate": "2016-04-01",
-      "endDate": "2017-08-01",
-      "summary": "Worked on a complete hospitality software suite (Brilliant Rewards)—dashboard, mobile and web apps—featuring loyalty programs, marketing automation, booking integration, and analytics.",
+      "startDate": "2016-04",
+      "endDate": "2017-08",
+      "summary": "Worked on a complete hospitality software suite (Brilliant Rewards)\u2014dashboard, mobile and web apps\u2014featuring loyalty programs, marketing automation, booking integration, and analytics.",
       "highlights": [
         "Led development of scalable microservices architecture with containerized, discoverable APIs following OpenAPI specifications.",
         "Managed sprint planning, daily standups, backlog prioritization, and blocker resolution to ensure continuous delivery.",
@@ -148,8 +145,8 @@
       "name": "RM plc.",
       "position": "Software Engineer",
       "url": "https://rmplc.com",
-      "startDate": "2011-06-01",
-      "endDate": "2016-03-01",
+      "startDate": "2011-06",
+      "endDate": "2016-03",
       "summary": "Worked on a school MIS system (RM Integris) featuring student management, grade tracking, attendance monitoring, parent portals, and performance analytics.",
       "highlights": [
         "Implemented OpenAPI/Swagger bridging layer to modernize legacy SOAP APIs for RESTful client consumption.",
@@ -175,8 +172,8 @@
       "name": "Posibolt Solutions Pvt. Ltd.",
       "position": "Junior Software Engineer",
       "url": "https://posibolt.com",
-      "startDate": "2010-07-01",
-      "endDate": "2011-01-01",
+      "startDate": "2010-07",
+      "endDate": "2011-01",
       "summary": "Worked on an adaptable cloud ERP solution (Posibolt) serving key retail businesses across global industry segments.",
       "highlights": [
         "Created UI mockups based on SRS specifications and converted approved designs into responsive HTML/CSS templates.",
@@ -201,8 +198,8 @@
       "url": "https://mgu.ac.in",
       "area": "Computer Science and Engineering",
       "studyType": "Bachelor's Degree",
-      "startDate": "2006-07-01",
-      "endDate": "2010-04-01"
+      "startDate": "2006-07",
+      "endDate": "2010-04"
     }
   ],
   "awards": [],
@@ -237,8 +234,8 @@
       "name": "Cloud Services",
       "level": "",
       "keywords": [
-        "Google Cloud (Vertex AI, GKE)",
-        "AWS (EKS, SageMaker, EC2 P4/P5, Inferentia, Lambda, S3)",
+        "GCP",
+        "AWS",
         "Vercel",
         "DigitalOcean",
         "MongoDB Atlas",
