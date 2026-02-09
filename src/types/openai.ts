@@ -24,9 +24,6 @@ export interface OpenAIRequest {
   presence_penalty?: number
   stop?: string[]
   stream?: boolean
-  response_format?: {
-    type: 'text' | 'json_object'
-  }
 }
 
 export interface OpenAIChoice {

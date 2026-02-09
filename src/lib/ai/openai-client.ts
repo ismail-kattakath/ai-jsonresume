@@ -677,7 +677,6 @@ export async function requestAISort(
     temperature: 0.3, // Lower temperature for more consistent sorting
     max_tokens: 2000, // Sufficient for sorting responses
     top_p: 0.9,
-    response_format: { type: 'json_object' },
   }
 
   const response = await makeOpenAIRequest(config, request)

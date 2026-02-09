@@ -57,7 +57,6 @@ export interface AIRequest {
   temperature?: number
   maxTokens?: number
   topP?: number
-  responseSchema?: any // Schema for structured output
 }
 
 /**
