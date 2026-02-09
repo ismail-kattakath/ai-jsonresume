@@ -2,7 +2,10 @@ const DateRange = ({ startYear, endYear, id, showOnlyEndDate = false }) => {
   // Helper function to parse date string and create Date object in local time
   const parseDate = (dateString) => {
     if (!dateString) return null
-    const [year, month, day] = dateString.split('-').map(Number)
+    const parts = dateString.split('-').map(Number)
+    const year = parts[0]
+    const month = parts[1]
+    const day = parts[2] || 1 // Default to 1st if day is missing
     return new Date(year, month - 1, day) // month is 0-indexed
   }
 
