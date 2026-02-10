@@ -212,7 +212,7 @@ export const mockFormData = {
   ],
   workExperience: [
     {
-      company: 'Tech Corp',
+      organization: 'Tech Corp',
       url: 'techcorp.com',
       position: 'Senior Developer',
       description: 'Led development projects',
@@ -226,7 +226,7 @@ export const mockFormData = {
     {
       school: 'University of Toronto',
       url: 'utoronto.ca',
-      degree: "Bachelor's Degree in Computer Science",
+      studyType: "Bachelor's Degree in Computer Science",
       startYear: '2015-09-01',
       endYear: '2019-06-01',
     },
