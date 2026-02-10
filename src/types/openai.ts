@@ -65,6 +65,7 @@ export interface StoredCredentials {
   providerType?: AIProviderType // Type of provider (openai-compatible or gemini)
   rememberCredentials: boolean
   lastJobDescription?: string
+  skillsToHighlight?: string
 }
 
 // Streaming types

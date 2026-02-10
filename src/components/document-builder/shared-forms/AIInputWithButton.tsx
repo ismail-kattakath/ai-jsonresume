@@ -2,6 +2,7 @@
 
 import React, { useState, useContext } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
+import AISortButton from '@/components/ui/AISortButton'
 import { toast } from 'sonner'
 import { useAISettings } from '@/lib/contexts/AISettingsContext'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
@@ -136,25 +137,16 @@ const AIInputWithButton: React.FC<AIInputWithButtonProps> = ({
           onChange={onChange}
           disabled={isGenerating}
         />
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={isGenerating || !isConfigured}
-          title={
-            isConfigured ? 'Generate with AI' : 'Configure AI settings first'
-          }
-          className={`absolute top-1/2 right-2 inline-flex -translate-y-1/2 cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs transition-all ${
-            isGenerating || !isConfigured
-              ? 'cursor-not-allowed bg-white/5 text-white/30'
-              : 'bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 hover:from-purple-500/30 hover:to-blue-500/30 hover:text-purple-200'
-          }`}
-        >
-          {isGenerating ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Sparkles className="h-3 w-3" />
-          )}
-        </button>
+        <div className="absolute top-1/2 right-2 -translate-y-1/2">
+          <AISortButton
+            isConfigured={isConfigured}
+            isLoading={isGenerating}
+            onClick={handleGenerate}
+            label="Generate by JD"
+            showLabel={false}
+            size="sm"
+          />
+        </div>
       </div>
       <label className="floating-label">{label}</label>
     </div>

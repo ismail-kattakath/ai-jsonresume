@@ -21,7 +21,7 @@ export interface WorkExperience {
   keyAchievements: Achievement[]
   startYear: string
   endYear: string
-  technologies: string[]
+  technologies?: string[]
   showTechnologies?: boolean // Optional: controls visibility of technologies in preview
 }
 
@@ -36,6 +36,7 @@ export interface Education {
 
 export interface Skill {
   text: string
+  highlight?: boolean
 }
 
 export interface SkillGroup {
@@ -69,6 +70,7 @@ export interface ResumeData {
   email: string
   address: string
   profilePicture: string
+  profileImage?: string
   calendarLink?: string
   socialMedia: SocialMediaLink[]
   summary: string

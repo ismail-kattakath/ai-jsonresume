@@ -64,6 +64,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { tooltips } from '@/config/tooltips'
 import { OnboardingTour } from '@/components/onboarding'
 import AISortButton from '@/components/ui/AISortButton'
+import { FormTextarea } from '@/components/ui/FormTextarea'
 import { requestAISort } from '@/lib/ai/openai-client'
 import {
   buildSkillsSortPrompt,
@@ -71,6 +72,7 @@ import {
   applySortedSkills,
 } from '@/lib/ai/sorting-prompts'
 import { DEFAULT_COVER_LETTER_CONTENT } from '@/data/cover-letter'
+import { generateSkillsToHighlightWithProvider } from '@/lib/ai/document-generator'
 
 type EditorMode = 'resume' | 'coverLetter'
 
@@ -247,8 +249,9 @@ function SkillGroupHeader({
  */
 function SkillsSection() {
   const context = useContext(ResumeContext)
-  const { settings, isConfigured } = useAISettings()
+  const { settings, updateSettings, isConfigured } = useAISettings()
   const [isSorting, setIsSorting] = useState(false)
+  const [isExtractingSkills, setIsExtractingSkills] = useState(false)
 
   if (!context) return null
 
@@ -327,6 +330,50 @@ function SkillsSection() {
     } finally {
       setIsSorting(false)
     }
+  }
+
+  const handleAIExtractSkills = async () => {
+    if (!isConfigured) {
+      toast.error('AI not configured', {
+        description:
+          'Please fill in the API settings and job description in the Generative AI Settings section above.',
+      })
+      return
+    }
+
+    if (
+      !settings.jobDescription ||
+      settings.jobDescription.trim().length < 50
+    ) {
+      toast.error('Job description too short', {
+        description: 'Please provide a more detailed job description first.',
+      })
+      return
+    }
+
+    setIsExtractingSkills(true)
+    toast.promise(
+      generateSkillsToHighlightWithProvider(
+        context.resumeData,
+        settings.jobDescription,
+        settings.apiUrl,
+        settings.apiKey,
+        settings.model,
+        settings.providerType
+      ),
+      {
+        loading: 'Extracting key skills from JD...',
+        success: (skills) => {
+          updateSettings({ skillsToHighlight: skills })
+          setIsExtractingSkills(false)
+          return 'Skills extracted successfully!'
+        },
+        error: (err) => {
+          setIsExtractingSkills(false)
+          return `Failed: ${err.message || 'Unknown error'}`
+        },
+      }
+    )
   }
 
   return (
@@ -431,6 +478,28 @@ function SkillsSection() {
           />
         </div>
       )}
+
+      {/* Skills to Highlight textarea */}
+      <div className="pt-2">
+        <FormTextarea
+          label="Skills to highlight"
+          name="skillsToHighlight"
+          value={settings.skillsToHighlight}
+          onChange={(e) =>
+            updateSettings({ skillsToHighlight: e.target.value })
+          }
+          placeholder="E.g. Focus on cloud architecture, mention leadership experience..."
+          variant="blue"
+          minHeight="80px"
+          helpText="Specify skills to highlight (comma-separated)"
+          onAIAction={handleAIExtractSkills}
+          isAILoading={isExtractingSkills}
+          aiButtonTitle="Extract skills from JD"
+          aiShowLabel={false}
+          isAIConfigured={isConfigured}
+          showCounter={false}
+        />
+      </div>
     </div>
   )
 }
@@ -479,10 +548,25 @@ function UnifiedEditor() {
           handleChange: coverLetterHandlers.handleChange,
         }
 
-  // Migrate skills data on mount if needed (resume only)
+  // Load saved data on mount
   useEffect(() => {
-    if (resumeData.skills && resumeData.skills.length > 0) {
-      const needsMigration = resumeData.skills.some((skillCategory) =>
+    // 1. Load resume data
+    const savedResumeData = localStorage.getItem('resumeData')
+    let initialResumeData = resumeData
+
+    if (savedResumeData) {
+      try {
+        const parsedResume = JSON.parse(savedResumeData)
+        initialResumeData = parsedResume
+        setResumeData(parsedResume)
+      } catch (error) {
+        console.error('Error loading saved resume data:', error)
+      }
+    }
+
+    // 2. Migrate skills data if needed
+    if (initialResumeData.skills && initialResumeData.skills.length > 0) {
+      const needsMigration = initialResumeData.skills.some((skillCategory) =>
         skillCategory.skills.some(
           (skill) =>
             typeof skill === 'string' ||
@@ -492,14 +576,13 @@ function UnifiedEditor() {
 
       if (needsMigration) {
         const migratedData = {
-          ...resumeData,
-          skills: resumeData.skills.map((skillCategory) => ({
+          ...initialResumeData,
+          skills: initialResumeData.skills.map((skillCategory) => ({
             ...skillCategory,
             skills: skillCategory.skills.map((skill) => {
               if (typeof skill === 'string') {
                 return { text: skill, highlight: false }
               }
-              // Handle old 'underline' property
               if ('underline' in skill && skill.highlight === undefined) {
                 return {
                   text: skill.text,
@@ -511,22 +594,19 @@ function UnifiedEditor() {
           })),
         }
         setResumeData(migratedData)
+        // Keep initialResumeData in sync for CL sync below
+        initialResumeData = migratedData
       }
     }
-  }, [])
 
-  // Load saved cover letter data on mount
-  useEffect(() => {
-    const savedData = localStorage.getItem('coverLetterData')
-    if (savedData) {
+    // 3. Load saved cover letter data
+    const savedCLData = localStorage.getItem('coverLetterData')
+    if (savedCLData) {
       try {
-        const parsedData = JSON.parse(savedData)
-        // Always merge with default data to ensure all fields exist
+        const parsedData = JSON.parse(savedCLData)
         setCoverLetterData({
           ...defaultResumeData,
-          content: DEFAULT_COVER_LETTER_CONTENT,
           ...parsedData,
-          // Ensure content is never empty - use default if saved content is empty
           content:
             parsedData.content && parsedData.content.trim()
               ? parsedData.content
@@ -537,6 +617,27 @@ function UnifiedEditor() {
       }
     }
   }, [])
+
+  // Save resume data on change
+  useEffect(() => {
+    if (resumeData !== defaultResumeData) {
+      localStorage.setItem('resumeData', JSON.stringify(resumeData))
+    }
+  }, [resumeData])
+
+  // Save cover letter data on change
+  useEffect(() => {
+    // Check if it's different from the initial default state (which has default content)
+    const isDefaultContent =
+      coverLetterData.content === DEFAULT_COVER_LETTER_CONTENT
+    const isDefaultData =
+      JSON.stringify({ ...coverLetterData, content: '' }) ===
+      JSON.stringify({ ...defaultResumeData, content: '' })
+
+    if (!(isDefaultContent && isDefaultData)) {
+      localStorage.setItem('coverLetterData', JSON.stringify(coverLetterData))
+    }
+  }, [coverLetterData])
 
   // Synchronize shared fields between resume and cover letter
   // Use refs to track the last synced values and prevent infinite loops

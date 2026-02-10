@@ -73,6 +73,7 @@ export interface AISettings {
   model: string
   providerType: AIProviderType
   jobDescription: string
+  skillsToHighlight: string
   rememberCredentials: boolean
 }
 
@@ -93,6 +94,7 @@ const defaultSettings: AISettings = {
   model: DEFAULT_MODEL,
   providerType: 'openai-compatible',
   jobDescription: DEFAULT_JOB_DESCRIPTION,
+  skillsToHighlight: '',
   rememberCredentials: true,
 }
 
@@ -167,6 +169,7 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
         providerType: saved.providerType || 'openai-compatible',
         rememberCredentials: true,
         jobDescription: saved.lastJobDescription || DEFAULT_JOB_DESCRIPTION,
+        skillsToHighlight: saved.skillsToHighlight || '',
       }))
     }
     setIsInitialized(true)
@@ -214,6 +217,7 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
       providerType: settings.providerType,
       rememberCredentials: settings.rememberCredentials,
       lastJobDescription: settings.jobDescription,
+      skillsToHighlight: settings.skillsToHighlight,
     })
   }, [settings, isInitialized])
 
