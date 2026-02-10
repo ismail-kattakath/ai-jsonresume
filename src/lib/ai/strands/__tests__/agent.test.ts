@@ -1,4 +1,4 @@
-import { analyzeJobDescription, analyzeJobDescriptionGraph } from '../agent'
+import { analyzeJobDescription, analyzeJobDescriptionGraph, sortSkillsGraph } from '../agent'
 import { Agent } from '@strands-agents/sdk'
 import { OpenAIModel } from '@strands-agents/sdk/openai'
 
@@ -37,9 +37,9 @@ describe('Strands Agent Lib', () => {
       const mockInvoke = jest.fn().mockResolvedValue({
         toString: () => 'Improved JD text',
       })
-      ;(Agent as jest.Mock).mockImplementation(() => ({
-        invoke: mockInvoke,
-      }))
+        ; (Agent as jest.Mock).mockImplementation(() => ({
+          invoke: mockInvoke,
+        }))
 
       const result = await analyzeJobDescription(mockJD, mockConfig)
 
@@ -60,9 +60,9 @@ describe('Strands Agent Lib', () => {
         }
       }
       const onProgress = jest.fn()
-      ;(Agent as jest.Mock).mockImplementation(() => ({
-        stream: mockStream,
-      }))
+        ; (Agent as jest.Mock).mockImplementation(() => ({
+          stream: mockStream,
+        }))
 
       const result = await analyzeJobDescription(mockJD, mockConfig, onProgress)
 
@@ -92,12 +92,12 @@ describe('Strands Agent Lib', () => {
         .mockResolvedValue({ toString: () => 'APPROVED: Highly professional' })
 
       let agentCount = 0
-      ;(Agent as jest.Mock).mockImplementation(() => {
-        agentCount++
-        return {
-          invoke: agentCount === 1 ? mockRefinerInvoke : mockReviewerInvoke,
-        }
-      })
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefinerInvoke : mockReviewerInvoke,
+          }
+        })
 
       const onProgress = jest.fn()
       const result = await analyzeJobDescriptionGraph(
@@ -138,12 +138,12 @@ describe('Strands Agent Lib', () => {
         .mockResolvedValueOnce(mockReviewer2Value)
 
       let agentCount = 0
-      ;(Agent as jest.Mock).mockImplementation(() => {
-        agentCount++
-        return {
-          invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
-        }
-      })
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+          }
+        })
 
       const result = await analyzeJobDescriptionGraph(mockJD, mockConfig)
 
@@ -165,12 +165,12 @@ describe('Strands Agent Lib', () => {
         .mockResolvedValue({ toString: () => 'CRITIQUE: Loop' })
 
       let agentCount = 0
-      ;(Agent as jest.Mock).mockImplementation(() => {
-        agentCount++
-        return {
-          invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
-        }
-      })
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+          }
+        })
 
       const result = await analyzeJobDescriptionGraph(mockJD, mockConfig)
 
@@ -180,6 +180,92 @@ describe('Strands Agent Lib', () => {
       expect(mockRefineInvoke).toHaveBeenCalledTimes(3)
       expect(mockReviewInvoke).toHaveBeenCalledTimes(3)
       expect(result).toBe('Always Same')
+    })
+  })
+
+  describe('sortSkillsGraph', () => {
+    const mockSkills = [
+      { title: 'Programming', skills: [{ text: 'React' }, { text: 'JS' }] },
+    ]
+
+    it('sorts and returns validated JSON result', async () => {
+      const mockResult = {
+        groupOrder: ['Programming'],
+        skillOrder: { Programming: ['JS', 'React', 'Next.js'] },
+      }
+      const mockRefineInvoke = jest
+        .fn()
+        .mockResolvedValue({ toString: () => JSON.stringify(mockResult) })
+      const mockReviewInvoke = jest.fn().mockResolvedValue({ toString: () => 'APPROVED' })
+
+      let agentCount = 0
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+          }
+        })
+
+      const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
+
+      expect(Agent).toHaveBeenCalledTimes(2)
+      expect(result).toEqual(mockResult)
+    })
+
+    it('retries when reviewer provides critique', async () => {
+      const mockResult = {
+        groupOrder: ['Programming'],
+        skillOrder: { Programming: ['JS', 'React'] },
+      }
+      const mockRefineInvoke = jest
+        .fn()
+        .mockResolvedValueOnce({ toString: () => 'invalid-json' })
+        .mockResolvedValueOnce({ toString: () => JSON.stringify(mockResult) })
+
+      const mockReviewInvoke = jest
+        .fn()
+        .mockResolvedValueOnce({ toString: () => 'CRITIQUE: Bad JSON' })
+        .mockResolvedValueOnce({ toString: () => 'APPROVED' })
+
+      let agentCount = 0
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+          }
+        })
+
+      const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
+
+      expect(mockRefineInvoke).toHaveBeenCalledTimes(2)
+      expect(mockReviewInvoke).toHaveBeenCalledTimes(2)
+      expect(result).toEqual(mockResult)
+    })
+
+    it('falls back to parsing last result on error after max iterations', async () => {
+      const mockResult = {
+        groupOrder: ['Programming'],
+        skillOrder: { Programming: ['React'] },
+      }
+      const mockRefineInvoke = jest
+        .fn()
+        .mockResolvedValue({ toString: () => JSON.stringify(mockResult) })
+      const mockReviewInvoke = jest
+        .fn()
+        .mockResolvedValue({ toString: () => 'CRITIQUE: Never perfect' })
+
+      let agentCount = 0
+        ; (Agent as jest.Mock).mockImplementation(() => {
+          agentCount++
+          return {
+            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+          }
+        })
+
+      const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
+
+      expect(mockRefineInvoke).toHaveBeenCalledTimes(3)
+      expect(result).toEqual(mockResult)
     })
   })
 })

@@ -8,6 +8,8 @@
 import { Agent } from '@strands-agents/sdk'
 import { OpenAIModel } from '@strands-agents/sdk/openai'
 import { StreamCallback } from '@/types/openai'
+import { SkillGroup } from '@/types'
+import { SkillsSortResult } from '@/lib/ai/sorting-prompts'
 
 /**
  * Interface for agent configuration pulled from AISettings
@@ -215,4 +217,122 @@ export async function analyzeJobDescriptionGraph(
 
   if (onProgress) onProgress({ content: '', done: true })
   return finalJD
+}
+
+/**
+ * A multi-agent graph flow that sorts resume skills based on job description relevance.
+ * Also identifies and adds relevant missing skills.
+ *
+ * @param skills - The current skill groups
+ * @param jobDescription - The target job description
+ * @param config - Provider configuration from AISettings
+ * @param onProgress - Optional callback for streaming updates
+ * @returns The sorted and enhanced SkillsSortResult
+ */
+export async function sortSkillsGraph(
+  skills: SkillGroup[],
+  jobDescription: string,
+  config: AgentConfig,
+  onProgress?: StreamCallback
+): Promise<SkillsSortResult> {
+  const model = new OpenAIModel({
+    modelId: config.model,
+    apiKey: config.apiKey || 'not-needed',
+    clientConfig: {
+      baseURL: config.apiUrl,
+      dangerouslyAllowBrowser: true,
+    },
+  })
+
+  const skillsData = skills.map((group) => ({
+    title: group.title,
+    skills: (group.skills || []).map((s) => s.text),
+  }))
+
+  const refiner = new Agent({
+    model,
+    systemPrompt:
+      'You are a Skill Sorting Expert. ' +
+      'Your goal is to sort resume skills by relevance to a job description AND identify missing key technologies. ' +
+      'RULES:\n' +
+      '1. Sort the skill groups (groupOrder) by relevance.\n' +
+      '2. Sort skills within each group (skillOrder) by relevance.\n' +
+      '3. IDENTIFY MISSING SKILLS: Find tech/tools from the JD not in the current list and add them to appropriate groups.\n' +
+      '4. Preserve ALL existing skills.\n' +
+      '5. Output ONLY valid JSON in this exact format:\n' +
+      '{\n' +
+      '  "groupOrder": ["Group 1", "Group 2", ...],\n' +
+      '  "skillOrder": {\n' +
+      '    "Group 1": ["skillA", "skillB", ...],\n' +
+      '    "Group 2": ["skillC", "skillD", ...]\n' +
+      '  }\n' +
+      '}',
+    printer: false,
+  })
+
+  const reviewer = new Agent({
+    model,
+    systemPrompt:
+      'You are a JSON & Data Validator. ' +
+      'Review the provided skill sorting result against the original data.\n' +
+      'CRITERIA:\n' +
+      '1. Is it valid JSON?\n' +
+      '2. Are ALL original groups and skills still present?\n' +
+      '3. Is the format exactly as requested?\n' +
+      'If perfect, respond "APPROVED". Otherwise, respond with "CRITIQUE: <reasons>".',
+    printer: false,
+  })
+
+  let currentResult = ''
+  let lastValidJson = ''
+  let iteration = 0
+  const maxIterations = 2
+
+  const inputContext = `JOB DESCRIPTION:\n${jobDescription}\n\nCURRENT SKILLS:\n${JSON.stringify(skillsData, null, 2)}`
+
+  if (onProgress) onProgress({ content: '🔍 Analyzing skills and job description...\n', done: false })
+
+  while (iteration <= maxIterations) {
+    iteration++
+    if (onProgress) onProgress({ content: `\n[Agent: Refiner] Sorting skills (Attempt ${iteration})...\n`, done: false })
+
+    const prompt = iteration === 1
+      ? inputContext
+      : `Previous result was rejected. Critiques:\n${currentResult}\n\nPlease fix and return ONLY valid JSON.`
+
+    const result = await refiner.invoke(prompt)
+    const rawResult = result.toString().trim()
+
+    // Quick cleanup (remove markdown code blocks if AI added them)
+    const cleaned = rawResult.replace(/```json/g, '').replace(/```/g, '').trim()
+    lastValidJson = cleaned
+
+    if (onProgress) onProgress({ content: `\n[Agent: Reviewer] Checking data integrity...\n`, done: false })
+
+    const review = await reviewer.invoke(`Original Data:\n${JSON.stringify(skillsData)}\n\nAI Result:\n${cleaned}`)
+    const reviewText = review.toString().trim()
+
+    if (reviewText.startsWith('APPROVED')) {
+      try {
+        const finalJson = JSON.parse(cleaned) as SkillsSortResult
+        if (onProgress) onProgress({ content: '✅ Skills sorted and validated.\n', done: false })
+        if (onProgress) onProgress({ content: '', done: true })
+        return finalJson
+      } catch (e) {
+        currentResult = `CRITIQUE: Failed to parse JSON even though reviewer approved. Response was: ${cleaned}`
+      }
+    } else {
+      currentResult = reviewText // Pass critiques back to next iteration
+      if (onProgress) onProgress({ content: `❌ ${reviewText}\n`, done: false })
+    }
+  }
+
+  // Fallback: try to parse the last result anyway
+  try {
+    console.log('[sortSkillsGraph] Attempting fallback parse of:', lastValidJson.substring(0, 50))
+    return JSON.parse(lastValidJson) as SkillsSortResult
+  } catch (e) {
+    console.error('[sortSkillsGraph] Fallback parse failed:', e)
+    throw new Error('Failed to generate a valid skill sorting result after multiple attempts.')
+  }
 }
