@@ -13,7 +13,7 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(onborda|react-tooltip|@strands-agents/sdk)/)',
+    'node_modules/(?!(onborda|react-tooltip|@strands-agents)/)',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
