@@ -243,14 +243,14 @@ const AISettings: React.FC = () => {
 
   const modelOptions = hasApiModels
     ? availableModels.map((model) => ({
+      value: model,
+      label: model,
+    }))
+    : shouldUseFallback
+      ? currentProvider.commonModels!.map((model) => ({
         value: model,
         label: model,
       }))
-    : shouldUseFallback
-      ? currentProvider.commonModels!.map((model) => ({
-          value: model,
-          label: model,
-        }))
       : []
 
   const showCustomURL = selectedProvider === 'OpenAI Compatible'
@@ -462,6 +462,7 @@ const AISettings: React.FC = () => {
         aiButtonTitle="Refine with AI"
         aiShowLabel={true}
         disabled={isAnalyzing}
+        showCounter={false}
       />
     </div>
   )
