@@ -76,7 +76,7 @@ const Preview = () => {
     { name: 'website', icon: <FaGlobe /> },
   ]
 
-  const onDragEnd = (result) => {
+  const onDragEnd = (result: any) => {
     const { destination, source } = result
 
     if (!destination) return
@@ -90,48 +90,73 @@ const Preview = () => {
     if (source.droppableId === 'work-experience') {
       const newWorkExperience = [...resumeData.workExperience]
       const [removed] = newWorkExperience.splice(source.index, 1)
-      newWorkExperience.splice(destination.index, 0, removed)
-      setResumeData({ ...resumeData, workExperience: newWorkExperience })
+      if (removed) {
+        newWorkExperience.splice(destination.index, 0, removed)
+        setResumeData({ ...resumeData, workExperience: newWorkExperience })
+      }
     }
 
     if (source.droppableId.includes('WORK_EXPERIENCE_KEY_ACHIEVEMENT')) {
       const newWorkExperience = [...resumeData.workExperience]
       const workExperienceIndex = parseInt(source.droppableId.split('-')[1])
-      const keyAchievements = [
-        ...newWorkExperience[workExperienceIndex].keyAchievements,
-      ]
-      const [removed] = keyAchievements.splice(source.index, 1)
-      keyAchievements.splice(destination.index, 0, removed)
-      newWorkExperience[workExperienceIndex].keyAchievements = keyAchievements
-      setResumeData({ ...resumeData, workExperience: newWorkExperience })
+      const workExp = newWorkExperience[workExperienceIndex]
+      if (workExp && workExp.keyAchievements) {
+        const keyAchievements = [...workExp.keyAchievements]
+        const [removed] = keyAchievements.splice(source.index, 1)
+        if (removed) {
+          keyAchievements.splice(destination.index, 0, removed)
+          workExp.keyAchievements = keyAchievements
+          setResumeData({ ...resumeData, workExperience: newWorkExperience })
+        }
+      }
     }
 
     if (source.droppableId === 'skills') {
       const newSkills = [...resumeData.skills]
       const [removed] = newSkills.splice(source.index, 1)
-      newSkills.splice(destination.index, 0, removed)
-      setResumeData({ ...resumeData, skills: newSkills })
+      if (removed) {
+        newSkills.splice(destination.index, 0, removed)
+        setResumeData({ ...resumeData, skills: newSkills })
+      }
     }
 
-    if (source.droppableId.includes('projects')) {
+    if (source.droppableId.includes('projects') && resumeData.projects) {
       const newProjects = [...resumeData.projects]
       const [removed] = newProjects.splice(source.index, 1)
-      newProjects.splice(destination.index, 0, removed)
-      setResumeData({ ...resumeData, projects: newProjects })
+      if (removed) {
+        newProjects.splice(destination.index, 0, removed)
+        setResumeData({ ...resumeData, projects: newProjects })
+      }
     }
 
-    if (source.droppableId.includes('PROJECTS_KEY_ACHIEVEMENT')) {
+    if (
+      source.droppableId.includes('PROJECTS_KEY_ACHIEVEMENT') &&
+      resumeData.projects
+    ) {
       const newProjects = [...resumeData.projects]
       const projectIndex = parseInt(source.droppableId.split('-')[1])
-      const keyAchievements = [...newProjects[projectIndex].keyAchievements]
-      const [removed] = keyAchievements.splice(source.index, 1)
-      keyAchievements.splice(destination.index, 0, removed)
-      newProjects[projectIndex].keyAchievements = keyAchievements
-      setResumeData({ ...resumeData, projects: newProjects })
+      const project = newProjects[projectIndex]
+      if (project && project.keyAchievements) {
+        const keyAchievements = [...project.keyAchievements]
+        const [removed] = keyAchievements.splice(source.index, 1)
+        if (removed) {
+          keyAchievements.splice(destination.index, 0, removed)
+          project.keyAchievements = keyAchievements
+          setResumeData({ ...resumeData, projects: newProjects })
+        }
+      }
     }
   }
 
-  const MenuButton = ({ title, icon, onClick }) => (
+  const MenuButton = ({
+    title,
+    icon,
+    onClick,
+  }: {
+    title: string
+    icon: React.ReactNode
+    onClick: () => void
+  }) => (
     <button
       onClick={onClick}
       title={title}
@@ -141,22 +166,22 @@ const Preview = () => {
     </button>
   )
 
-  const formatText = (command, value = null) => {
-    document.execCommand(command, false, value)
+  const formatText = (command: string, value: string | null = null) => {
+    document.execCommand(command, false, value || undefined)
   }
 
   const toggleBold = () => formatText('bold')
   const toggleItalic = () => formatText('italic')
   const toggleUnderline = () => formatText('underline')
-  const changeFontSize = (size) => formatText('fontSize', size)
-  const alignText = (alignment) => formatText(`justify${alignment}`)
+  const changeFontSize = (size: string) => formatText('fontSize', size)
+  const alignText = (alignment: string) => formatText(`justify${alignment}`)
 
   useKeyboardShortcut('b', true, toggleBold)
   useKeyboardShortcut('i', true, toggleItalic)
   useKeyboardShortcut('u', true, toggleUnderline)
 
   return (
-    <div className="preview rm-padding-print w-full bg-white p-6 font-[sans-serif] text-black md:min-h-[11in] md:w-[8.5in]">
+    <div className="preview rm-padding-print w-full bg-white p-6 text-black md:min-h-[11in] md:w-[8.5in]">
       <A4PageWrapper>
         <HighlightMenu
           styles={{
@@ -168,6 +193,7 @@ const Preview = () => {
             padding: '3px',
           }}
           target="body"
+          allowedPlacements={['top', 'bottom']}
           menu={() => (
             <>
               <MenuButton
@@ -188,12 +214,12 @@ const Preview = () => {
               <MenuButton
                 title="Increase Font Size"
                 icon={<FaPlus />}
-                onClick={() => changeFontSize(4)}
+                onClick={() => changeFontSize('4')}
               />
               <MenuButton
                 title="Decrease Font Size"
                 icon={<FaMinus />}
-                onClick={() => changeFontSize(2)}
+                onClick={() => changeFontSize('2')}
               />
 
               <MenuButton
@@ -256,10 +282,18 @@ const Preview = () => {
             />
             <div className="grid grid-cols-3 gap-1">
               {resumeData.socialMedia.map((socialMedia, index) => {
-                const handleSocialMediaBlur = (e) => {
+                const handleSocialMediaBlur = (
+                  e: React.FocusEvent<HTMLAnchorElement>
+                ) => {
                   const newSocialMedia = [...resumeData.socialMedia]
-                  newSocialMedia[index].link = e.target.innerText
-                  setResumeData({ ...resumeData, socialMedia: newSocialMedia })
+                  const item = newSocialMedia[index]
+                  if (item) {
+                    item.link = e.target.innerText
+                    setResumeData({
+                      ...resumeData,
+                      socialMedia: newSocialMedia,
+                    })
+                  }
                 }
 
                 return (
@@ -290,8 +324,8 @@ const Preview = () => {
             </div>
           </div>
           {/* two column start */}
-          <div className="grid grid-cols-3 gap-6">
-            <div className="col-span-1 space-y-2">
+          <div className="grid grid-cols-8 gap-6">
+            <div className="col-span-3 space-y-2 bg-[#fefefe]">
               {resumeData.summary.length > 0 && (
                 <div className="mb-1">
                   <h2
@@ -313,6 +347,34 @@ const Preview = () => {
                   </p>
                 </div>
               )}
+              <Droppable droppableId="skills" type="SKILLS">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {resumeData.skills.map((skill, index) => (
+                      <Draggable
+                        key={`SKILLS-${index}`}
+                        draggableId={`SKILLS-${index}`}
+                        index={index}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`mb-1 cursor-grab active:cursor-grabbing ${
+                              snapshot.isDragging &&
+                              'bg-white outline-2 outline-gray-400 outline-dashed'
+                            }`}
+                          >
+                            <Skills title={skill.title} skills={skill.skills} />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
               <div>
                 {resumeData.education.length > 0 && (
                   <div className="mb-1">
@@ -357,34 +419,7 @@ const Preview = () => {
                   </div>
                 )}
               </div>
-              <Droppable droppableId="skills" type="SKILLS">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {resumeData.skills.map((skill, index) => (
-                      <Draggable
-                        key={`SKILLS-${index}`}
-                        draggableId={`SKILLS-${index}`}
-                        index={index}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={`mb-1 cursor-grab active:cursor-grabbing ${
-                              snapshot.isDragging &&
-                              'bg-white outline-2 outline-gray-400 outline-dashed'
-                            }`}
-                          >
-                            <Skills title={skill.title} skills={skill.skills} />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
+
               <Language title="Languages" languages={resumeData.languages} />
               <Certification
                 title="Certifications"
@@ -392,7 +427,7 @@ const Preview = () => {
               />
             </div>
 
-            <div className="col-span-2 space-y-2">
+            <div className="col-span-5 space-y-2">
               {resumeData.workExperience.length > 0 && (
                 <Droppable droppableId="work-experience" type="WORK_EXPERIENCE">
                   {(provided) => (
@@ -416,6 +451,10 @@ const Preview = () => {
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               className={`mb-2 cursor-grab active:cursor-grabbing ${
+                                index !== resumeData.workExperience.length - 1
+                                  ? 'border-b-2 border-dashed border-gray-300 pb-1'
+                                  : ''
+                              } ${
                                 snapshot.isDragging &&
                                 'bg-white outline-2 outline-gray-400 outline-dashed'
                               }`}
@@ -466,7 +505,7 @@ const Preview = () => {
                               >
                                 {(provided) => (
                                   <ul
-                                    className="content list-disc ps-3.5"
+                                    className="content mt-1 list-disc ps-3.5"
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
                                   >
@@ -507,10 +546,10 @@ const Preview = () => {
                                 item.technologies &&
                                 item.technologies.length > 0 && (
                                   <div className="mt-1">
-                                    <span className="content i-bold italic">
+                                    <span className="content i-bold">
                                       Tech Stack:{' '}
                                     </span>
-                                    <span className="content italic select-all">
+                                    <span className="content select-all">
                                       <Highlight
                                         text={item.technologies.join(', ')}
                                         keywords={settings.skillsToHighlight}
@@ -535,13 +574,15 @@ const Preview = () => {
   )
 }
 
-const A4PageWrapper = ({ children }) => {
+const A4PageWrapper = ({ children }: { children: React.ReactNode }) => {
   const alertA4Size = () => {
-    const preview = document.querySelector('.preview')
-    const previewHeight = preview.offsetHeight
-    console.log(previewHeight)
-    if (previewHeight > 1122) {
-      alert('A4 size exceeded')
+    const preview = document.querySelector('.preview') as HTMLElement | null
+    if (preview) {
+      const previewHeight = preview.offsetHeight
+      console.log(previewHeight)
+      if (previewHeight > 1122) {
+        alert('A4 size exceeded')
+      }
     }
   }
 
