@@ -25,6 +25,11 @@ import AISettings from '@/components/document-builder/shared-forms/AISettings'
 import ScaledPreviewWrapper from '@/components/document-builder/ui/ScaledPreviewWrapper'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import {
+  analyzeJobDescription,
+  analyzeJobDescriptionGraph,
+  sortSkillsGraph,
+} from '@/lib/ai/strands/agent'
+import {
   AISettingsProvider,
   useAISettings,
 } from '@/lib/contexts/AISettingsContext'
@@ -70,9 +75,11 @@ import {
   buildSkillsSortPrompt,
   parseSkillsSortResponse,
   applySortedSkills,
+  type SkillsSortResult,
 } from '@/lib/ai/sorting-prompts'
 import { DEFAULT_COVER_LETTER_CONTENT } from '@/data/cover-letter'
 import { generateSkillsToHighlightWithProvider } from '@/lib/ai/document-generator'
+import { StreamCallback } from '@/types/openai'
 
 type EditorMode = 'resume' | 'coverLetter'
 
@@ -299,34 +306,40 @@ function SkillsSection() {
     setIsSorting(true)
     /* istanbul ignore next */
     try {
-      const prompt = buildSkillsSortPrompt(
+      const sortPromise = sortSkillsGraph(
         resumeData.skills,
-        settings.jobDescription
-      )
-
-      const response = await requestAISort(
+        settings.jobDescription,
         {
-          baseURL: settings.apiUrl,
+          apiUrl: settings.apiUrl,
           apiKey: settings.apiKey,
           model: settings.model,
         },
-        prompt
+        (chunk: {
+          content?: string
+          reasoning?: string
+          done: boolean
+        }) => {
+          if (chunk.content) {
+            console.log('[Skills Sort Graph]', chunk.content)
+          }
+        }
       )
 
-      const sortResult = parseSkillsSortResponse(response, resumeData.skills)
+      toast.promise(sortPromise, {
+        loading: 'AI is sorting and optimizing your skills...',
+        success: (sortResult: SkillsSortResult) => {
+          const sortedSkills = applySortedSkills(resumeData.skills, sortResult)
+          setResumeData({ ...resumeData, skills: sortedSkills })
+          return 'Skills optimized and sorted by job relevance!'
+        },
+        error: (err) =>
+          `Failed to sort skills: ${err.message || 'Unknown error occurred'}`,
+      })
 
-      if (sortResult) {
-        const sortedSkills = applySortedSkills(resumeData.skills, sortResult)
-        setResumeData({ ...resumeData, skills: sortedSkills })
-        toast.success('Skills sorted by job relevance')
-      } else {
-        toast.error('Failed to parse AI response. Please try again.')
-      }
+      await sortPromise
     } catch (error) {
       console.error('AI Skills sort error:', error)
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to sort skills'
-      )
+      // toast.error is handled by toast.promise
     } finally {
       setIsSorting(false)
     }
@@ -533,19 +546,19 @@ function UnifiedEditor() {
   const currentContext =
     mode === 'resume'
       ? {
-          resumeData,
-          setResumeData,
-          handleProfilePicture: resumeHandlers.handleProfilePicture,
-          handleChange: resumeHandlers.handleChange,
-        }
+        resumeData,
+        setResumeData,
+        handleProfilePicture: resumeHandlers.handleProfilePicture,
+        handleChange: resumeHandlers.handleChange,
+      }
       : {
-          resumeData: coverLetterData as ResumeData,
-          setResumeData: setCoverLetterData as React.Dispatch<
-            React.SetStateAction<ResumeData>
-          >,
-          handleProfilePicture: coverLetterHandlers.handleProfilePicture,
-          handleChange: coverLetterHandlers.handleChange,
-        }
+        resumeData: coverLetterData as ResumeData,
+        setResumeData: setCoverLetterData as React.Dispatch<
+          React.SetStateAction<ResumeData>
+        >,
+        handleProfilePicture: coverLetterHandlers.handleProfilePicture,
+        handleChange: coverLetterHandlers.handleChange,
+      }
 
   // Load saved data on mount
   useEffect(() => {
@@ -734,7 +747,7 @@ function UnifiedEditor() {
         ) !==
         JSON.stringify(
           lastSyncedCoverLetterData.current[
-            key as keyof typeof currentCoverLetterFields
+          key as keyof typeof currentCoverLetterFields
           ]
         )
     )
@@ -841,11 +854,10 @@ function UnifiedEditor() {
                     <button
                       type="button"
                       onClick={() => setMode('resume')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
-                        mode === 'resume'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-                      }`}
+                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${mode === 'resume'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                        : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                        }`}
                     >
                       <span>📄</span>
                       Resume
@@ -853,11 +865,10 @@ function UnifiedEditor() {
                     <button
                       type="button"
                       onClick={() => setMode('coverLetter')}
-                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
-                        mode === 'coverLetter'
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-                      }`}
+                      className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${mode === 'coverLetter'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                        : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                        }`}
                     >
                       <span>✉️</span>
                       Cover Letter
