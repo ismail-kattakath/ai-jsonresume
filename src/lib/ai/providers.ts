@@ -12,6 +12,7 @@ export interface ProviderPreset {
   requiresAuth: boolean // Whether it requires API key to list models
   providerType: AIProviderType // Type of provider (openai-compatible or gemini)
   commonModels?: string[] // Common models for this provider (fallback)
+  apiKeyURL?: string // URL to obtain an API key
 }
 
 export const PROVIDER_PRESETS: ProviderPreset[] = [
@@ -29,6 +30,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'gpt-4',
       'gpt-3.5-turbo',
     ],
+    apiKeyURL: 'https://platform.openai.com/api-keys',
   },
   {
     name: 'OpenRouter',
@@ -44,12 +46,13 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'openai/gpt-4o-mini',
       'deepseek/deepseek-r1',
     ],
+    apiKeyURL: 'https://openrouter.ai/keys',
   },
   {
     name: 'Google Gemini',
     baseURL: 'https://generativelanguage.googleapis.com/v1beta',
     description: 'Direct Google Gemini API (native, not via OpenRouter)',
-    supportsModels: false, // Gemini doesn't have a models list endpoint
+    supportsModels: true, // Now supported with Gemini-specific logic
     requiresAuth: true,
     providerType: 'gemini',
     commonModels: [
@@ -58,6 +61,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
       'gemini-1.5-flash',
       'gemini-1.5-pro',
     ],
+    apiKeyURL: 'https://aistudio.google.com/app/apikey',
   },
   {
     name: 'xAI (Grok)',
@@ -67,6 +71,7 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
     requiresAuth: true,
     providerType: 'openai-compatible',
     commonModels: ['grok-beta', 'grok-vision-beta'],
+    apiKeyURL: 'https://console.x.ai/',
   },
   {
     name: 'Local (LM Studio)',
@@ -84,9 +89,9 @@ export const PROVIDER_PRESETS: ProviderPreset[] = [
 ]
 
 export const CUSTOM_PROVIDER: ProviderPreset = {
-  name: 'Custom',
+  name: 'OpenAI Compatible',
   baseURL: '',
-  description: 'Enter your own API URL',
+  description: 'Enter your own OpenAI-compatible API URL',
   supportsModels: false,
   requiresAuth: true,
   providerType: 'openai-compatible', // Default to OpenAI-compatible for custom

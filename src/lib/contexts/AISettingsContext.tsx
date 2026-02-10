@@ -16,6 +16,7 @@ import {
   testConnection,
   validateJobDescription,
 } from '@/lib/ai/openai-client'
+import { getProviderByURL } from '@/lib/ai/providers'
 
 const DEFAULT_API_URL = 'https://api.openai.com/v1'
 const DEFAULT_API_KEY = ''
@@ -72,6 +73,7 @@ export interface AISettings {
   apiKey: string
   model: string
   providerType: AIProviderType
+  providerKeys: Record<string, string> // Map of provider names to keys
   jobDescription: string
   skillsToHighlight: string
   rememberCredentials: boolean
@@ -93,6 +95,7 @@ const defaultSettings: AISettings = {
   apiKey: DEFAULT_API_KEY,
   model: DEFAULT_MODEL,
   providerType: 'openai-compatible',
+  providerKeys: {},
   jobDescription: DEFAULT_JOB_DESCRIPTION,
   skillsToHighlight: '',
   rememberCredentials: true,
@@ -115,7 +118,35 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
 
   // Validate API connection
   const validateConnection = useCallback(async () => {
-    if (!settings.apiUrl.trim() || !settings.apiKey.trim()) {
+    console.log('[AISettings] Validating connection...', {
+      apiUrl: settings.apiUrl,
+      apiKey: settings.apiKey,
+      model: settings.model,
+    })
+
+    // Check if URL is present (always required)
+    if (!settings.apiUrl.trim()) {
+      console.log('[AISettings] Validation failed: Missing API URL')
+      setConnectionStatus('invalid')
+      return false
+    }
+
+    // Check if API key is required for this provider
+    const provider = getProviderByURL(settings.apiUrl)
+    // If provider is known, check its auth requirement. Custom providers (unknown) require key by default unless empty
+    // But for OpenAI compatible, we might want to allow empty key if user knows what they're doing?
+    // Let's stick to: if matches a known provider, use its setting. If custom/unknown, require key.
+    // Actually, common "custom" endpoints like Ollama/LM Studio might not need keys.
+    // A safer bet: If it's a known provider that DOESN'T require auth, allow empty key.
+    // Otherwise (unknown or requires auth), require key.
+
+    const requiresAuth = provider ? provider.requiresAuth : true
+
+    // Only check for API key if the provider explicitly requires it
+    if (requiresAuth && !settings.apiKey.trim()) {
+      console.log(
+        '[AISettings] Validation failed: Missing API Key for auth-required provider'
+      )
       setConnectionStatus('invalid')
       return false
     }
@@ -123,15 +154,23 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
     setConnectionStatus('testing')
 
     try {
-      const isValid = await testConnection({
+      console.log('[AISettings] Testing connection with:', {
         baseURL: settings.apiUrl,
         apiKey: settings.apiKey,
         model: settings.model,
       })
 
+      const isValid = await testConnection({
+        baseURL: settings.apiUrl,
+        apiKey: settings.apiKey,
+        model: settings.model,
+      })
+      console.log('[AISettings] Connection test result:', isValid)
+
       setConnectionStatus(isValid ? 'valid' : 'invalid')
       return isValid
-    } catch {
+    } catch (error) {
+      console.error('[AISettings] Validation error:', error)
       setConnectionStatus('invalid')
       return false
     }
@@ -159,20 +198,24 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
 
   // Load saved credentials on mount
   useEffect(() => {
-    const saved = loadCredentials()
-    if (saved) {
-      setSettings((prev) => ({
-        ...prev,
-        apiUrl: saved.apiUrl || DEFAULT_API_URL,
-        apiKey: saved.apiKey || DEFAULT_API_KEY,
-        model: saved.model || DEFAULT_MODEL,
-        providerType: saved.providerType || 'openai-compatible',
-        rememberCredentials: true,
-        jobDescription: saved.lastJobDescription || DEFAULT_JOB_DESCRIPTION,
-        skillsToHighlight: saved.skillsToHighlight || '',
-      }))
+    const init = async () => {
+      const saved = await loadCredentials()
+      if (saved) {
+        setSettings((prev) => ({
+          ...prev,
+          apiUrl: saved.apiUrl || DEFAULT_API_URL,
+          apiKey: saved.apiKey || DEFAULT_API_KEY,
+          model: saved.model || DEFAULT_MODEL,
+          providerType: saved.providerType || 'openai-compatible',
+          providerKeys: saved.providerKeys || {},
+          rememberCredentials: saved.rememberCredentials ?? true,
+          jobDescription: saved.lastJobDescription || DEFAULT_JOB_DESCRIPTION,
+          skillsToHighlight: saved.skillsToHighlight || '',
+        }))
+      }
+      setIsInitialized(true)
     }
-    setIsInitialized(true)
+    init()
   }, [])
 
   // Validate connection when credentials change (with debounce)
@@ -210,20 +253,41 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isInitialized) return
 
-    saveCredentials({
-      apiUrl: settings.apiUrl,
-      apiKey: settings.apiKey,
-      model: settings.model,
-      providerType: settings.providerType,
-      rememberCredentials: settings.rememberCredentials,
-      lastJobDescription: settings.jobDescription,
-      skillsToHighlight: settings.skillsToHighlight,
-    })
+    const persist = async () => {
+      await saveCredentials({
+        apiUrl: settings.apiUrl,
+        apiKey: settings.apiKey,
+        model: settings.model,
+        providerType: settings.providerType,
+        providerKeys: settings.providerKeys,
+        rememberCredentials: settings.rememberCredentials,
+        lastJobDescription: settings.jobDescription,
+        skillsToHighlight: settings.skillsToHighlight,
+      })
+    }
+    persist()
   }, [settings, isInitialized])
 
-  const updateSettings = (updates: Partial<AISettings>) => {
-    setSettings((prev) => ({ ...prev, ...updates }))
-  }
+  const updateSettings = useCallback((updates: Partial<AISettings>) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev, ...updates }
+
+      // If key changed, update it in the provider-specific map
+      if (updates.apiKey !== undefined) {
+        newSettings.providerKeys = {
+          ...newSettings.providerKeys,
+          [newSettings.apiUrl]: updates.apiKey,
+        }
+      }
+
+      // If URL (provider) changed, switch to the key stored for that URL
+      if (updates.apiUrl !== undefined && updates.apiUrl !== prev.apiUrl) {
+        newSettings.apiKey = newSettings.providerKeys[updates.apiUrl] || ''
+      }
+
+      return newSettings
+    })
+  }, [])
 
   // isConfigured requires valid connection AND valid job description
   const isConfigured =

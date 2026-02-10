@@ -33,7 +33,7 @@
     "postinstall": "npm run download-resume",
     "postbuild": "next-sitemap",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",

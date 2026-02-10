@@ -1,20 +1,17 @@
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
 import checkFile from 'eslint-plugin-check-file'
 import jsdoc from 'eslint-plugin-jsdoc'
 import security from 'eslint-plugin-security'
+import tseslint from 'typescript-eslint'
+import reactPlugin from 'eslint-plugin-react'
+import nextPlugin from '@next/eslint-plugin-next'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-})
-
-const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+const eslintConfig = tseslint.config(
   {
     ignores: [
       'node_modules/**',
@@ -24,21 +21,43 @@ const eslintConfig = [
       'next-env.d.ts',
     ],
   },
+  ...tseslint.configs.recommended,
   {
+    files: ['src/**/*.{ts,tsx,js,jsx}'],
     plugins: {
+      'react': reactPlugin,
+      '@next/next': nextPlugin,
       'no-relative-import-paths': noRelativeImportPaths,
       'check-file': checkFile,
-      jsdoc: jsdoc,
-      security: security,
+      'jsdoc': jsdoc,
+      'security': security,
+    },
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
     },
     rules: {
+      // Basic React and Next.js rules
+      ...reactPlugin.configs.recommended.rules,
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs['core-web-vitals'].rules,
+
+      // React specific fixes for Next.js
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+
       // Critical rules - enforce strictly
       '@typescript-eslint/no-require-imports': 'error',
       '@typescript-eslint/no-unused-expressions': 'error',
       'react/no-unescaped-entities': 'error',
+
       // Code quality rules - keep as warnings for gradual improvement
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn',
+
       // Import path rules - enforce absolute imports with @/ alias
       'no-relative-import-paths/no-relative-import-paths': [
         'error',
@@ -48,6 +67,7 @@ const eslintConfig = [
           prefix: '@',
         },
       ],
+
       // File naming conventions
       'check-file/filename-naming-convention': [
         'error',
@@ -67,7 +87,8 @@ const eslintConfig = [
           'src/**/': 'KEBAB_CASE',
         },
       ],
-      // JSDoc requirements for public APIs (warnings for gradual adoption)
+
+      // JSDoc requirements for public APIs
       'jsdoc/require-jsdoc': [
         'warn',
         {
@@ -83,6 +104,7 @@ const eslintConfig = [
       'jsdoc/require-description': ['warn', { contexts: ['any'] }],
       'jsdoc/require-param-description': 'warn',
       'jsdoc/require-returns-description': 'warn',
+
       // Security rules
       'security/detect-object-injection': 'warn',
       'security/detect-non-literal-regexp': 'warn',
@@ -97,7 +119,12 @@ const eslintConfig = [
       'security/detect-possible-timing-attacks': 'warn',
       'security/detect-pseudoRandomBytes': 'error',
     },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
   },
-]
+)
 
 export default eslintConfig

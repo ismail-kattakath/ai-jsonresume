@@ -48,6 +48,13 @@ global.IntersectionObserver = class IntersectionObserver {
 global.performance.mark = jest.fn()
 global.performance.measure = jest.fn()
 global.performance.getEntriesByName = jest.fn(() => [])
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+    ok: true,
+  })
+)
 
 // Mock DragAndDrop wrapper components for testing
 jest.mock('@/components/ui/DragAndDrop', () => ({

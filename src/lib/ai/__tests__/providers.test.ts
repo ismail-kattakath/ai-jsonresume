@@ -79,9 +79,11 @@ describe('AI Providers', () => {
 
   describe('CUSTOM_PROVIDER', () => {
     it('has correct configuration', () => {
-      expect(CUSTOM_PROVIDER.name).toBe('Custom')
+      expect(CUSTOM_PROVIDER.name).toBe('OpenAI Compatible')
       expect(CUSTOM_PROVIDER.baseURL).toBe('')
-      expect(CUSTOM_PROVIDER.description).toBe('Enter your own API URL')
+      expect(CUSTOM_PROVIDER.description).toBe(
+        'Enter your own OpenAI-compatible API URL'
+      )
       expect(CUSTOM_PROVIDER.supportsModels).toBe(false)
     })
   })

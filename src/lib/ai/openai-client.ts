@@ -20,7 +20,7 @@ import {
   buildSkillsToHighlightPrompt,
 } from '@/lib/ai/document-prompts'
 
-const STORAGE_KEY = 'ai_cover_letter_credentials'
+const STORAGE_KEY = 'jsonresume_ai_credentials'
 const REQUEST_TIMEOUT = 120000 // 120 seconds (2 minutes) - increased for thinking models like OLMo-3
 
 /**
@@ -48,12 +48,17 @@ async function makeOpenAIRequest(
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (config.apiKey) {
+      headers['Authorization'] = `Bearer ${config.apiKey}`
+    }
+
     const response = await fetch(`${config.baseURL}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
-      },
+      headers,
       body: JSON.stringify(request),
       signal: controller.signal,
     })
@@ -120,12 +125,17 @@ async function makeOpenAIStreamRequest(
   onProgress: StreamCallback
 ): Promise<string> {
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (config.apiKey) {
+      headers['Authorization'] = `Bearer ${config.apiKey}`
+    }
+
     const response = await fetch(`${config.baseURL}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
-      },
+      headers,
       body: JSON.stringify({ ...request, stream: true }),
     })
 
@@ -489,47 +499,104 @@ export async function generateSkillsToHighlight(
   }
 }
 
+import {
+  encryptData,
+  decryptData,
+  generateVaultKey,
+} from '@/lib/utils/encryption'
+
+const VAULT_KEY = 'jsonresume_vault_key'
+
+/**
+ * Gets or creates a unique vault key for this browser
+ */
+function getVaultKey(): string {
+  if (typeof window === 'undefined') return ''
+  let key = localStorage.getItem(VAULT_KEY)
+  if (!key) {
+    key = generateVaultKey()
+    localStorage.setItem(VAULT_KEY, key)
+  }
+  return key
+}
+
 /**
  * Saves API credentials and job description to localStorage
  */
-export function saveCredentials(credentials: StoredCredentials): void {
+export async function saveCredentials(
+  credentials: StoredCredentials
+): Promise<void> {
   if (typeof window === 'undefined') return
 
-  if (credentials.rememberCredentials) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(credentials))
-  } else {
-    // Clear credentials but keep job description and model if provided
-    if (credentials.lastJobDescription || credentials.model) {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          apiUrl: '',
-          apiKey: '',
-          model: credentials.model,
-          rememberCredentials: false,
-          lastJobDescription: credentials.lastJobDescription,
-        })
-      )
-    } else {
-      localStorage.removeItem(STORAGE_KEY)
+  const vaultKey = getVaultKey()
+
+  // Encrypt sensitive data
+  const encryptedApiKey = credentials.apiKey
+    ? await encryptData(credentials.apiKey, vaultKey)
+    : ''
+
+  const encryptedProviderKeys: Record<string, string> = {}
+  if (credentials.providerKeys) {
+    for (const [url, key] of Object.entries(credentials.providerKeys)) {
+      encryptedProviderKeys[url] = await encryptData(key, vaultKey)
     }
   }
+
+  const dataToSave = credentials.rememberCredentials
+    ? {
+        ...credentials,
+        apiKey: encryptedApiKey,
+        providerKeys: encryptedProviderKeys,
+      }
+    : {
+        apiUrl: '',
+        apiKey: '',
+        model: credentials.model,
+        providerType: credentials.providerType,
+        providerKeys: encryptedProviderKeys, // We still encrypt these
+        rememberCredentials: false,
+        lastJobDescription: credentials.lastJobDescription,
+        skillsToHighlight: credentials.skillsToHighlight,
+      }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave))
 }
 
 /**
  * Loads API credentials from localStorage
  */
-export function loadCredentials(): StoredCredentials | null {
+export async function loadCredentials(): Promise<StoredCredentials | null> {
   if (typeof window === 'undefined') return null
 
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) return null
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (!saved) return null
 
-    const credentials: StoredCredentials = JSON.parse(stored)
+  try {
+    const credentials = JSON.parse(saved) as StoredCredentials
+    const vaultKey = getVaultKey()
+
+    // Decrypt sensitive data
+    if (credentials.apiKey) {
+      try {
+        credentials.apiKey = await decryptData(credentials.apiKey, vaultKey)
+      } catch {
+        credentials.apiKey = '' // Reset on failure
+      }
+    }
+
+    if (credentials.providerKeys) {
+      for (const [url, key] of Object.entries(credentials.providerKeys)) {
+        try {
+          credentials.providerKeys[url] = await decryptData(key, vaultKey)
+        } catch {
+          credentials.providerKeys[url] = ''
+        }
+      }
+    }
+
     return credentials
   } catch (error) {
-    console.error('Failed to load credentials:', error)
+    console.error('Failed to parse or decrypt credentials:', error)
     return null
   }
 }
@@ -560,7 +627,10 @@ export async function testConnection(config: OpenAIConfig): Promise<boolean> {
 
     await makeOpenAIRequest(config, request)
     return true
-  } catch {
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[OpenAIClient] Connection test failed:', error)
+    }
     return false
   }
 }
@@ -574,29 +644,50 @@ export async function fetchAvailableModels(
   config: Pick<OpenAIConfig, 'baseURL' | 'apiKey'>
 ): Promise<string[]> {
   try {
-    // Validate inputs
-    if (!config.baseURL || !config.apiKey) {
+    // Validate inputs - only baseURL is required
+    if (!config.baseURL) {
       return []
     }
 
-    // All providers: baseURL already includes /v1 or /api/v1, just append /models
-    const endpoint = `${config.baseURL}/models`
+    const isGemini = config.baseURL.includes(
+      'generativelanguage.googleapis.com'
+    )
     const isOpenRouter = config.baseURL.includes('openrouter.ai')
+
+    // Prepare endpoint and headers
+    let endpoint: string
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (isGemini) {
+      // Gemini format: baseURL/models?key=apiKey
+      if (!config.apiKey) {
+        return [] // Gemini requires API key
+      }
+      endpoint = `${config.baseURL}/models?key=${config.apiKey}`
+    } else {
+      // OpenAI/standard format: baseURL/models with Authorization header
+      endpoint = `${config.baseURL}/models`
+
+      // Only add Authorization header if apiKey is provided
+      if (config.apiKey) {
+        headers['Authorization'] = `Bearer ${config.apiKey}`
+      }
+
+      if (isOpenRouter) {
+        headers['HTTP-Referer'] =
+          'https://github.com/ismail-kattakath/jsonresume-to-everything'
+        headers['X-Title'] = 'JSON Resume to Everything'
+      }
+    }
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
     const response = await fetch(endpoint, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${config.apiKey}`,
-        'Content-Type': 'application/json',
-        ...(isOpenRouter && {
-          'HTTP-Referer':
-            'https://github.com/ismail-kattakath/jsonresume-to-everything',
-          'X-Title': 'JSON Resume to Everything',
-        }),
-      },
+      headers,
       signal: controller.signal,
     })
 
@@ -607,6 +698,13 @@ export async function fetchAvailableModels(
     }
 
     const data = await response.json()
+
+    // Gemini format: { models: [{ name: "models/gemini-1.5-flash", ... }, ...] }
+    if (isGemini && data.models && Array.isArray(data.models)) {
+      return data.models
+        .map((model: { name: string }) => model.name.replace('models/', ''))
+        .sort()
+    }
 
     // OpenAI/most providers format: { data: [{ id: "model-name" }, ...] }
     if (data.data && Array.isArray(data.data)) {
