@@ -188,57 +188,81 @@ describe('Strands Agent Lib', () => {
       { title: 'Programming', skills: [{ text: 'React' }, { text: 'JS' }] },
     ]
 
-    it('sorts and returns validated JSON result', async () => {
+    it('sorts and returns validated JSON result via three-agent flow', async () => {
+      const mockAnalysis = 'Brain says: Sort JS first and add Next.js'
       const mockResult = {
         groupOrder: ['Programming'],
         skillOrder: { Programming: ['JS', 'React', 'Next.js'] },
       }
-      const mockRefineInvoke = jest
-        .fn()
-        .mockResolvedValue({ toString: () => JSON.stringify(mockResult) })
-      const mockReviewInvoke = jest.fn().mockResolvedValue({ toString: () => 'APPROVED' })
 
-      let agentCount = 0
+      const mockBrainInvoke = jest.fn().mockResolvedValue({ toString: () => mockAnalysis })
+      const mockScribeInvoke = jest.fn().mockResolvedValue({ toString: () => JSON.stringify(mockResult) })
+      const mockEditorInvoke = jest.fn().mockResolvedValue({ toString: () => 'APPROVED' })
+
+      let agentCallCount = 0
         ; (Agent as jest.Mock).mockImplementation(() => {
-          agentCount++
+          agentCallCount++
           return {
-            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+            invoke: agentCallCount === 1 ? mockBrainInvoke :
+              agentCallCount === 2 ? mockScribeInvoke : mockEditorInvoke,
           }
         })
 
       const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
 
-      expect(Agent).toHaveBeenCalledTimes(2)
+      expect(Agent).toHaveBeenCalledTimes(3) // Brain, Scribe, Editor
+      expect(mockBrainInvoke).toHaveBeenCalled()
+      expect(mockScribeInvoke).toHaveBeenCalledWith(expect.stringContaining(mockAnalysis))
       expect(result).toEqual(mockResult)
     })
 
-    it('retries when reviewer provides critique', async () => {
+    it('retries Scribe when Editor provides critique', async () => {
+      const mockAnalysis = 'Brain says: Good'
       const mockResult = {
         groupOrder: ['Programming'],
         skillOrder: { Programming: ['JS', 'React'] },
       }
-      const mockRefineInvoke = jest
+
+      const mockBrainInvoke = jest.fn().mockResolvedValue({ toString: () => mockAnalysis })
+      const mockScribeInvoke = jest
         .fn()
         .mockResolvedValueOnce({ toString: () => 'invalid-json' })
         .mockResolvedValueOnce({ toString: () => JSON.stringify(mockResult) })
 
-      const mockReviewInvoke = jest
+      const mockEditorInvoke = jest
         .fn()
         .mockResolvedValueOnce({ toString: () => 'CRITIQUE: Bad JSON' })
         .mockResolvedValueOnce({ toString: () => 'APPROVED' })
 
-      let agentCount = 0
+      let callSequence = 0
         ; (Agent as jest.Mock).mockImplementation(() => {
-          agentCount++
+          callSequence++
+          const localSeq = callSequence // closure
           return {
-            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+            invoke: (prompt: string) => {
+              if (localSeq === 1) return mockBrainInvoke(prompt)
+              if (localSeq === 2) return mockScribeInvoke(prompt)
+              if (localSeq === 3) return mockEditorInvoke(prompt)
+              return Promise.resolve({ toString: () => '' })
+            }
           }
         })
 
       const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
 
-      expect(mockRefineInvoke).toHaveBeenCalledTimes(2)
-      expect(mockReviewInvoke).toHaveBeenCalledTimes(2)
+      // Brain (1) + Scribe (2) + Editor (1) = 4 calls total in the loop/flow
+      // Actually: Brain call 1. Loop 1: Scribe call 2, Editor call 3. Loop 2: Scribe call 4, Editor call 5.
+      // Wait, let's check the code:
+      // Brain: 1 agent instance
+      // Scribe: 1 agent instance
+      // Editor: 1 agent instance
+      // Total 3 Agent instances.
+      // 1st invoke is brain. Then loop starts.
+      // In loop: scribe.invoke, editor.invoke.
+
+      expect(mockBrainInvoke).toHaveBeenCalledTimes(1)
+      expect(mockScribeInvoke).toHaveBeenCalledTimes(2)
+      expect(mockEditorInvoke).toHaveBeenCalledTimes(2)
       expect(result).toEqual(mockResult)
     })
 
@@ -247,24 +271,34 @@ describe('Strands Agent Lib', () => {
         groupOrder: ['Programming'],
         skillOrder: { Programming: ['React'] },
       }
-      const mockRefineInvoke = jest
+      const mockAnalysis = 'Brain says: Never perfect'
+      const mockBrainInvoke = jest.fn().mockResolvedValue({ toString: () => mockAnalysis })
+      const mockScribeInvoke = jest
         .fn()
         .mockResolvedValue({ toString: () => JSON.stringify(mockResult) })
-      const mockReviewInvoke = jest
+      const mockEditorInvoke = jest
         .fn()
         .mockResolvedValue({ toString: () => 'CRITIQUE: Never perfect' })
 
-      let agentCount = 0
+      let callSequence = 0
         ; (Agent as jest.Mock).mockImplementation(() => {
-          agentCount++
+          callSequence++
+          const localSeq = callSequence
           return {
-            invoke: agentCount === 1 ? mockRefineInvoke : mockReviewInvoke,
+            invoke: (prompt: string) => {
+              if (localSeq === 1) return mockBrainInvoke(prompt)
+              if (localSeq === 2) return mockScribeInvoke(prompt)
+              if (localSeq === 3) return mockEditorInvoke(prompt)
+              return Promise.resolve({ toString: () => '' })
+            }
           }
         })
 
       const result = await sortSkillsGraph(mockSkills, mockJD, mockConfig)
 
-      expect(mockRefineInvoke).toHaveBeenCalledTimes(3)
+      expect(mockBrainInvoke).toHaveBeenCalledTimes(1)
+      expect(mockScribeInvoke).toHaveBeenCalledTimes(3) // 1 initial + 2 retries
+      expect(mockEditorInvoke).toHaveBeenCalledTimes(3) // 1 initial + 2 retries
       expect(result).toEqual(mockResult)
     })
   })

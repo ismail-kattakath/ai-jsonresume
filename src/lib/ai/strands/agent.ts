@@ -249,17 +249,32 @@ export async function sortSkillsGraph(
     skills: (group.skills || []).map((s) => s.text),
   }))
 
-  const refiner = new Agent({
+  // Agent 1: The Brain - Analyzes and optimizes (Output: Markdown Report)
+  const brain = new Agent({
     model,
     systemPrompt:
-      'You are a Skill Sorting Expert. ' +
-      'Your goal is to sort resume skills by relevance to a job description AND identify missing key technologies. ' +
+      'You are a Skill Sorting Expert (The Brain). ' +
+      'Your task is to analyze a job description and determine the most relevant order for resume skills. ' +
       'RULES:\n' +
-      '1. Sort the skill groups (groupOrder) by relevance.\n' +
-      '2. Sort skills within each group (skillOrder) by relevance.\n' +
-      '3. IDENTIFY MISSING SKILLS: Find tech/tools from the JD not in the current list and add them to appropriate groups.\n' +
-      '4. Preserve ALL existing skills.\n' +
-      '5. Output ONLY valid JSON in this exact format:\n' +
+      '1. Determine the best order for skill groups based on JD relevance.\n' +
+      '2. Determine the best order for skills within each group.\n' +
+      '3. IDENTIFY MISSING TECH: Find technologies in the JD that are not in the current list.\n' +
+      '4. PRESERVE ALL: Never suggest removing an existing skill.\n' +
+      'OUTPUT: A clean markdown report with the optimized structure. No JSON yet.',
+    printer: false,
+  })
+
+  // Agent 2: The Scribe - Converts analysis to JSON (Output: JSON)
+  const scribe = new Agent({
+    model,
+    systemPrompt:
+      'You are a Data Architect (The Scribe). ' +
+      'Your ONLY task is to convert a skill analysis report and original data into a STRICT JSON format. ' +
+      'RULES:\n' +
+      '1. Use the optimized order and new skills provided in the analysis.\n' +
+      '2. Ensure ALL original groups and skills are included.\n' +
+      '3. Output EXCLUSIVELY valid JSON. No preamble, no markdown code blocks.\n' +
+      'TARGET FORMAT:\n' +
       '{\n' +
       '  "groupOrder": ["Group 1", "Group 2", ...],\n' +
       '  "skillOrder": {\n' +
@@ -270,69 +285,75 @@ export async function sortSkillsGraph(
     printer: false,
   })
 
-  const reviewer = new Agent({
+  // Agent 3: The Editor - Validates data integrity (Output: APPROVED or CRITIQUE)
+  const editor = new Agent({
     model,
     systemPrompt:
-      'You are a JSON & Data Validator. ' +
-      'Review the provided skill sorting result against the original data.\n' +
+      'You are a Data Validator (The Editor). ' +
+      'Verify the generated skill JSON against the original data.\n' +
       'CRITERIA:\n' +
-      '1. Is it valid JSON?\n' +
-      '2. Are ALL original groups and skills still present?\n' +
-      '3. Is the format exactly as requested?\n' +
-      'If perfect, respond "APPROVED". Otherwise, respond with "CRITIQUE: <reasons>".',
+      '1. Valid JSON syntax?\n' +
+      '2. ALL ${skillsData.length} original groups present?\n' +
+      '3. NO original skills lost?\n' +
+      '4. Proper camelCase or standard tech naming?\n' +
+      'If perfect, respond "APPROVED". Otherwise, respond "CRITIQUE: <reasons>".',
     printer: false,
   })
 
-  let currentResult = ''
-  let lastValidJson = ''
   let iteration = 0
   const maxIterations = 2
+  let lastAnalysis = ''
+  let lastAttemptedJson = ''
+  let lastCritique = ''
 
-  const inputContext = `JOB DESCRIPTION:\n${jobDescription}\n\nCURRENT SKILLS:\n${JSON.stringify(skillsData, null, 2)}`
+  if (onProgress) onProgress({ content: '🧠 [1/3] Brain: Analyzing job description and skills...\n', done: false })
 
-  if (onProgress) onProgress({ content: '🔍 Analyzing skills and job description...\n', done: false })
+  // STAGE 1: Analysis
+  const analysisResult = await brain.invoke(`JOB DESCRIPTION:\n${jobDescription}\n\nCURRENT SKILLS:\n${JSON.stringify(skillsData)}`)
+  lastAnalysis = analysisResult.toString().trim()
 
+  if (onProgress) {
+    onProgress({ content: `✅ Analysis complete.\n\n✍️ [2/3] Scribe: Constructing JSON output...\n`, done: false })
+  }
+
+  // STAGE 2 & 3: Iterative Scribing and Editing
   while (iteration <= maxIterations) {
     iteration++
-    if (onProgress) onProgress({ content: `\n[Agent: Refiner] Sorting skills (Attempt ${iteration})...\n`, done: false })
 
-    const prompt = iteration === 1
-      ? inputContext
-      : `Previous result was rejected. Critiques:\n${currentResult}\n\nPlease fix and return ONLY valid JSON.`
+    const scribePrompt = iteration === 1
+      ? `Original Data:\n${JSON.stringify(skillsData)}\n\nOptimization Analysis:\n${lastAnalysis}`
+      : `Data review failed. Fix the JSON based on these critiques:\n${lastCritique}\n\nKeep the original optimized structure from the analysis.`
 
-    const result = await refiner.invoke(prompt)
-    const rawResult = result.toString().trim()
+    const scribeResult = await scribe.invoke(scribePrompt)
+    const rawJson = scribeResult.toString().trim()
+    const cleanedJson = rawJson.replace(/```json/g, '').replace(/```/g, '').trim()
+    lastAttemptedJson = cleanedJson
 
-    // Quick cleanup (remove markdown code blocks if AI added them)
-    const cleaned = rawResult.replace(/```json/g, '').replace(/```/g, '').trim()
-    lastValidJson = cleaned
+    if (onProgress) onProgress({ content: `🔍 [3/3] Editor: Validating data integrity (Attempt ${iteration})...\n`, done: false })
 
-    if (onProgress) onProgress({ content: `\n[Agent: Reviewer] Checking data integrity...\n`, done: false })
-
-    const review = await reviewer.invoke(`Original Data:\n${JSON.stringify(skillsData)}\n\nAI Result:\n${cleaned}`)
+    const review = await editor.invoke(`Original Data:\n${JSON.stringify(skillsData)}\n\nGenerated JSON:\n${cleanedJson}`)
     const reviewText = review.toString().trim()
 
     if (reviewText.startsWith('APPROVED')) {
       try {
-        const finalJson = JSON.parse(cleaned) as SkillsSortResult
-        if (onProgress) onProgress({ content: '✅ Skills sorted and validated.\n', done: false })
-        if (onProgress) onProgress({ content: '', done: true })
+        const finalJson = JSON.parse(cleanedJson) as SkillsSortResult
+        if (onProgress) onProgress({ content: '✨ Skills optimized, structured, and verified.\n', done: true })
         return finalJson
       } catch (e) {
-        currentResult = `CRITIQUE: Failed to parse JSON even though reviewer approved. Response was: ${cleaned}`
+        lastCritique = `CRITIQUE: Error parsing JSON: ${e instanceof Error ? e.message : 'Unknown error'}`
       }
     } else {
-      currentResult = reviewText // Pass critiques back to next iteration
       if (onProgress) onProgress({ content: `❌ ${reviewText}\n`, done: false })
+      lastCritique = reviewText // Pass critique for next iteration
     }
   }
 
-  // Fallback: try to parse the last result anyway
+  // Final fallback
   try {
-    console.log('[sortSkillsGraph] Attempting fallback parse of:', lastValidJson.substring(0, 50))
-    return JSON.parse(lastValidJson) as SkillsSortResult
+    const fallback = JSON.parse(lastAttemptedJson.replace(/```json/g, '').replace(/```/g, '').trim())
+    if (onProgress) onProgress({ content: '⚠️ Used fallback version (validation partially failed).\n', done: true })
+    return fallback as SkillsSortResult
   } catch (e) {
-    console.error('[sortSkillsGraph] Fallback parse failed:', e)
     throw new Error('Failed to generate a valid skill sorting result after multiple attempts.')
   }
 }
