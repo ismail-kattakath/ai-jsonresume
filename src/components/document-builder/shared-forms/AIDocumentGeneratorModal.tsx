@@ -71,20 +71,24 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({
 
   // Load saved credentials and job description on mount
   useEffect(() => {
-    if (isOpen) {
-      const saved = loadCredentials()
-      if (saved) {
-        if (saved.rememberCredentials) {
-          setApiUrl(saved.apiUrl)
-          setApiKey(saved.apiKey)
-          setRememberCredentials(true)
-        }
-        // Always load last job description if available
-        if (saved.lastJobDescription) {
-          setJobDescription(saved.lastJobDescription)
+    const loadSavedData = async () => {
+      if (isOpen) {
+        const saved = await loadCredentials()
+        if (saved) {
+          if (saved.rememberCredentials) {
+            setApiUrl(saved.apiUrl)
+            setApiKey(saved.apiKey)
+            setRememberCredentials(true)
+          }
+          // Always load last job description if available
+          if (saved.lastJobDescription) {
+            setJobDescription(saved.lastJobDescription)
+          }
         }
       }
     }
+
+    loadSavedData()
   }, [isOpen])
 
   // Reset form when modal closes

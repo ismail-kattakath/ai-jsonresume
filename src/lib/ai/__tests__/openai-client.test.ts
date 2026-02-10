@@ -11,6 +11,15 @@ import {
 } from '@/lib/ai/openai-client'
 import type { ResumeData, StoredCredentials } from '@/types'
 
+// Mock encryption
+jest.mock('@/lib/utils/encryption', () => ({
+  encryptData: jest.fn((data) => Promise.resolve(`encrypted-${data}`)),
+  decryptData: jest.fn((data) =>
+    Promise.resolve(data.replace('encrypted-', ''))
+  ),
+  generateVaultKey: jest.fn(() => 'test-vault-key'),
+}))
+
 // Mock fetch
 global.fetch = jest.fn()
 
@@ -239,7 +248,7 @@ describe('OpenAI Service', () => {
   })
 
   describe('Credential Management', () => {
-    it('saves credentials to localStorage when remember is true', () => {
+    it('saves credentials to localStorage when remember is true', async () => {
       const credentials: StoredCredentials = {
         apiUrl: 'http://localhost:1234',
         apiKey: 'test-key',
@@ -247,17 +256,17 @@ describe('OpenAI Service', () => {
         lastJobDescription: 'Test job description',
       }
 
-      saveCredentials(credentials)
+      await saveCredentials(credentials)
 
-      const stored = localStorage.getItem('ai_cover_letter_credentials')
+      const stored = localStorage.getItem('jsonresume_ai_credentials')
       expect(stored).toBeTruthy()
-      expect(JSON.parse(stored!)).toEqual(credentials)
+      // Note: stored keys will be encrypted, so we can't directly compare
     })
 
-    it('keeps job description when remember is false', () => {
+    it('keeps job description when remember is false', async () => {
       // First save credentials
       localStorage.setItem(
-        'ai_cover_letter_credentials',
+        'jsonresume_ai_credentials',
         JSON.stringify({
           apiUrl: 'http://localhost:1234',
           apiKey: 'test-key',
@@ -267,14 +276,14 @@ describe('OpenAI Service', () => {
       )
 
       // Then save with remember false but with job description
-      saveCredentials({
+      await saveCredentials({
         apiUrl: 'http://localhost:1234',
         apiKey: 'test-key',
         rememberCredentials: false,
         lastJobDescription: 'New job description',
       })
 
-      const stored = localStorage.getItem('ai_cover_letter_credentials')
+      const stored = localStorage.getItem('jsonresume_ai_credentials')
       expect(stored).toBeTruthy()
       const parsed = JSON.parse(stored!)
       expect(parsed.lastJobDescription).toBe('New job description')
@@ -282,38 +291,39 @@ describe('OpenAI Service', () => {
       expect(parsed.apiKey).toBe('')
     })
 
-    it('loads credentials from localStorage', () => {
+    it('loads credentials from localStorage', async () => {
       const credentials: StoredCredentials = {
         apiUrl: 'http://localhost:1234',
-        apiKey: 'test-key',
+        apiKey: 'encrypted-test-key',
         rememberCredentials: true,
         lastJobDescription: 'Saved job description',
       }
 
       localStorage.setItem(
-        'ai_cover_letter_credentials',
+        'jsonresume_ai_credentials',
         JSON.stringify(credentials)
       )
 
-      const loaded = loadCredentials()
-      expect(loaded).toEqual(credentials)
+      const loaded = await loadCredentials()
+      expect(loaded?.apiKey).toBe('test-key') // Should be decrypted
+      expect(loaded?.apiUrl).toBe('http://localhost:1234')
     })
 
-    it('returns null when no credentials stored', () => {
-      const loaded = loadCredentials()
+    it('returns null when no credentials stored', async () => {
+      const loaded = await loadCredentials()
       expect(loaded).toBeNull()
     })
 
-    it('handles corrupted localStorage data', () => {
-      localStorage.setItem('ai_cover_letter_credentials', 'invalid json')
+    it('handles corrupted localStorage data', async () => {
+      localStorage.setItem('jsonresume_ai_credentials', 'invalid json')
 
-      const loaded = loadCredentials()
+      const loaded = await loadCredentials()
       expect(loaded).toBeNull()
     })
 
     it('clears credentials', () => {
       localStorage.setItem(
-        'ai_cover_letter_credentials',
+        'jsonresume_ai_credentials',
         JSON.stringify({
           apiUrl: 'http://localhost:1234',
           apiKey: 'test-key',
@@ -323,7 +333,7 @@ describe('OpenAI Service', () => {
 
       clearCredentials()
 
-      const stored = localStorage.getItem('ai_cover_letter_credentials')
+      const stored = localStorage.getItem('jsonresume_ai_credentials')
       expect(stored).toBeNull()
     })
   })
@@ -573,6 +583,33 @@ describe('OpenAI Service', () => {
       )
     })
 
+    it('should send request without Authorization header if apiKey is missing', async () => {
+      const configNoKey = { ...mockConfig, apiKey: '' }
+      const mockSortResponse = JSON.stringify({
+        groupOrder: ['Group A'],
+        skillOrder: { 'Group A': ['Skill 1'] },
+      })
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: mockSortResponse } }],
+        }),
+      })
+
+      await requestAISort(configNoKey, 'Sort these skills...')
+
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:1234/chat/completions',
+        expect.objectContaining({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      )
+    })
+
     it('should use low temperature for consistent sorting', async () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
@@ -696,6 +733,33 @@ describe('OpenAI Service', () => {
       )
     })
 
+    it('fetches models successfully from Gemini provider', async () => {
+      const mockGeminiResponse = {
+        models: [
+          { name: 'models/gemini-1.5-flash' },
+          { name: 'models/gemini-1.5-pro' },
+        ],
+      }
+
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockGeminiResponse,
+      })
+
+      const models = await fetchAvailableModels({
+        baseURL: 'https://generativelanguage.googleapis.com/v1beta',
+        apiKey: 'gemini-key',
+      })
+
+      expect(models).toEqual(['gemini-1.5-flash', 'gemini-1.5-pro'])
+      expect(global.fetch).toHaveBeenCalledWith(
+        'https://generativelanguage.googleapis.com/v1beta/models?key=gemini-key',
+        expect.objectContaining({
+          method: 'GET',
+        })
+      )
+    })
+
     it('fetches models from OpenRouter with special headers', async () => {
       const mockModelsResponse = {
         data: [
@@ -730,14 +794,38 @@ describe('OpenAI Service', () => {
       )
     })
 
-    it('returns empty array when no API key provided', async () => {
+    it('returns empty array when no API key provided for Gemini', async () => {
       const models = await fetchAvailableModels({
-        baseURL: 'https://api.openai.com/v1',
+        baseURL: 'https://generativelanguage.googleapis.com',
         apiKey: '',
       })
 
       expect(models).toEqual([])
       expect(global.fetch).not.toHaveBeenCalled()
+    })
+
+    it('fetches models without API key for generic provider', async () => {
+      ;(global.fetch as jest.Mock).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 'model-1' }],
+        }),
+      })
+
+      const models = await fetchAvailableModels({
+        baseURL: 'http://localhost:1234/v1',
+        apiKey: '',
+      })
+
+      expect(models).toEqual(['model-1'])
+      expect(global.fetch).toHaveBeenCalledWith(
+        'http://localhost:1234/v1/models',
+        expect.objectContaining({
+          headers: expect.not.objectContaining({
+            Authorization: expect.any(String),
+          }),
+        })
+      )
     })
 
     it('returns empty array when no baseURL provided', async () => {
@@ -806,31 +894,46 @@ describe('OpenAI Service', () => {
         baseURL: 'https://api.openai.com/v1',
         apiKey: 'test-key',
       })
-
       expect(models).toEqual(['alpha-model', 'beta-model', 'zebra-model'])
     })
   })
 
-  describe('Credential Management with Model', () => {
-    it('saves model with credentials', () => {
-      const credentials: StoredCredentials = {
-        apiUrl: 'https://api.openai.com/v1',
-        apiKey: 'test-key',
-        model: 'gpt-4o-mini',
-        rememberCredentials: true,
-        lastJobDescription: 'Test job',
-      }
-
-      saveCredentials(credentials)
-
-      const stored = localStorage.getItem('ai_cover_letter_credentials')
-      expect(stored).toBeTruthy()
-      const parsed = JSON.parse(stored!)
-      expect(parsed.model).toBe('gpt-4o-mini')
+  describe('Credential Management', () => {
+    beforeEach(() => {
+      clearCredentials()
     })
 
-    it('preserves model when rememberCredentials is false', () => {
-      saveCredentials({
+    it('saves and loads credentials correctly', async () => {
+      const creds: StoredCredentials = {
+        apiUrl: 'https://api.openai.com/v1',
+        apiKey: 'test-key',
+        model: 'gpt-4o',
+        rememberCredentials: true,
+      }
+
+      await saveCredentials(creds)
+      const loaded = await loadCredentials()
+
+      expect(loaded?.apiUrl).toBe(creds.apiUrl)
+      expect(loaded?.apiKey).toBe(creds.apiKey)
+      expect(loaded?.model).toBe(creds.model)
+    })
+
+    it('clears credentials correctly', async () => {
+      await saveCredentials({
+        apiUrl: 'https://api.openai.com/v1',
+        apiKey: 'test-key',
+        model: 'gpt-4o',
+        rememberCredentials: true,
+      })
+
+      clearCredentials()
+      const loaded = await loadCredentials()
+      expect(loaded).toBeNull()
+    })
+
+    it('preserves job description when clearing credentials but rememberCredentials is false', async () => {
+      await saveCredentials({
         apiUrl: 'https://api.openai.com/v1',
         apiKey: 'test-key',
         model: 'gpt-4o',
@@ -838,7 +941,7 @@ describe('OpenAI Service', () => {
         lastJobDescription: 'Job desc',
       })
 
-      const stored = localStorage.getItem('ai_cover_letter_credentials')
+      const stored = localStorage.getItem('jsonresume_ai_credentials')
       expect(stored).toBeTruthy()
       const parsed = JSON.parse(stored!)
       expect(parsed.model).toBe('gpt-4o')
@@ -846,18 +949,59 @@ describe('OpenAI Service', () => {
       expect(parsed.apiUrl).toBe('')
     })
 
-    it('loads model with credentials', () => {
+    it('loads model with credentials', async () => {
       localStorage.setItem(
-        'ai_cover_letter_credentials',
+        'jsonresume_ai_credentials',
         JSON.stringify({
           apiUrl: 'https://api.openai.com/v1',
-          apiKey: 'test-key',
+          apiKey: 'encrypted-test-key',
           model: 'gpt-4-turbo',
           rememberCredentials: true,
         })
       )
 
-      const loaded = loadCredentials()
+      const loaded = await loadCredentials()
+      expect(loaded?.model).toBe('gpt-4-turbo')
+      expect(loaded?.apiKey).toBe('test-key')
+    })
+  })
+
+  describe('Credential Management with Model', () => {
+    it('saves model with credentials', async () => {
+      await saveCredentials({
+        apiUrl: 'https://api.openai.com/v1',
+        apiKey: 'test-key',
+        model: 'gpt-4o',
+        rememberCredentials: true,
+      })
+      const loaded = await loadCredentials()
+      expect(loaded?.model).toBe('gpt-4o')
+    })
+
+    it('preserves model when rememberCredentials is false', async () => {
+      await saveCredentials({
+        apiUrl: 'https://api.openai.com/v1',
+        apiKey: 'test-key',
+        model: 'gpt-4o',
+        rememberCredentials: false,
+      })
+      const stored = localStorage.getItem('jsonresume_ai_credentials')
+      const parsed = JSON.parse(stored!)
+      expect(parsed.model).toBe('gpt-4o')
+    })
+
+    it('loads model with credentials', async () => {
+      localStorage.setItem(
+        'jsonresume_ai_credentials',
+        JSON.stringify({
+          apiUrl: 'https://api.openai.com/v1',
+          apiKey: 'encrypted-test-key',
+          model: 'gpt-4-turbo',
+          rememberCredentials: true,
+        })
+      )
+
+      const loaded = await loadCredentials()
       expect(loaded?.model).toBe('gpt-4-turbo')
     })
   })

@@ -26,8 +26,8 @@ const mockTestConnection = testConnection as jest.MockedFunction<
 describe('AISettingsContext', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockLoadCredentials.mockReturnValue(null)
-    mockSaveCredentials.mockImplementation(() => {})
+    mockLoadCredentials.mockResolvedValue(null)
+    mockSaveCredentials.mockResolvedValue(undefined)
     mockTestConnection.mockResolvedValue(true)
   })
 
@@ -43,6 +43,7 @@ describe('AISettingsContext', () => {
         apiUrl: 'https://api.openai.com/v1',
         apiKey: '',
         model: 'gpt-4o-mini',
+        providerKeys: {},
         providerType: 'openai-compatible',
         rememberCredentials: true,
         skillsToHighlight: '',
@@ -50,25 +51,30 @@ describe('AISettingsContext', () => {
       })
     })
 
-    it('loads saved credentials on mount', () => {
-      mockLoadCredentials.mockReturnValue({
+    it('loads saved credentials on mount', async () => {
+      mockLoadCredentials.mockResolvedValue({
         apiUrl: 'https://openrouter.ai/api/v1',
         apiKey: 'saved-key',
         model: 'gpt-4o',
         rememberCredentials: true,
         lastJobDescription: 'Saved job description',
+        providerKeys: {},
+        providerType: 'openai-compatible',
+        skillsToHighlight: '',
       })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
-      expect(result.current.settings.apiUrl).toBe(
-        'https://openrouter.ai/api/v1'
-      )
-      expect(result.current.settings.apiKey).toBe('saved-key')
-      expect(result.current.settings.model).toBe('gpt-4o')
-      expect(result.current.settings.jobDescription).toBe(
-        'Saved job description'
-      )
+      await waitFor(() => {
+        expect(result.current.settings.apiUrl).toBe(
+          'https://openrouter.ai/api/v1'
+        )
+        expect(result.current.settings.apiKey).toBe('saved-key')
+        expect(result.current.settings.model).toBe('gpt-4o')
+        expect(result.current.settings.jobDescription).toBe(
+          'Saved job description'
+        )
+      })
     })
 
     it('starts with idle status', () => {

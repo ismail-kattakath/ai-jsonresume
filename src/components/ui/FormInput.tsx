@@ -15,7 +15,8 @@ interface FormInputProps {
   maxLength?: number
   showCounter?: boolean
   className?: string
-  helpText?: string
+  helpText?: React.ReactNode
+  disabled?: boolean
 }
 
 /**
@@ -35,6 +36,7 @@ export function FormInput({
   showCounter = false,
   className = '',
   helpText,
+  disabled,
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false)
   const isPassword = type === 'password'
@@ -51,10 +53,11 @@ export function FormInput({
           placeholder={placeholder || label}
           name={name}
           aria-label={label}
-          className={`w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${isPassword ? 'pr-12' : ''} ${variantClasses[variant]}`}
+          className={`w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${isPassword ? 'pr-12' : ''} ${variantClasses[variant]} ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
           value={value}
           onChange={onChange}
           maxLength={maxLength}
+          disabled={disabled}
         />
         <label htmlFor={inputId} className="floating-label">
           {label}
@@ -62,8 +65,9 @@ export function FormInput({
         {isPassword && (
           <button
             type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-white/60 transition-colors hover:text-white"
+            onClick={() => !disabled && setShowPassword(!showPassword)}
+            className={`absolute top-1/2 right-3 -translate-y-1/2 text-white/60 transition-colors ${disabled ? 'cursor-not-allowed' : 'cursor-pointer hover:text-white'}`}
+            disabled={disabled}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

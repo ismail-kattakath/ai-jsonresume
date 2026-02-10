@@ -22,6 +22,7 @@ const mockResumeData: ResumeData = {
   projects: [],
   certifications: [],
   languages: [],
+  content: '',
   socialMedia: [
     {
       socialMedia: 'LinkedIn',
@@ -43,6 +44,7 @@ const mockAISettings: AISettings = {
   providerType: 'openai-compatible',
   jobDescription: '',
   skillsToHighlight: '',
+  providerKeys: {},
   rememberCredentials: true,
 }
 

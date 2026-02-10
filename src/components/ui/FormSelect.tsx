@@ -17,7 +17,8 @@ interface FormSelectProps {
   name: string
   variant?: FormVariant
   className?: string
-  helpText?: string
+  helpText?: React.ReactNode
+  disabled?: boolean
 }
 
 /**
@@ -33,6 +34,7 @@ export function FormSelect({
   variant = 'teal',
   className = '',
   helpText,
+  disabled,
 }: FormSelectProps) {
   const selectId = `select-${name}`
 
@@ -43,9 +45,10 @@ export function FormSelect({
           id={selectId}
           name={name}
           aria-label={label}
-          className={`form-select w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 pr-10 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${variantClasses[variant]} cursor-pointer appearance-none`}
+          className={`form-select w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 pr-10 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:ring-2 ${variantClasses[variant]} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} appearance-none`}
           value={value}
           onChange={onChange}
+          disabled={disabled}
         >
           {options.map((option) => (
             <option

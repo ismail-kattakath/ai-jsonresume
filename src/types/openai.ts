@@ -63,6 +63,7 @@ export interface StoredCredentials {
   model?: string
   providerName?: string
   providerType?: AIProviderType // Type of provider (openai-compatible or gemini)
+  providerKeys?: Record<string, string> // Map of provider name/URL to API key
   rememberCredentials: boolean
   lastJobDescription?: string
   skillsToHighlight?: string

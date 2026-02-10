@@ -45,6 +45,7 @@ const mockAISettings = {
     providerType: 'openai-compatible' as const,
     rememberCredentials: false,
     skillsToHighlight: '',
+    providerKeys: {},
   },
   updateSettings: jest.fn(),
   isConfigured: false,

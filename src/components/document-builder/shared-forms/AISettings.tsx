@@ -36,7 +36,7 @@ const AISettings: React.FC = () => {
   // Sync provider selection when settings.apiUrl changes (e.g., loaded from localStorage)
   useEffect(() => {
     const provider = getProviderByURL(settings.apiUrl)
-    const detectedProvider = provider?.name || 'Custom'
+    const detectedProvider = provider?.name || 'OpenAI Compatible'
 
     if (detectedProvider !== selectedProvider) {
       setSelectedProvider(detectedProvider)
@@ -49,8 +49,10 @@ const AISettings: React.FC = () => {
     const providerName = e.target.value
     setSelectedProvider(providerName)
 
-    if (providerName === 'Custom') {
-      // User selected custom - don't change URL yet
+    if (providerName === 'OpenAI Compatible') {
+      // User selected custom - clear models and don't change URL yet
+      setAvailableModels([])
+      setModelsError(null)
       return
     }
 
@@ -84,8 +86,11 @@ const AISettings: React.FC = () => {
       // Reset state first
       setModelsError(null)
 
-      // Only fetch if we have both URL and key
-      if (!settings.apiUrl.trim() || !settings.apiKey.trim()) {
+      const provider = getProviderByURL(settings.apiUrl)
+      const requiresKey = provider ? provider.requiresAuth : true
+
+      // Only fetch if we have URL AND (either key or no key needed)
+      if (!settings.apiUrl.trim() || (requiresKey && !settings.apiKey.trim())) {
         setAvailableModels([])
         setLoadingModels(false)
         return
@@ -168,66 +173,75 @@ const AISettings: React.FC = () => {
   ]
 
   // Get current provider for common models fallback
-  const currentProvider = PROVIDER_PRESETS.find(
-    (p) => p.name === selectedProvider
-  )
+  const currentProvider =
+    PROVIDER_PRESETS.find((p) => p.name === selectedProvider) ||
+    (selectedProvider === CUSTOM_PROVIDER.name ? CUSTOM_PROVIDER : null)
 
   // Model dropdown options - use API models or fallback to common models
   const hasApiModels = availableModels.length > 0
   const hasCommonModels =
     currentProvider?.commonModels && currentProvider.commonModels.length > 0
 
+  // For providers that support dynamic model fetching, don't use fallback models
+  const shouldUseFallback =
+    hasCommonModels && (!hasApiModels || !currentProvider?.supportsModels)
+
   const modelOptions = hasApiModels
     ? availableModels.map((model) => ({
         value: model,
         label: model,
       }))
-    : hasCommonModels
+    : shouldUseFallback
       ? currentProvider.commonModels!.map((model) => ({
           value: model,
           label: model,
         }))
       : []
 
-  const showCustomURL = selectedProvider === 'Custom'
+  const showCustomURL = selectedProvider === 'OpenAI Compatible'
   const showModelDropdown = modelOptions.length > 0 && !loadingModels
-  const usingFallbackModels = !hasApiModels && hasCommonModels
+  const usingFallbackModels = !hasApiModels && shouldUseFallback
+  const requiresKey = currentProvider ? currentProvider.requiresAuth : true
+
+  // Check if provider is unreachable (has supportsModels but fetch failed)
+  const isProviderUnreachable =
+    currentProvider?.supportsModels &&
+    !hasApiModels &&
+    !loadingModels &&
+    modelsError !== null
 
   // Format status messages
   const getConnectionStatusMessage = () => {
-    if (!settings.apiKey || !settings.apiUrl) {
-      return { text: 'No credentials configured', color: 'text-white/40' }
+    if (requiresKey && !settings.apiKey && settings.apiUrl) {
+      return { text: 'API Key required', color: 'text-yellow-400' }
+    }
+    if (!settings.apiUrl) {
+      return { text: 'No URL configured', color: 'text-white/40' }
     }
 
     switch (connectionStatus) {
       case 'testing':
-        return { text: 'Testing connection...', color: 'text-yellow-400' }
+        return { text: 'Testing...', color: 'text-yellow-400' }
       case 'valid':
-        return { text: '✓ Connected successfully', color: 'text-green-400' }
+        return { text: '✓ Connected', color: 'text-green-400' }
       case 'invalid':
-        return { text: '✗ Connection failed', color: 'text-red-400' }
+        return { text: '✗ Failed', color: 'text-red-400' }
       default:
-        return { text: 'Ready to connect', color: 'text-white/60' }
+        return { text: 'Ready', color: 'text-white/60' }
     }
   }
 
   const getModelStatusMessage = () => {
     if (loadingModels) {
-      return { text: 'Fetching models...', color: 'text-yellow-400' }
+      return { text: 'Fetching...', color: 'text-yellow-400' }
     }
     if (modelsError) {
       return { text: `✗ ${modelsError}`, color: 'text-red-400' }
     }
     if (hasApiModels) {
       return {
-        text: `✓ ${availableModels.length} models loaded from API`,
+        text: `✓ ${availableModels.length} models`,
         color: 'text-green-400',
-      }
-    }
-    if (hasCommonModels) {
-      return {
-        text: `${currentProvider?.commonModels?.length} common models (enter API key for full list)`,
-        color: 'text-blue-400',
       }
     }
     return null
@@ -239,8 +253,8 @@ const AISettings: React.FC = () => {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-white/60">
-        Connect to an OpenAI-compatible API to generate tailored cover letters
-        and professional summaries based on the job description.
+        Choose an AI provider to generate tailored content. For local or custom
+        endpoints, use the OpenAI Compatible option.
       </p>
 
       {/* Connection Status Log */}
@@ -250,17 +264,17 @@ const AISettings: React.FC = () => {
         </div>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-white/40">Active Provider:</span>
+            <span className="text-white/40">Provider:</span>
             <span className="text-white/80">{selectedProvider}</span>
           </div>
           {settings.model && (
             <div className="flex items-center gap-2">
-              <span className="text-white/40">Active Model:</span>
+              <span className="text-white/40">Model:</span>
               <span className="text-white/60">{settings.model}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
-            <span className="text-white/40">Connection:</span>
+            <span className="text-white/40">Status:</span>
             <span className={connectionStatusMsg.color}>
               {connectionStatusMsg.text}
             </span>
@@ -276,13 +290,13 @@ const AISettings: React.FC = () => {
         onChange={handleProviderChange}
         options={providerOptions}
         variant="blue"
-        helpText="Choose a preset provider or select Custom for your own URL"
+        helpText="Select a preset or enter a custom OpenAI-compatible URL"
       />
 
       {/* API URL (only show if Custom is selected) */}
       {showCustomURL && (
         <FormInput
-          label="Custom API URL"
+          label="API URL"
           name="customApiUrl"
           value={customURL}
           onChange={handleCustomURLChange}
@@ -293,16 +307,35 @@ const AISettings: React.FC = () => {
       )}
 
       {/* API Key */}
-      <FormInput
-        label="API Key"
-        name="apiKey"
-        type="password"
-        value={settings.apiKey}
-        onChange={(e) => updateSettings({ apiKey: e.target.value })}
-        placeholder="sk-..."
-        variant="blue"
-        helpText="Get from your AI provider (required for model fetching)"
-      />
+      {requiresKey && (
+        <FormInput
+          label="API Key"
+          name="apiKey"
+          type="password"
+          value={settings.apiKey}
+          onChange={(e) => updateSettings({ apiKey: e.target.value })}
+          placeholder="sk-..."
+          variant="blue"
+          helpText={
+            currentProvider?.apiKeyURL ? (
+              <span>
+                Get from{' '}
+                <a
+                  href={currentProvider.apiKeyURL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 underline hover:text-blue-300"
+                >
+                  {currentProvider.name}
+                </a>{' '}
+                (required for model fetching)
+              </span>
+            ) : (
+              'Enter key from your AI provider'
+            )
+          }
+        />
+      )}
 
       {/* Model Selection */}
       {showModelDropdown ? (
@@ -313,9 +346,12 @@ const AISettings: React.FC = () => {
           onChange={(e) => updateSettings({ model: e.target.value })}
           options={modelOptions}
           variant="blue"
+          disabled={usingFallbackModels && !loadingModels && requiresKey}
           helpText={
             usingFallbackModels
-              ? `Showing common ${selectedProvider} models - enter API key to fetch all available models`
+              ? requiresKey
+                ? 'Enter API key to fetch available models'
+                : `Showing common ${selectedProvider} models`
               : `${availableModels.length} models available from API`
           }
         />
@@ -325,14 +361,25 @@ const AISettings: React.FC = () => {
           name="model"
           value={settings.model}
           onChange={(e) => updateSettings({ model: e.target.value })}
-          placeholder={selectedProvider === 'Custom' ? '' : 'gpt-4o-mini'}
+          placeholder={requiresKey ? 'gpt-4o-mini' : ''}
           variant="blue"
+          disabled={
+            loadingModels ||
+            isProviderUnreachable ||
+            (requiresKey &&
+              !settings.apiKey.trim() &&
+              selectedProvider !== 'OpenAI Compatible')
+          }
           helpText={
             loadingModels
               ? 'Loading models from API...'
-              : modelsError
-                ? 'Enter model name manually'
-                : 'Enter API key to load available models'
+              : isProviderUnreachable
+                ? `✗ ${currentProvider?.name} is unreachable. Please start the server and refresh.`
+                : modelsError
+                  ? 'Enter model name manually'
+                  : requiresKey
+                    ? 'Enter API key to load available models'
+                    : 'Enter model name manually if not detected'
           }
         />
       )}
