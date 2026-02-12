@@ -80,7 +80,9 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
 
   /* istanbul ignore next */
   const handleGenerate = async () => {
+    process.stderr.write(`[DEBUG] handleGenerate ENTERED - isConfigured: ${isConfigured}, mode: ${mode}\n`)
     if (!isConfigured) {
+      process.stderr.write(`[DEBUG] NOT CONFIGURED\n`)
       toast.error('AI not configured', {
         description:
           'Please fill in the API settings and job description in the Generative AI Settings section above.',
@@ -94,7 +96,7 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
     let toastId: string | number | undefined
 
     // Track generation start
-    analytics.aiGenerationStart(settings.providerType, settings.model)
+    // analytics.aiGenerationStart(settings.providerType, settings.model)
 
     try {
       // Use Strands Graph for Summary if mode is summary
@@ -235,9 +237,9 @@ const AITextAreaWithButton: React.FC<AITextAreaWithButtonProps> = ({
             isLoading={isGenerating}
             onClick={handleGenerate}
             label="Generate by JD"
-            showLabel={false}
+            disabledTooltip="Configure AI settings first"
             size="sm"
-            variant="amber"
+            variant="primary"
           />
         </div>
       </div>

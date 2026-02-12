@@ -30,12 +30,25 @@ jest.mock('@/lib/ai/openai-client', () => ({
 }))
 
 // Mock sonner toast
-jest.mock('sonner', () => ({
-  toast: {
+jest.mock('sonner', () => {
+  const toastMock = jest.fn()
+  Object.assign(toastMock, {
     success: jest.fn(),
     error: jest.fn(),
     loading: jest.fn(),
     dismiss: jest.fn(),
+  })
+  return {
+    toast: toastMock,
+  }
+})
+
+// Mock analytics
+jest.mock('@/lib/analytics', () => ({
+  analytics: {
+    aiGenerationStart: jest.fn(),
+    aiGenerationSuccess: jest.fn(),
+    aiGenerationError: jest.fn(),
   },
 }))
 
@@ -65,6 +78,7 @@ const mockAISettings = {
     model: 'gpt-4o-mini',
     jobDescription: '',
     providerType: 'openai-compatible' as const,
+    providerKeys: {},
     rememberCredentials: false,
     skillsToHighlight: '',
   },
@@ -90,14 +104,15 @@ const mockConfiguredAISettings = {
 const renderWithContext = (
   resumeData: ResumeData = mockResumeData,
   handleChange = mockHandleChange,
-  aiSettings: any = mockAISettings
+  aiSettings: any = mockAISettings,
+  setResumeData = mockSetResumeData
 ) => {
   return render(
     <AISettingsContext.Provider value={aiSettings}>
       <ResumeContext.Provider
         value={{
           resumeData,
-          setResumeData: mockSetResumeData,
+          setResumeData,
           handleChange,
           handleProfilePicture: jest.fn(),
         }}
@@ -176,7 +191,7 @@ describe('Summary Component', () => {
       const button = screen.getByRole('button')
       expect(button).not.toBeDisabled()
       expect(button).toBeInTheDocument()
-      expect(screen.getByTitle('Generate by JD')).toBeInTheDocument()
+      expect(screen.getByText('Generate by JD')).toBeInTheDocument()
     })
   })
 
@@ -229,14 +244,17 @@ describe('Summary Component', () => {
       renderWithContext(
         mockResumeData,
         mockHandleChange,
-        mockConfiguredAISettings
+        mockConfiguredAISettings,
+        mockSetResumeData
       )
 
       mockSetResumeData.mockClear()
 
+      console.error('[TEST DEBUG] Clicking button')
       // Click the AI generation button
-      const aiButton = screen.getByRole('button')
-      fireEvent.click(aiButton)
+      const aiButton = screen.getByRole('button', { name: /generate by jd/i })
+      aiButton.click()
+      console.error('[TEST DEBUG] Clicked')
 
       // Wait for AI generation to complete and setResumeData to be called
       await waitFor(() => {

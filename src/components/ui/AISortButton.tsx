@@ -71,14 +71,17 @@ export default function AISortButton({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        console.error('[DEBUG] AISortButton CLICKED')
+        onClick()
+      }}
       disabled={isDisabled}
       title={showTooltip ? tooltipText : undefined}
       data-tooltip-id={showTooltip ? 'app-tooltip' : undefined}
       data-tooltip-content={showTooltip ? tooltipText : undefined}
       className={`inline-flex cursor-pointer items-center justify-center rounded transition-all duration-200 ${sizeClasses} ${isDisabled
-          ? 'cursor-not-allowed bg-white/5 text-white/30 border border-white/10'
-          : variantClasses
+        ? 'cursor-not-allowed bg-white/5 text-white/30 border border-white/10'
+        : variantClasses
         } ${fullWidth ? 'w-full' : ''} ${customClassName}`}
     >
       {isLoading ? (

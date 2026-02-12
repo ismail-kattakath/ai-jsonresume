@@ -226,15 +226,28 @@ const KeyAchievements = ({
         </DnDDroppable>
       </DnDContext>
 
-      {/* Add new achievement input */}
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleAddKeyDown}
-        placeholder="Add key achievement... (Press Enter to save)"
-        className={`w-full rounded-lg border border-dashed ${borderColor} bg-transparent px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 ${focusBorderColor}`}
-      />
+      {/* Add new achievement input and AI Sort button */}
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleAddKeyDown}
+          placeholder="Add key achievement... (Press Enter to save)"
+          className={`flex-1 rounded-lg border border-dashed ${borderColor} bg-transparent px-3 py-2 text-sm text-white outline-none placeholder:text-white/40 ${focusBorderColor}`}
+        />
+        {showAISort && (
+          <AISortButton
+            isConfigured={isConfigured}
+            isLoading={isSorting}
+            onClick={handleAISort}
+            label="Sort by JD"
+            showLabel={true}
+            size="sm"
+            variant="amber"
+          />
+        )}
+      </div>
     </div>
   )
 }

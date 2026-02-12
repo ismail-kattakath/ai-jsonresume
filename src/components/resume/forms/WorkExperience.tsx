@@ -34,20 +34,7 @@ const KeyAchievementsSortButton = ({
 }: {
   workExperienceIndex: number
 }) => {
-  const { resumeData, setResumeData } = useContext(ResumeContext)
-  const { settings, isConfigured } = useAISettings()
-  const [isSorting, setIsSorting] = useState(false)
-
-  const workExperience = resumeData.workExperience[workExperienceIndex]
-  if (!workExperience) return null
-
-  const achievements = workExperience.keyAchievements || []
-
-  // Only show if there are 2+ achievements
-  if (achievements.length < 2) return null
-
-  // This button is now handled by the KeyAchievements component itself
-  return null
+  return null // Still null because KeyAchievements component should handle its own button now
 }
 
 /**
@@ -126,6 +113,7 @@ const TechStackSortButton = ({
       isLoading={isSorting}
       onClick={handleAISort}
       label="Sort by JD"
+      showLabel={true}
       size="sm"
       variant="amber"
     />
@@ -401,6 +389,8 @@ const WorkExperience = () => {
                             isConfigured={isConfigured && !!settings.jobDescription}
                             isLoading={isTailoringExperience[index] || false}
                             onClick={() => handleTailorToJD(index)}
+                            label="Tailor Experience"
+                            showLabel={false}
                             size="sm"
                             variant="amber"
                           />

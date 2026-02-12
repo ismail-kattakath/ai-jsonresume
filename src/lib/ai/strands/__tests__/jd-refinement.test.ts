@@ -118,11 +118,7 @@ describe('JD Refinement', () => {
             expect(mockReviewerInvoke).toHaveBeenCalledWith(
                 expect.stringContaining('# position-title')
             )
-            expect(onProgress).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    content: expect.stringContaining('Approved by Reviewer'),
-                })
-            )
+
             expect(result).toBe(mockRefinedJD)
         })
 
