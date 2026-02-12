@@ -2,7 +2,10 @@ import { sortTechStackGraph } from '../techStackSorting'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Agent class and createModel
-jest.mock('@strands-agents/sdk')
+jest.mock('@strands-agents/sdk', () => ({
+    Agent: jest.fn(),
+    Model: jest.fn(),
+}))
 jest.mock('../factory', () => ({
     createModel: jest.fn(),
 }))

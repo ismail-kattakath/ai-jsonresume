@@ -8,12 +8,19 @@ jest.mock('@strands-agents/sdk', () => {
             invoke: jest.fn(),
             stream: jest.fn(),
         })),
+        Model: jest.fn(),
     }
 })
 
 jest.mock('@strands-agents/sdk/openai', () => {
     return {
         OpenAIModel: jest.fn().mockImplementation(() => ({})),
+    }
+})
+
+jest.mock('@strands-agents/sdk/gemini', () => {
+    return {
+        GeminiModel: jest.fn().mockImplementation(() => ({})),
     }
 })
 
