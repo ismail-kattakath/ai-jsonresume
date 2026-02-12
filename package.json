@@ -41,7 +41,8 @@
     "test:coverage": "jest --coverage",
     "export": "next build && next export",
     "deploy": "npm run build && npx gh-pages -d out -t true",
-    "deploy-auto": "nohup npm run deploy > /tmp/deploy.log 2>&1 &"
+    "deploy-auto": "nohup npm run deploy > /tmp/deploy.log 2>&1 &",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/genai": "^1.41.0",
@@ -88,13 +89,21 @@
     "eslint-plugin-jsdoc": "^61.4.1",
     "eslint-plugin-no-relative-import-paths": "^1.6.1",
     "eslint-plugin-security": "^3.0.1",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jest-axe": "^10.0.0",
     "jest-environment-jsdom": "^30.2.0",
+    "lint-staged": "^16.2.7",
     "next-sitemap": "^4.2.3",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
     "tailwindcss": "^4",
     "typescript": "5.9.3"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "bash -c 'npx tsc --noEmit'",
+      "npm test -- --findRelatedTests --passWithNoTests"
+    ]
   }
 }
