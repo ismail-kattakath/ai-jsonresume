@@ -4,6 +4,7 @@ out/
 *.log
 .DS_Store
 qdrant_storage/
+*output*.txt
 
 src/data/resume.json
 # Environment variables (ignore all except example)
