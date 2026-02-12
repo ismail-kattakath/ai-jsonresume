@@ -96,6 +96,10 @@ jest.mock('@strands-agents/sdk/openai', () => ({
   OpenAIModel: jest.fn().mockImplementation(() => ({})),
 }))
 
+jest.mock('@strands-agents/sdk/gemini', () => ({
+  GeminiModel: jest.fn().mockImplementation(() => ({})),
+}))
+
 // Suppress React act() warnings and intentional test console.errors
 const originalError = console.error
 beforeAll(() => {

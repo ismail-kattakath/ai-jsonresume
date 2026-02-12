@@ -174,6 +174,7 @@ const AISettings: React.FC = () => {
             apiUrl: settings.apiUrl,
             apiKey: settings.apiKey,
             model: settings.model,
+            providerType: settings.providerType,
           },
           (chunk) => {
             if (chunk.content) {

@@ -315,6 +315,7 @@ function SkillsSection() {
           apiUrl: settings.apiUrl,
           apiKey: settings.apiKey,
           model: settings.model,
+          providerType: settings.providerType,
         },
         (chunk: {
           content?: string
@@ -374,6 +375,7 @@ function SkillsSection() {
         apiUrl: settings.apiUrl,
         apiKey: settings.apiKey,
         model: settings.model,
+        providerType: settings.providerType,
       },
       (chunk: { content?: string; done: boolean }) => {
         if (chunk.content) {
