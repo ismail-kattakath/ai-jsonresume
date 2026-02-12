@@ -2,7 +2,10 @@ import { sortTechStackGraph } from '../techStackSorting'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Agent class and createModel
-jest.mock('@strands-agents/sdk')
+jest.mock('@strands-agents/sdk', () => ({
+    Agent: jest.fn(),
+    Model: jest.fn(),
+}))
 jest.mock('../factory', () => ({
     createModel: jest.fn(),
 }))
@@ -10,7 +13,7 @@ jest.mock('../factory', () => ({
 describe('sortTechStackGraph', () => {
     const mockTechnologies = ['React', 'Node.js', 'PostgreSQL']
     const mockJD = 'Looking for a React developer with Node.js experience.'
-    const mockConfig = { apiUrl: 'test', apiKey: 'test', model: 'test' }
+    const mockConfig = { apiUrl: 'test', apiKey: 'test', model: 'test', providerType: 'openai-compatible' }
 
     beforeEach(() => {
         jest.clearAllMocks()

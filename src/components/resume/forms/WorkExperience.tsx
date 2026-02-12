@@ -146,6 +146,7 @@ const TechStackSortButton = ({
         apiUrl: settings.apiUrl,
         apiKey: settings.apiKey,
         model: settings.model,
+        providerType: settings.providerType,
       },
       (chunk) => {
         if (chunk.content) {

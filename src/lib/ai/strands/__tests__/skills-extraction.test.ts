@@ -8,6 +8,7 @@ jest.mock('@strands-agents/sdk', () => {
             invoke: jest.fn(),
             stream: jest.fn(),
         })),
+        Model: jest.fn(),
     }
 })
 
@@ -17,11 +18,18 @@ jest.mock('@strands-agents/sdk/openai', () => {
     }
 })
 
+jest.mock('@strands-agents/sdk/gemini', () => {
+    return {
+        GeminiModel: jest.fn().mockImplementation(() => ({})),
+    }
+})
+
 describe('Skills Extraction', () => {
     const mockConfig = {
         apiUrl: 'http://localhost:1234/v1',
         apiKey: 'test-key',
         model: 'test-model',
+        providerType: 'openai-compatible',
     }
 
     const mockJD = 'Looking for a React developer with Postgres experience.'

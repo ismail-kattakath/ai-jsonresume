@@ -44,6 +44,7 @@
     "deploy-auto": "nohup npm run deploy > /tmp/deploy.log 2>&1 &"
   },
   "dependencies": {
+    "@google/genai": "^1.41.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@lottiefiles/dotlottie-react": "^0.17.14",
     "@next/third-parties": "^16.0.5",
