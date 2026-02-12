@@ -821,21 +821,21 @@ describe('Preview Component', () => {
             {
               name: 'Project A',
               description: 'Description A',
-              keyAchievements: [{ text: 'Achievement A' }],
+              highlights: ['Achievement A'],
               url: '',
               technologies: [],
             },
             {
               name: 'Project B',
               description: 'Description B',
-              keyAchievements: [{ text: 'Achievement B' }],
+              highlights: ['Achievement B'],
               url: '',
               technologies: [],
             },
             {
               name: 'Project C',
               description: 'Description C',
-              keyAchievements: [{ text: 'Achievement C' }],
+              highlights: ['Achievement C'],
               url: '',
               technologies: [],
             },
@@ -869,17 +869,17 @@ describe('Preview Component', () => {
       })
     })
 
-    describe('onDragEnd - Project Key Achievements', () => {
-      it('should reorder key achievements within projects', () => {
+    describe('onDragEnd - Project Highlights', () => {
+      it('should reorder highlights within projects', () => {
         const mockData = createMockResumeData({
           projects: [
             {
               name: 'Project A',
               description: 'Description A',
-              keyAchievements: [
-                { text: 'Achievement 1' },
-                { text: 'Achievement 2' },
-                { text: 'Achievement 3' },
+              highlights: [
+                'Achievement 1',
+                'Achievement 2',
+                'Achievement 3',
               ],
               url: '',
               technologies: [],
@@ -897,10 +897,10 @@ describe('Preview Component', () => {
 
         expect(capturedOnDragEnd).toBeTruthy()
 
-        // Move first achievement to last position within project index 0
+        // Move first highlight to last position within project index 0
         capturedOnDragEnd!({
-          source: { droppableId: 'PROJECTS_KEY_ACHIEVEMENT-0', index: 0 },
-          destination: { droppableId: 'PROJECTS_KEY_ACHIEVEMENT-0', index: 2 },
+          source: { droppableId: 'PROJECTS_HIGHLIGHT-0', index: 0 },
+          destination: { droppableId: 'PROJECTS_HIGHLIGHT-0', index: 2 },
         })
 
         expect(mockSetResumeData).toHaveBeenCalledWith({
@@ -908,10 +908,10 @@ describe('Preview Component', () => {
           projects: [
             {
               ...mockData.projects[0],
-              keyAchievements: [
-                { text: 'Achievement 2' },
-                { text: 'Achievement 3' },
-                { text: 'Achievement 1' },
+              highlights: [
+                'Achievement 2',
+                'Achievement 3',
+                'Achievement 1',
               ],
             },
           ],

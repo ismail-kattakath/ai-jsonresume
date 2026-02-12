@@ -126,9 +126,7 @@ export function convertToJSONResume(customData?: ResumeData) {
   const projects = (data.projects || []).map((project: Project) => ({
     name: project.name,
     description: project.description,
-    highlights: project.keyAchievements.map(
-      (achievement: Achievement) => achievement.text
-    ),
+    highlights: project.highlights,
     startDate: project.startYear,
     endDate: project.endYear,
     url: project.link ? ensureProtocol(project.link) : undefined,
@@ -246,11 +244,7 @@ export function convertFromJSONResume(
         name: project.name || '',
         link: project.url?.replace(/^https?:\/\//, '') || '',
         description: project.description || '',
-        keyAchievements: (project.highlights || []).map(
-          (highlight: string) => ({
-            text: highlight,
-          })
-        ),
+        highlights: project.highlights || [],
         startYear: project.startDate || '',
         endYear: project.endDate || '',
       })

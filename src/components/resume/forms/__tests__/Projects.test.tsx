@@ -74,7 +74,7 @@ const mockResumeData: ResumeData = {
       name: 'Test Project',
       link: 'https://project.com',
       description: 'Test description',
-      keyAchievements: [{ text: 'Achievement 1\nAchievement 2' }],
+      highlights: ['Achievement 1', 'Achievement 2'],
       startYear: '2023-01',
       endYear: '2023-12',
     },
@@ -126,7 +126,7 @@ describe('Projects Form Component', () => {
     expect(screen.getByPlaceholderText(/^link$/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/description/i)).toBeInTheDocument()
     expect(
-      screen.getByPlaceholderText(/add key achievement/i)
+      screen.getByPlaceholderText(/add highlight/i)
     ).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/start year/i)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/end year/i)).toBeInTheDocument()
@@ -189,7 +189,7 @@ describe('Projects Form Component', () => {
 
   it('adds key achievement when Enter is pressed', () => {
     renderWithContext()
-    const addInput = screen.getByPlaceholderText(/add key achievement/i)
+    const addInput = screen.getByPlaceholderText(/add highlight/i)
 
     // Type achievement and press Enter
     fireEvent.change(addInput, {
@@ -206,10 +206,8 @@ describe('Projects Form Component', () => {
         ? updateFunction(mockResumeData)
         : updateFunction
 
-    expect(result.projects[0].keyAchievements).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ text: 'New achievement' }),
-      ])
+    expect(result.projects[0].highlights).toEqual(
+      expect.arrayContaining(['New achievement'])
     )
   })
 
@@ -280,7 +278,7 @@ describe('Projects Form Component', () => {
             name: '',
             link: '',
             description: '',
-            keyAchievements: [],
+            highlights: [],
             startYear: '',
             endYear: '',
           }),
@@ -313,7 +311,7 @@ describe('Projects Form Component', () => {
           name: 'Second Project',
           link: 'https://second.com',
           description: 'Second description',
-          keyAchievements: [{ text: 'Second achievements' }],
+          highlights: ['Second achievements'],
           startYear: '2024-01',
           endYear: '2024-12',
         },
@@ -346,7 +344,7 @@ describe('Projects Form Component', () => {
       name: 'Project 1',
       link: 'https://project1.com',
       description: 'First project',
-      keyAchievements: [{ text: 'Achievement 1' }],
+      highlights: ['Achievement 1'],
       startYear: '2023-01',
       endYear: '2023-06',
     }
@@ -355,7 +353,7 @@ describe('Projects Form Component', () => {
       name: 'Project 2',
       link: 'https://project2.com',
       description: 'Second project',
-      keyAchievements: [{ text: 'Achievement 2' }],
+      highlights: ['Achievement 2'],
       startYear: '2023-07',
       endYear: '2023-12',
     }
@@ -364,7 +362,7 @@ describe('Projects Form Component', () => {
       name: 'Project 3',
       link: 'https://project3.com',
       description: 'Third project',
-      keyAchievements: [{ text: 'Achievement 3' }],
+      highlights: ['Achievement 3'],
       startYear: '2024-01',
       endYear: '2024-06',
     }

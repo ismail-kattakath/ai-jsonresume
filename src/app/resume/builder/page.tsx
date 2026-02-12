@@ -18,6 +18,7 @@ import PersonalInformation from '@/components/document-builder/shared-forms/Pers
 import Summary from '@/components/resume/forms/Summary'
 import Education from '@/components/resume/forms/Education'
 import CoverLetterContent from '@/components/cover-letter/forms/CoverLetterContent'
+import Projects from '@/components/resume/forms/Projects'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
 import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSection'
 import { AccordionCard } from '@/components/ui/AccordionCard'
@@ -585,6 +586,16 @@ function UnifiedEditor() {
       }
     }
 
+    // Ensure projects are populated if missing from saved data but present in default
+    if (!initialResumeData.projects && defaultResumeData.projects) {
+      const dataWithProjects = {
+        ...initialResumeData,
+        projects: defaultResumeData.projects
+      };
+      setResumeData(dataWithProjects);
+      initialResumeData = dataWithProjects;
+    }
+
     // 2. Migrate skills data if needed
     if (initialResumeData.skills && initialResumeData.skills.length > 0) {
       const needsMigration = initialResumeData.skills.some((skillCategory) =>
@@ -925,15 +936,17 @@ function UnifiedEditor() {
                   </CollapsibleSection>
                 </div>
 
-                <CollapsibleSection
-                  title="Social Media"
-                  icon={<Share2 className="h-4 w-4 text-blue-400" />}
-                  isExpanded={expandedSection === 'social-media'}
-                  onToggle={createToggleHandler('social-media')}
-                  tooltip={tooltips.sections.socialMedia}
-                >
-                  <SocialMedia />
-                </CollapsibleSection>
+                <div id="section-social-media">
+                  <CollapsibleSection
+                    title="Social Media"
+                    icon={<Share2 className="h-4 w-4 text-blue-400" />}
+                    isExpanded={expandedSection === 'social-media'}
+                    onToggle={createToggleHandler('social-media')}
+                    tooltip={tooltips.sections.socialMedia}
+                  >
+                    <SocialMedia />
+                  </CollapsibleSection>
+                </div>
 
                 {/* Resume-only sections */}
                 {mode === 'resume' && (
@@ -948,15 +961,17 @@ function UnifiedEditor() {
                       <Summary />
                     </CollapsibleSection>
 
-                    <CollapsibleSection
-                      title="Education"
-                      icon={<GraduationCap className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'education'}
-                      onToggle={createToggleHandler('education')}
-                      tooltip={tooltips.sections.education}
-                    >
-                      <Education />
-                    </CollapsibleSection>
+                    <div id="section-education">
+                      <CollapsibleSection
+                        title="Education"
+                        icon={<GraduationCap className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'education'}
+                        onToggle={createToggleHandler('education')}
+                        tooltip={tooltips.sections.education}
+                      >
+                        <Education />
+                      </CollapsibleSection>
+                    </div>
 
                     <div id="section-work-experience">
                       <CollapsibleSection
@@ -983,15 +998,29 @@ function UnifiedEditor() {
                       </CollapsibleSection>
                     </div>
 
-                    <CollapsibleSection
-                      title="Additional Info"
-                      icon={<Layers className="h-4 w-4 text-blue-400" />}
-                      isExpanded={expandedSection === 'additional-info'}
-                      onToggle={createToggleHandler('additional-info')}
-                      tooltip={tooltips.sections.additionalInfo}
-                    >
-                      <AdditionalSections />
-                    </CollapsibleSection>
+                    <div id="section-projects">
+                      <CollapsibleSection
+                        title="Featured Projects"
+                        icon={<Briefcase className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'projects'}
+                        onToggle={createToggleHandler('projects')}
+                        tooltip={tooltips.sections.projects}
+                      >
+                        <Projects />
+                      </CollapsibleSection>
+                    </div>
+
+                    <div id="section-additional-info">
+                      <CollapsibleSection
+                        title="Additional Info"
+                        icon={<Layers className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'additional-info'}
+                        onToggle={createToggleHandler('additional-info')}
+                        tooltip={tooltips.sections.additionalInfo}
+                      >
+                        <AdditionalSections />
+                      </CollapsibleSection>
+                    </div>
                   </>
                 )}
 

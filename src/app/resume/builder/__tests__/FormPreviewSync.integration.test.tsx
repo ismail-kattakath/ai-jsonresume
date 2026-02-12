@@ -432,7 +432,11 @@ describe('Integration: Form → Preview Synchronization', () => {
 
         // Fill in the new social media
         await waitFor(() => {
-          const linkInputs = container.querySelectorAll('input[name="link"]')
+          // Find the social media section container first
+          const socialSection = container.querySelector('#section-social-media')
+          expect(socialSection).toBeInTheDocument()
+
+          const linkInputs = socialSection!.querySelectorAll('input[name="link"]')
           const lastLinkInput = linkInputs[
             linkInputs.length - 1
           ] as HTMLInputElement
@@ -529,6 +533,60 @@ describe('Integration: Form → Preview Synchronization', () => {
       // Verify the preview exists and is ready
       const preview = container.querySelector('.preview')
       expect(preview).toBeTruthy()
+    })
+  })
+  describe('Projects Sync', () => {
+    it('should update preview when project name is changed', async () => {
+      const { container } = render(<ResumeEditPage />)
+
+      // Find the first project name input
+      await waitFor(() => {
+        const projectNameInput = container.querySelector(
+          'input[name="name"]'
+        ) as HTMLInputElement
+        // There are multiple "name" inputs (basics, projects, etc.)
+        // We need to find the one in the projects section or just use the first if it works
+        // But usually "name" in basics is first.
+        const inputs = container.querySelectorAll('input[name="name"]')
+        const projectInput = Array.from(inputs).find(input =>
+          input.closest('.group')?.textContent?.includes('Project Name')
+        ) as HTMLInputElement
+
+        if (projectInput) {
+          fireEvent.change(projectInput, {
+            target: { name: 'name', value: 'Awesome Project X' },
+          })
+        }
+      })
+
+      // Verify the preview updates
+      await waitFor(() => {
+        const preview = container.querySelector('.preview')
+        expect(preview).toHaveTextContent('Awesome Project X')
+      })
+    })
+
+    it('should update preview when project highlight is added', async () => {
+      const { container } = render(<ResumeEditPage />)
+
+      // Find the "Add highlight" input
+      await waitFor(() => {
+        const addInput = container.querySelector(
+          'input[placeholder*="Add highlight"]'
+        ) as HTMLInputElement
+        expect(addInput).toBeInTheDocument()
+
+        fireEvent.change(addInput, {
+          target: { value: 'Successfully refactored highlights' },
+        })
+        fireEvent.keyDown(addInput, { key: 'Enter', code: 'Enter' })
+      })
+
+      // Verify the preview updates
+      await waitFor(() => {
+        const preview = container.querySelector('.preview')
+        expect(preview).toHaveTextContent('Successfully refactored highlights')
+      })
     })
   })
 })

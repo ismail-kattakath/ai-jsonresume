@@ -377,7 +377,7 @@ describe('JSON Resume Conversion', () => {
             name: 'Open Source Project',
             link: 'github.com/project',
             description: 'A great project',
-            keyAchievements: [{ text: 'Achievement 1' }],
+            highlights: ['Achievement 1'],
             startYear: '2020-01',
             endYear: '2021-12',
           },
@@ -398,7 +398,7 @@ describe('JSON Resume Conversion', () => {
             name: 'Internal Project',
             link: '',
             description: 'Internal project',
-            keyAchievements: [],
+            highlights: [],
             startYear: '2020-01',
             endYear: '2021-12',
           },
@@ -656,7 +656,7 @@ describe('JSON Resume Conversion', () => {
             name: 'Project 1',
             link: 'github.com/p1',
             description: 'Desc 1',
-            keyAchievements: [{ text: 'Achievement 1' }],
+            highlights: ['Achievement 1'],
             startYear: '2020',
             endYear: '2021',
           },
@@ -664,7 +664,7 @@ describe('JSON Resume Conversion', () => {
             name: 'Project 2',
             link: '',
             description: 'Desc 2',
-            keyAchievements: [],
+            highlights: [],
             startYear: '2021',
             endYear: '2022',
           },
@@ -2098,7 +2098,7 @@ describe('JSON Resume Conversion', () => {
       }
 
       const result = convertFromJSONResume(jsonResume) as any
-      expect(result?.projects[0].keyAchievements).toHaveLength(2)
+      expect(result?.projects[0].highlights).toHaveLength(2)
     })
 
     it('should return null when validation fails', () => {
