@@ -139,31 +139,6 @@ describe('AIContentGenerator Component', () => {
       expect(button).toBeInTheDocument()
     })
 
-    it('should display character counter by default', () => {
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value="Hello" />
-      )
-      expect(screen.getByText('5')).toBeInTheDocument()
-    })
-
-    it('should hide character counter when showCharacterCount is false', () => {
-      renderWithProviders(
-        <AIContentGenerator
-          {...defaultProps}
-          value="Hello"
-          showCharacterCount={false}
-        />
-      )
-      expect(screen.queryByText('5')).not.toBeInTheDocument()
-    })
-
-    it('should display maxLength in character counter when provided', () => {
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value="Hello" maxLength={100} />
-      )
-      expect(screen.getByText('5/100')).toBeInTheDocument()
-    })
-
     it('should render with custom rows prop', () => {
       renderWithProviders(<AIContentGenerator {...defaultProps} rows={10} />)
       const textarea = screen.getByPlaceholderText('Test placeholder')
@@ -187,9 +162,8 @@ describe('AIContentGenerator Component', () => {
         <AIContentGenerator {...defaultProps} />,
         mockConfiguredAISettings
       )
-      const button = screen.getByRole('button')
+      const button = screen.getByRole('button', { name: /generate by jd/i })
       expect(button).toBeInTheDocument()
-      expect(screen.getByText('Generate by JD')).toBeInTheDocument()
     })
   })
 
@@ -251,26 +225,17 @@ describe('AIContentGenerator Component', () => {
 
     it('should have inline generate button at top', () => {
       renderWithProviders(<AIContentGenerator {...defaultProps} />)
-      const button = screen.getByRole('button')
+      const button = screen.getByRole('button', { name: /generate by jd/i })
       expect(button).toBeInTheDocument()
-      expect(screen.getByText('Generate by JD')).toBeInTheDocument()
     })
 
-    it('should have gradient purple/blue button styling', () => {
+    it('should have gradient amber button styling', () => {
       const { container } = renderWithProviders(
         <AIContentGenerator {...defaultProps} />,
         mockConfiguredAISettings
       )
       const button = screen.getByRole('button')
       expect(button).toHaveClass('bg-gradient-to-r')
-    })
-
-    it('should position character counter at top-right', () => {
-      const { container } = renderWithProviders(
-        <AIContentGenerator {...defaultProps} />
-      )
-      const counter = container.querySelector('.absolute.top-3.right-3')
-      expect(counter).toBeInTheDocument()
     })
 
     it('should apply custom className to wrapper', () => {
@@ -291,43 +256,6 @@ describe('AIContentGenerator Component', () => {
     })
   })
 
-  describe('Character Counter', () => {
-    it('should show 0 for empty value', () => {
-      renderWithProviders(<AIContentGenerator {...defaultProps} value="" />)
-      expect(screen.getByText('0')).toBeInTheDocument()
-    })
-
-    it('should count all characters including spaces', () => {
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value="Hello World" />
-      )
-      expect(screen.getByText('11')).toBeInTheDocument()
-    })
-
-    it('should count newlines', () => {
-      const valueWithNewline = 'Line 1\nLine 2'
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value={valueWithNewline} />
-      )
-      expect(screen.getByText(`${valueWithNewline.length}`)).toBeInTheDocument()
-    })
-
-    it('should count special characters', () => {
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value="Test@123!" />
-      )
-      expect(screen.getByText('9')).toBeInTheDocument()
-    })
-
-    it('should be non-interactive', () => {
-      const { container } = renderWithProviders(
-        <AIContentGenerator {...defaultProps} />
-      )
-      const counter = container.querySelector('.pointer-events-none')
-      expect(counter).toBeInTheDocument()
-    })
-  })
-
   describe('Accessibility', () => {
     it('should have accessible button with title', () => {
       renderWithProviders(
@@ -338,7 +266,7 @@ describe('AIContentGenerator Component', () => {
       expect(button).toBeInTheDocument()
       // Title is only shown when disabled or label is hidden. Since label is shown, title is undefined.
       expect(button).not.toHaveAttribute('title')
-      expect(screen.getByText('Generate by JD')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /generate by jd/i })).toBeInTheDocument()
     })
 
     it('should have button type set to button', () => {
@@ -380,44 +308,13 @@ describe('AIContentGenerator Component', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle undefined value', () => {
-      renderWithProviders(
-        <AIContentGenerator
-          {...defaultProps}
-          value={undefined as unknown as string}
-        />
-      )
-      const textarea = screen.getByPlaceholderText('Test placeholder')
-      expect(textarea).toHaveValue('')
-      expect(screen.getByText('0')).toBeInTheDocument()
-    })
-
-    it('should handle null value', () => {
-      renderWithProviders(
-        <AIContentGenerator
-          {...defaultProps}
-          value={null as unknown as string}
-        />
-      )
-      const textarea = screen.getByPlaceholderText('Test placeholder')
-      expect(textarea).toHaveValue('')
-      expect(screen.getByText('0')).toBeInTheDocument()
-    })
-
-    it('should handle very long content', () => {
-      const longContent = 'A'.repeat(5000)
-      renderWithProviders(
-        <AIContentGenerator {...defaultProps} value={longContent} />
-      )
-      expect(screen.getByText('5000')).toBeInTheDocument()
-    })
-
     it('should handle emoji and unicode characters', () => {
       const content = 'Hello 🎉 你好'
       renderWithProviders(
         <AIContentGenerator {...defaultProps} value={content} />
       )
-      expect(screen.getByText(`${content.length}`)).toBeInTheDocument()
+      const textarea = screen.getByPlaceholderText('Test placeholder')
+      expect(textarea).toHaveValue(content)
     })
   })
 

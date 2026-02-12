@@ -18,6 +18,7 @@ import {
 } from '@/lib/ai/models'
 import { analytics } from '@/lib/analytics'
 import { AILoadingToast } from '@/components/ui/AILoadingToast'
+import { FormTextarea } from '@/components/ui/FormTextarea'
 
 interface AIContentGeneratorProps {
   value: string
@@ -42,16 +43,13 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
   rows = 18,
   minHeight = '300px',
   maxLength,
-  showCharacterCount = true,
+  showCharacterCount = false,
   className = '',
   mode,
 }) => {
   const { settings, isConfigured } = useAISettings()
   const { resumeData } = useContext(ResumeContext)
   const [isGenerating, setIsGenerating] = useState(false)
-
-  const characterCount = value?.length || 0
-  const maxLengthDisplay = maxLength ? `/${maxLength}` : ''
 
   const config = {
     summary: {
@@ -82,9 +80,9 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
 
   /* istanbul ignore next */
   const handleGenerate = async () => {
-    process.stderr.write(`[DEBUG] handleGenerate ENTERED - isConfigured: ${isConfigured}, mode: ${mode}\n`)
+    // ... exactly the same generate logic ...
     if (!isConfigured) {
-      process.stderr.write(`[DEBUG] NOT CONFIGURED\n`)
+      console.log(`[DEBUG] NOT CONFIGURED`)
       toast.error('AI not configured', {
         description:
           'Please fill in the API settings and job description in the Generative AI Settings section above.',
@@ -96,9 +94,6 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
     let streamedContent = ''
     const startTime = Date.now()
     let toastId: string | number | undefined
-
-    // Track generation start
-    // analytics.aiGenerationStart(settings.providerType, settings.model)
 
     try {
       // Use Strands Graph for Summary if mode is summary
@@ -122,10 +117,11 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
                 chunk.content.startsWith('**CRITIQUE:**')
 
               if (!isCritique) {
+                const cleanMessage = chunk.content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, '').trim()
                 if (!toastId) {
-                  toastId = toast(<AILoadingToast message={chunk.content} />, { duration: Infinity })
+                  toastId = toast(<AILoadingToast message={cleanMessage} />, { duration: Infinity })
                 } else {
-                  toast(<AILoadingToast message={chunk.content} />, { id: toastId, duration: Infinity })
+                  toast(<AILoadingToast message={cleanMessage} />, { id: toastId, duration: Infinity })
                 }
               }
             }
@@ -144,10 +140,11 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
           },
           (chunk) => {
             if (chunk.content) {
+              const cleanMessage = chunk.content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, '').trim()
               if (!toastId) {
-                toastId = toast(<AILoadingToast message={chunk.content} />, { duration: Infinity })
+                toastId = toast(<AILoadingToast message={cleanMessage} />, { duration: Infinity })
               } else {
-                toast(<AILoadingToast message={chunk.content} />, { id: toastId, duration: Infinity })
+                toast(<AILoadingToast message={cleanMessage} />, { id: toastId, duration: Infinity })
               }
             }
           }
@@ -209,42 +206,26 @@ const AIContentGenerator: React.FC<AIContentGeneratorProps> = ({
   }
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      {/* Textarea with character count and AI button */}
-      <div className="relative">
-        <textarea
-          placeholder={placeholder}
-          name={name}
-          rows={rows}
-          className="block w-full resize-y rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm leading-relaxed text-white transition-all outline-none placeholder:text-white/30 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 disabled:cursor-not-allowed disabled:opacity50"
-          value={value}
-          onChange={onChange}
-          maxLength={maxLength}
-          style={{ minHeight }}
-          disabled={isGenerating}
-        />
-
-        {/* Character count - top right */}
-        {showCharacterCount && (
-          <div className="pointer-events-none absolute top-3 right-3 rounded-lg bg-white/5 px-3 py-1 text-xs text-white/50">
-            {characterCount}
-            {maxLengthDisplay}
-          </div>
-        )}
-
-        {/* Generate by JD button - absolute bottom right */}
-        <div className="absolute right-3 bottom-3">
-          <AIActionButton
-            isLoading={isGenerating}
-            onClick={handleGenerate}
-            label={isGenerating ? 'Generating...' : 'Generate by JD'}
-            isConfigured={isConfigured}
-            className="text-amber-400 border-amber-400/20 hover:bg-amber-400/10"
-            variant="amber"
-          />
-        </div>
-      </div>
-    </div>
+    <FormTextarea
+      label={currentConfig.label}
+      name={name}
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e)} // onChange expects event
+      maxLength={maxLength}
+      showCounter={showCharacterCount}
+      minHeight={minHeight}
+      rows={rows}
+      className={className}
+      disabled={isGenerating}
+      variant="amber"
+      onAIAction={handleGenerate}
+      isAILoading={isGenerating}
+      isAIConfigured={isConfigured}
+      aiButtonTitle="Generate by JD"
+      aiShowLabel={true}
+      aiVariant="amber"
+    />
   )
 }
 

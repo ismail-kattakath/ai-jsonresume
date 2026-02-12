@@ -20,22 +20,12 @@ import { useAISettings } from '@/lib/contexts/AISettingsContext'
 import {
   sortSkillsGraph,
   sortTechStackGraph,
-  tailorExperienceToJD,
+  tailorExperienceToJDGraph,
 } from '@/lib/ai/strands/agent'
 import { AILoadingToast } from '@/components/ui/AILoadingToast'
 import type { DropResult } from '@hello-pangea/dnd'
 import type { WorkExperience as WorkExperienceType, Achievement } from '@/types'
 
-/**
- * Sort button for Key Achievements
- */
-const KeyAchievementsSortButton = ({
-  workExperienceIndex,
-}: {
-  workExperienceIndex: number
-}) => {
-  return null // Still null because KeyAchievements component should handle its own button now
-}
 
 /**
  * Sort button for Tech Stack
@@ -76,11 +66,13 @@ const TechStackSortButton = ({
       (chunk) => {
         if (chunk.content) {
           console.log('[Tech Stack Sort Graph]', chunk.content)
-          // Update toast with progress
+          // Update toast with progress - scrub emojis if present
+          const cleanMessage = chunk.content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, '').trim()
+
           if (!toastId) {
-            toastId = toast(<AILoadingToast message={chunk.content} />, { duration: Infinity })
+            toastId = toast(<AILoadingToast message={cleanMessage} />, { duration: Infinity })
           } else {
-            toast(<AILoadingToast message={chunk.content} />, { id: toastId, duration: Infinity })
+            toast(<AILoadingToast message={cleanMessage} />, { id: toastId, duration: Infinity })
           }
         }
       }
@@ -115,7 +107,7 @@ const TechStackSortButton = ({
       label={isSorting ? 'Sorting...' : 'Sort by JD'}
       showLabel={true}
       size="sm"
-      variant="amber"
+      variant="blue"
     />
   )
 }
@@ -240,7 +232,7 @@ const WorkExperience = () => {
     try {
       const achievements = (workExperience.keyAchievements || []).map(a => a.text)
 
-      const result = await tailorExperienceToJD(
+      const result = await tailorExperienceToJDGraph(
         workExperience.description,
         achievements,
         workExperience.position,
@@ -254,10 +246,11 @@ const WorkExperience = () => {
         },
         (chunk) => {
           if (chunk.content) {
+            const cleanMessage = chunk.content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, '').trim()
             if (!toastId) {
-              toastId = toast(<AILoadingToast message={chunk.content} />, { duration: Infinity })
+              toastId = toast(<AILoadingToast message={cleanMessage} />, { duration: Infinity })
             } else {
-              toast(<AILoadingToast message={chunk.content} />, { id: toastId, duration: Infinity })
+              toast(<AILoadingToast message={cleanMessage} />, { id: toastId, duration: Infinity })
             }
           }
         }
@@ -372,39 +365,29 @@ const WorkExperience = () => {
                         variant="teal"
                       />
 
-                      <div className="relative">
-                        <FormTextarea
-                          label="Description"
-                          name="description"
-                          placeholder="Brief company/role description..."
-                          value={workExperience.description}
-                          onChange={(e) => handleChange(e, index)}
-                          variant="teal"
-                          maxLength={250}
-                          showCounter
-                          minHeight="100px"
-                        />
-                        <div className="absolute bottom-2 right-2">
-                          <AIActionButton
-                            isConfigured={isConfigured && !!settings.jobDescription}
-                            isLoading={isTailoringExperience[index] || false}
-                            onClick={() => handleTailorToJD(index)}
-                            label="Tailor Experience"
-                            showLabel={false}
-                            size="sm"
-                            variant="amber"
-                          />
-                        </div>
-                      </div>
+                      <FormTextarea
+                        label="Description"
+                        name="description"
+                        placeholder="Brief company/role description..."
+                        value={workExperience.description}
+                        onChange={(e) => handleChange(e, index)}
+                        variant="teal"
+                        maxLength={250}
+                        showCounter={false}
+                        minHeight="100px"
+                        onAIAction={() => handleTailorToJD(index)}
+                        isAILoading={isTailoringExperience[index] || false}
+                        isAIConfigured={isConfigured && !!settings.jobDescription}
+                        aiButtonTitle=""
+                        aiShowLabel={false}
+                        aiVariant="amber"
+                      />
 
                       <div>
                         <div className="mb-2 flex items-center gap-2">
                           <label className="text-sm font-medium text-white">
                             Key Achievements
                           </label>
-                          <KeyAchievementsSortButton
-                            workExperienceIndex={index}
-                          />
                         </div>
                         <KeyAchievements
                           workExperienceIndex={index}
@@ -465,7 +448,7 @@ const WorkExperience = () => {
       </DnDContext>
 
       <FormButton size={data.length} add={handleAdd} label="Experience" />
-    </div>
+    </div >
   )
 }
 

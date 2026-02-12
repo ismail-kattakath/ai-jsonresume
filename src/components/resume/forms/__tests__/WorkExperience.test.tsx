@@ -559,52 +559,6 @@ describe('WorkExperience Component', () => {
   })
 
   describe('Character Counters', () => {
-    it('should display character count for description', () => {
-      const mockData = createMockResumeData({
-        workExperience: [
-          {
-            organization: 'Test',
-            url: '',
-            position: '',
-            description: 'Test description',
-            keyAchievements: [],
-            startYear: '',
-            endYear: '',
-          },
-        ],
-      })
-
-      renderWithContext(<WorkExperience />, {
-        contextValue: { ...({} as any), resumeData: mockData as any },
-      })
-
-      expect(screen.getByText('16/250')).toBeInTheDocument()
-    })
-
-    it.skip('should display character count for key achievements', () => {
-      // Note: KeyAchievements now uses individual achievement items instead of textarea
-      // Character count is no longer displayed in the new UI
-      const mockData = createMockResumeData({
-        workExperience: [
-          {
-            organization: 'Test',
-            url: '',
-            position: '',
-            description: '',
-            keyAchievements: [{ text: 'Test achievements' }],
-            startYear: '',
-            endYear: '',
-          },
-        ],
-      })
-
-      renderWithContext(<WorkExperience />, {
-        contextValue: { ...({} as any), resumeData: mockData as any },
-      })
-
-      expect(screen.getByText('17 chars')).toBeInTheDocument()
-    })
-
     it('should have maxLength on description textarea', () => {
       const mockData = createMockResumeData({
         workExperience: [

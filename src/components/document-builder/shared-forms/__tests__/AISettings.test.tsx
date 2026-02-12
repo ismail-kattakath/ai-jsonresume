@@ -86,10 +86,16 @@ describe('AISettings Component', () => {
       ).toBe(true)
     })
 
-    it('clears models when switching to OpenAI Compatible', () => {
+    it('clears URL and models when switching to OpenAI Compatible', () => {
       render(<AISettings />)
       const select = screen.getByLabelText('AI Provider') as HTMLSelectElement
       fireEvent.change(select, { target: { value: 'OpenAI Compatible' } })
+
+      // Should clear URL because the default was OpenAI (a preset)
+      expect(mockUpdateSettings).toHaveBeenCalledWith({
+        apiUrl: '',
+        model: '',
+      })
       expect(screen.getByLabelText('API URL')).toBeInTheDocument()
     })
 
@@ -175,6 +181,7 @@ describe('AISettings Component', () => {
       expect(mockUpdateSettings).toHaveBeenCalledWith({
         apiUrl: 'https://openrouter.ai/api/v1',
         providerType: 'openai-compatible',
+        model: 'google/gemini-2.0-flash-exp:free',
       })
     })
 
@@ -185,6 +192,8 @@ describe('AISettings Component', () => {
       fireEvent.change(select, { target: { value: 'OpenRouter' } })
 
       expect(mockUpdateSettings).toHaveBeenCalledWith({
+        apiUrl: 'https://openrouter.ai/api/v1',
+        providerType: 'openai-compatible',
         model: 'google/gemini-2.0-flash-exp:free',
       })
     })
@@ -359,26 +368,6 @@ describe('AISettings Component', () => {
     })
   })
 
-  describe('Job Description', () => {
-    it('renders job description textarea', () => {
-      render(<AISettings />)
-      expect(screen.getByLabelText('Job Description')).toBeInTheDocument()
-    })
-
-    it('updates settings when job description changes', () => {
-      render(<AISettings />)
-      const textarea = screen.getByLabelText('Job Description')
-
-      fireEvent.change(textarea, {
-        target: { value: 'Looking for a React developer' },
-      })
-
-      expect(mockUpdateSettings).toHaveBeenCalledWith({
-        jobDescription: 'Looking for a React developer',
-      })
-    })
-  })
-
   describe('Loading States', () => {
     it('shows loading indicator when fetching models', async () => {
       mockFetchAvailableModels.mockImplementation(
@@ -476,85 +465,5 @@ describe('AISettings Component', () => {
       })
     })
   })
-
-  describe('Job Description Refinement', () => {
-    it('shows error toast if AI not configured', async () => {
-      mockUseAISettings.mockReturnValue({
-        settings: {
-          apiUrl: '',
-          apiKey: '',
-          model: '',
-          jobDescription: 'Too short',
-          providerType: 'openai-compatible',
-          providerKeys: {},
-          rememberCredentials: true,
-          skillsToHighlight: '',
-        },
-        updateSettings: mockUpdateSettings,
-        isConfigured: false,
-        connectionStatus: 'idle',
-        jobDescriptionStatus: 'idle',
-        validateAll: jest.fn(),
-      })
-
-      render(<AISettings />)
-      const refineButton = screen.getByTitle('Configure AI settings first').closest('button')
-      expect(refineButton).toBeDisabled()
-    })
-
-    it('triggers refinement flow and disables textarea', async () => {
-      const longJD =
-        'This is a sufficiently long job description for testing purposes.'.repeat(
-          5
-        )
-      mockUseAISettings.mockReturnValue({
-        settings: {
-          apiUrl: 'http://localhost:1234/v1',
-          apiKey: 'key',
-          model: 'model',
-          jobDescription: longJD,
-          providerType: 'openai-compatible',
-          providerKeys: {},
-          rememberCredentials: true,
-          skillsToHighlight: '',
-        },
-        updateSettings: mockUpdateSettings,
-        isConfigured: true,
-        connectionStatus: 'valid',
-        jobDescriptionStatus: 'idle',
-        validateAll: jest.fn(),
-      })
-
-      // Use a deferred promise to control timing
-      let resolveRefine: (value: string) => void
-      const refinePromise = new Promise<string>((resolve) => {
-        resolveRefine = resolve
-      })
-        ; (analyzeJobDescriptionGraph as jest.Mock).mockReturnValue(refinePromise)
-
-      render(<AISettings />)
-      const refineButton = screen.getByTitle('Refine with AI').closest('button')!
-      fireEvent.click(refineButton)
-
-      // Check if textarea is disabled while isAnalyzing is true
-      const textarea = screen.getByLabelText('Job Description')
-      expect(textarea).toBeDisabled()
-
-      // Resolve the promise
-      resolveRefine!('# position-title\nRefined')
-
-      await waitFor(() => {
-        expect(mockToast.success).toHaveBeenCalled()
-        expect(analyzeJobDescriptionGraph).toHaveBeenCalled()
-        expect(mockUpdateSettings).toHaveBeenCalledWith({
-          jobDescription: '# position-title\nRefined',
-        })
-      })
-
-      // After refinement, it should be enabled again
-      await waitFor(() => {
-        expect(textarea).not.toBeDisabled()
-      })
-    })
-  })
 })
+

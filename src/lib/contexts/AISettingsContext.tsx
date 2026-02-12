@@ -120,6 +120,28 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
   // Track last validated JD to avoid re-validating the same content
   const lastValidatedJD = useRef<string>('')
 
+  // Define updateSettings FIRST because it's used in validateConnection
+  const updateSettings = useCallback((updates: Partial<AISettings>) => {
+    setSettings((prev) => {
+      const newSettings = { ...prev, ...updates }
+
+      // If key changed, update it in the provider-specific map
+      if (updates.apiKey !== undefined) {
+        newSettings.providerKeys = {
+          ...newSettings.providerKeys,
+          [newSettings.apiUrl]: updates.apiKey,
+        }
+      }
+
+      // If URL (provider) changed, switch to the key stored for that URL
+      if (updates.apiUrl !== undefined && updates.apiUrl !== prev.apiUrl) {
+        newSettings.apiKey = newSettings.providerKeys[updates.apiUrl] || ''
+      }
+
+      return newSettings
+    })
+  }, [])
+
   // Validate API connection
   const validateConnection = useCallback(async () => {
     console.log('[AISettings] Validating connection...', {
@@ -137,13 +159,6 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
 
     // Check if API key is required for this provider
     const provider = getProviderByURL(settings.apiUrl)
-    // If provider is known, check its auth requirement. Custom providers (unknown) require key by default unless empty
-    // But for OpenAI compatible, we might want to allow empty key if user knows what they're doing?
-    // Let's stick to: if matches a known provider, use its setting. If custom/unknown, require key.
-    // Actually, common "custom" endpoints like Ollama/LM Studio might not need keys.
-    // A safer bet: If it's a known provider that DOESN'T require auth, allow empty key.
-    // Otherwise (unknown or requires auth), require key.
-
     const requiresAuth = provider ? provider.requiresAuth : true
 
     // Only check for API key if the provider explicitly requires it
@@ -164,21 +179,35 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
         model: settings.model,
       })
 
-      const isValid = await testConnection({
+      const result = await testConnection({
         baseURL: settings.apiUrl,
         apiKey: settings.apiKey,
         model: settings.model,
       })
-      console.log('[AISettings] Connection test result:', isValid)
+      console.log('[AISettings] Connection test result:', result)
 
-      setConnectionStatus(isValid ? 'valid' : 'invalid')
-      return isValid
+      if (result.success) {
+        setConnectionStatus('valid')
+        // Sync model if server used a different one - ONLY for local providers
+        // Local servers like LM Studio or Ollama often ignore the requested model
+        const provider = getProviderByURL(settings.apiUrl)
+        const isLocalProvider = provider?.name === 'LM Studio' || provider?.name === 'Ollama'
+
+        if (isLocalProvider && result.modelId && result.modelId !== settings.model) {
+          console.log('[AISettings] Local provider forced model sync:', result.modelId)
+          updateSettings({ model: result.modelId })
+        }
+        return true
+      } else {
+        setConnectionStatus('invalid')
+        return false
+      }
     } catch (error) {
       console.error('[AISettings] Validation error:', error)
       setConnectionStatus('invalid')
       return false
     }
-  }, [settings.apiUrl, settings.apiKey, settings.model])
+  }, [settings.apiUrl, settings.apiKey, settings.model, updateSettings])
 
   // Validate job description (simple character count check)
   const validateJD = useCallback(() => {
@@ -271,27 +300,6 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
     }
     persist()
   }, [settings, isInitialized])
-
-  const updateSettings = useCallback((updates: Partial<AISettings>) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev, ...updates }
-
-      // If key changed, update it in the provider-specific map
-      if (updates.apiKey !== undefined) {
-        newSettings.providerKeys = {
-          ...newSettings.providerKeys,
-          [newSettings.apiUrl]: updates.apiKey,
-        }
-      }
-
-      // If URL (provider) changed, switch to the key stored for that URL
-      if (updates.apiUrl !== undefined && updates.apiUrl !== prev.apiUrl) {
-        newSettings.apiKey = newSettings.providerKeys[updates.apiUrl] || ''
-      }
-
-      return newSettings
-    })
-  }, [])
 
   // isConfigured requires valid connection AND valid job description
   const isConfigured =

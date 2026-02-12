@@ -146,10 +146,6 @@ describe('Summary Component', () => {
       expect(button).toBeInTheDocument()
     })
 
-    it('displays character counter', () => {
-      renderWithContext()
-      expect(screen.getByText('12/600')).toBeInTheDocument()
-    })
   })
 
   describe('Summary Text Editing', () => {

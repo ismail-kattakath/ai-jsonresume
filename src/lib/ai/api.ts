@@ -22,6 +22,70 @@ export class OpenAIAPIError extends Error {
 }
 
 /**
+ * Helper to sanitize OpenAI/Provider errors into user-friendly messages
+ */
+function sanitizeOpenAIError(error: any): string {
+    // 1. Handle string errors directly
+    if (typeof error === 'string') return error
+
+    // 2. Handle standard Error objects
+    const message = error.message || error.toString()
+
+    // 3. Check for specific provider error patterns (LiteLLM, Google, etc.)
+
+    // Rate limits / Quota
+    if (
+        message.includes('RateLimitError') ||
+        message.includes('429') ||
+        message.includes('quota') ||
+        message.includes('Resource has been exhausted')
+    ) {
+        return 'Rate limit exceeded. Please try again later or check your API quota.'
+    }
+
+    // Overloaded server / Service Unavailable
+    if (
+        message.includes('ServiceUnavailableError') ||
+        message.includes('503') ||
+        message.includes('Overloaded')
+    ) {
+        return 'AI Service is currently overloaded. Please try again in a few moments.'
+    }
+
+    // Context length exceeded
+    if (
+        message.includes('context_length_exceeded') ||
+        message.includes('maximum context length')
+    ) {
+        return 'The document is too long for this AI model. Please try shortening your input.'
+    }
+
+    // Invalid API Key
+    if (
+        message.includes('InvalidAuthenticationError') ||
+        message.includes('401') ||
+        message.includes('invalid api key')
+    ) {
+        return 'Invalid API Key. Please check your settings.'
+    }
+
+    // Common raw JSON dumps (try to extract meaningful message)
+    if (message.includes('{') && message.includes('}')) {
+        try {
+            // Attempt to find a nested "message" field in the raw string
+            const match = message.match(/"message":\s*"([^"]+)"/)
+            if (match && match[1]) {
+                return match[1]
+            }
+        } catch (e) {
+            // ignore parsing errors
+        }
+    }
+
+    return message
+}
+
+/**
  * Makes a non-streaming request to OpenAI-compatible API
  */
 export async function makeOpenAIRequest(
@@ -54,8 +118,12 @@ export async function makeOpenAIRequest(
             try {
                 const errorData: OpenAIError = await response.json()
                 errorMessage = errorData.error.message || errorMessage
+
+                // Sanitize the message before throwing
+                const sanitizedMessage = sanitizeOpenAIError(errorMessage)
+
                 throw new OpenAIAPIError(
-                    errorMessage,
+                    sanitizedMessage,
                     errorData.error.code,
                     errorData.error.type
                 )
@@ -63,7 +131,7 @@ export async function makeOpenAIRequest(
                 if (parseError instanceof OpenAIAPIError) {
                     throw parseError
                 }
-                throw new OpenAIAPIError(errorMessage)
+                throw new OpenAIAPIError(sanitizeOpenAIError(errorMessage))
             }
         }
 
@@ -89,7 +157,8 @@ export async function makeOpenAIRequest(
                 )
             }
 
-            throw new OpenAIAPIError(error.message)
+            // Sanitize generic errors
+            throw new OpenAIAPIError(sanitizeOpenAIError(error))
         }
 
         throw new OpenAIAPIError('An unexpected error occurred')
@@ -97,9 +166,12 @@ export async function makeOpenAIRequest(
 }
 
 /**
- * Tests the API connection
+ * Tests the API connection and returns the actual model being used by the server
  */
-export async function testConnection(config: OpenAIConfig): Promise<boolean> {
+export async function testConnection(config: OpenAIConfig): Promise<{
+    success: boolean
+    modelId?: string
+}> {
     try {
         const request: OpenAIRequest = {
             model: config.model,
@@ -112,12 +184,15 @@ export async function testConnection(config: OpenAIConfig): Promise<boolean> {
             max_tokens: 5,
         }
 
-        await makeOpenAIRequest(config, request)
-        return true
+        const response = await makeOpenAIRequest(config, request)
+        return {
+            success: true,
+            modelId: response.model,
+        }
     } catch (error) {
         if (process.env.NODE_ENV === 'development') {
             console.error('[OpenAIClient] Connection test failed:', error)
         }
-        return false
+        return { success: false }
     }
 }

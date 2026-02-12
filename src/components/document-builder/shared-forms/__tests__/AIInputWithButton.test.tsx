@@ -356,7 +356,7 @@ describe('AIInputWithButton Component', () => {
       )
 
       const button = container.querySelector('button')
-      expect(button).toHaveClass('from-blue-500', 'to-purple-500')
+      expect(button).toHaveClass('from-amber-500', 'to-orange-500')
     })
 
     it('should apply disabled styling when not configured', () => {
@@ -375,7 +375,7 @@ describe('AIInputWithButton Component', () => {
       )
 
       const button = container.querySelector('button')
-      expect(button).toHaveClass('cursor-not-allowed', 'text-white/30')
+      expect(button).toHaveClass('cursor-not-allowed', 'opacity-50')
     })
   })
 
@@ -401,10 +401,18 @@ describe('AIInputWithButton Component', () => {
         },
       })
 
-      const button = screen.getByRole('button')
-      // Title is not shown when showLabel is true and not disabled
-      expect(button).not.toHaveAttribute('title')
-      expect(screen.getByText('Refine')).toBeInTheDocument()
+      const button = screen.getByRole('button', { name: /generate by jd/i })
+      // Title IS shown when showLabel is false
+      expect(button).toHaveAttribute('title', 'Generate by JD')
+      expect(button).toBeInTheDocument()
+    })
+
+    it('should have amber focus styles', () => {
+      const { container } = renderWithContext(
+        <AIInputWithButton {...defaultProps} />
+      )
+      const input = container.querySelector('input')
+      expect(input).toHaveClass('focus:border-amber-400')
     })
 
     it('should have proper input attributes', () => {
@@ -463,7 +471,7 @@ describe('AIInputWithButton Component', () => {
         <AIInputWithButton {...defaultProps} className="custom-class" />
       )
 
-      const wrapper = container.querySelector('.floating-label-group')
+      const wrapper = container.firstChild as HTMLElement
       expect(wrapper).toHaveClass('custom-class')
     })
   })

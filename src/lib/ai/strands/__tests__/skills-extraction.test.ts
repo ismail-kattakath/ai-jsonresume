@@ -1,4 +1,4 @@
-import { extractSkillsGraph } from '../skills-extraction'
+import { extractSkillsGraph } from '../skills-extraction-graph'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Strands SDK
@@ -41,8 +41,12 @@ describe('Skills Extraction', () => {
     describe('extractSkillsGraph', () => {
         it('extracts and returns a comma-separated list of skills', async () => {
             const mockExtraction = 'React, Postgres'
-            const mockToString = jest.fn().mockReturnValue(mockExtraction)
-            const mockInvoke = jest.fn().mockResolvedValue({ toString: mockToString })
+            const mockVerification = 'React, PostgreSQL'
+            const mockToString1 = jest.fn().mockReturnValue(mockExtraction)
+            const mockToString2 = jest.fn().mockReturnValue(mockVerification)
+            const mockInvoke = jest.fn()
+                .mockResolvedValueOnce({ toString: mockToString1 })
+                .mockResolvedValueOnce({ toString: mockToString2 })
 
                 ; (Agent as jest.Mock).mockImplementation(() => ({
                     invoke: mockInvoke,
@@ -51,10 +55,11 @@ describe('Skills Extraction', () => {
             const onProgress = jest.fn()
             const result = await extractSkillsGraph(mockJD, mockConfig, onProgress)
 
-            expect(Agent).toHaveBeenCalledTimes(1)
+            expect(Agent).toHaveBeenCalledTimes(2) // Extractor and Verifier
             expect(mockInvoke).toHaveBeenCalledWith(expect.stringContaining(mockJD))
-            expect(result).toBe(mockExtraction)
-            expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: '🎯 Extracting key skills from JD...' }))
+            expect(result).toBe(mockVerification)
+            expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Extracting key skills from JD...' }))
+            expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Verifying skill accuracy...' }))
         })
     })
 })

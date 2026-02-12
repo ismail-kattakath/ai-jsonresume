@@ -121,22 +121,22 @@ export async function generateSummaryGraph(
         const writerResult = await writer.invoke(writerPrompt)
         currentSummary = writerResult.toString().replace(/^["']|["']$/g, '').trim()
 
-        if (onProgress) onProgress({ content: 'Auditing summary for structure and alignment...\n', done: false })
+        if (onProgress) onProgress({ content: 'Auditing summary for structure and alignment...', done: false })
 
         const reviewPrompt = `Summary to review:\n${currentSummary}\n\nVerify against the 4-sentence structure using the validate_skills tool.`
         const reviewResult = await reviewer.invoke(reviewPrompt)
         const reviewText = reviewResult.toString().trim()
 
         if (reviewText.startsWith('APPROVED')) {
-            if (onProgress) onProgress({ content: '✨ Expert summary generated and verified.\n', done: true })
+            if (onProgress) onProgress({ content: 'Expert summary generated and verified.', done: true })
             return currentSummary
         } else {
             lastCritique = reviewText
-            if (onProgress) onProgress({ content: `❌ ${reviewText.slice(0, 100)}...\n`, done: false })
+            if (onProgress) onProgress({ content: `Audit failed: ${reviewText.slice(0, 50)}...`, done: false })
         }
     }
 
-    if (onProgress) onProgress({ content: '⚠️ Generated with minor validation warnings.\n', done: true })
+    if (onProgress) onProgress({ content: 'Generated with minor validation warnings.', done: true })
     return currentSummary
 }
 

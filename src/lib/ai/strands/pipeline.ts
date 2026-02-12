@@ -1,7 +1,7 @@
 import { AgentConfig } from './types'
-import { analyzeJobDescription } from './jd-refinement'
+import { analyzeJobDescriptionGraph } from './jd-refinement-graph'
 import { generateSummaryGraph } from './summary-graph'
-import { tailorExperienceToJD } from './experience-tailoring'
+import { tailorExperienceToJDGraph } from './experience-tailoring-graph'
 import type { ResumeData, WorkExperience, Achievement } from '@/types'
 
 export interface PipelineProgress {
@@ -9,6 +9,10 @@ export interface PipelineProgress {
     totalSteps: number
     message: string
     done: boolean
+    // Partial results available as each step completes
+    refinedJD?: string
+    summary?: string
+    workExperiences?: WorkExperience[]
 }
 
 export interface PipelineResult {
@@ -45,13 +49,29 @@ export async function runAIGenerationPipeline(
         done: false
     })
 
-    const refinedJD = await analyzeJobDescription(
+    const refinedJD = await analyzeJobDescriptionGraph(
         jobDescription,
         config,
-        () => {
-            // Internal progress - don't update main progress
+        (progress) => {
+            // Forward the graph progress to the main pipeline progress if needed
+            // but for now we just want the incremental JD after it completes
+            if (progress.content && !progress.done) {
+                onProgress?.({
+                    currentStep: 1,
+                    totalSteps,
+                    message: progress.content,
+                    done: false
+                })
+            }
         }
     )
+    onProgress?.({
+        currentStep: 1,
+        totalSteps,
+        message: 'JD refinement complete',
+        done: false,
+        refinedJD
+    })
 
     // Step 2: Generate Summary
     currentStep++
@@ -59,10 +79,10 @@ export async function runAIGenerationPipeline(
         currentStep,
         totalSteps,
         message: 'Generating professional summary...',
-        done: false
+        done: false,
+        refinedJD
     })
 
-    // Create updated resume data with refined JD for summary generation
     const updatedResumeData: ResumeData = {
         ...resumeData,
     }
@@ -71,10 +91,26 @@ export async function runAIGenerationPipeline(
         updatedResumeData,
         refinedJD, // Use refined JD
         config,
-        () => {
-            // Internal progress - don't update main progress
+        (p) => {
+            if (p.content && !p.done) {
+                onProgress?.({
+                    currentStep: 2,
+                    totalSteps,
+                    message: p.content,
+                    done: false,
+                    refinedJD
+                })
+            }
         }
     )
+    onProgress?.({
+        currentStep,
+        totalSteps,
+        message: 'Summary generation complete',
+        done: false,
+        refinedJD,
+        summary
+    })
 
     // Steps 3+: Tailor Each Work Experience
     const tailoredExperiences: WorkExperience[] = []
@@ -94,15 +130,25 @@ export async function runAIGenerationPipeline(
 
         const achievements = (experience.keyAchievements || []).map((a: Achievement) => a.text)
 
-        const result = await tailorExperienceToJD(
+        const result = await tailorExperienceToJDGraph(
             experience.description || '',
             achievements,
             experience.position || '',
             experience.organization || '',
             refinedJD, // Use refined JD
             config,
-            () => {
-                // Internal progress - don't update main progress
+            (p) => {
+                if (p.content && !p.done) {
+                    onProgress?.({
+                        currentStep,
+                        totalSteps,
+                        message: `Tailoring experience ${i + 1}: ${p.content}`,
+                        done: false,
+                        refinedJD,
+                        summary,
+                        workExperiences: [...tailoredExperiences]
+                    })
+                }
             }
         )
 
@@ -111,8 +157,17 @@ export async function runAIGenerationPipeline(
             description: result.description,
             keyAchievements: result.achievements.map(text => ({ text }))
         })
-    }
 
+        onProgress?.({
+            currentStep,
+            totalSteps,
+            message: `Tailored experience ${i + 1} of ${workExperienceCount}`,
+            done: false,
+            refinedJD,
+            summary,
+            workExperiences: [...tailoredExperiences]
+        })
+    }
     onProgress?.({
         currentStep: totalSteps,
         totalSteps,

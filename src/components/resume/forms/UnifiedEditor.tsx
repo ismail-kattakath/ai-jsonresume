@@ -14,6 +14,7 @@ import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSect
 import ScaledPreviewWrapper from '@/components/document-builder/ui/ScaledPreviewWrapper'
 import ImportExport from '@/components/document-builder/shared-forms/ImportExport'
 import AISettings from '@/components/document-builder/shared-forms/AISettings'
+import JobDescriptionSection from '@/components/document-builder/shared-forms/JobDescriptionSection'
 import PersonalInformation from '@/components/document-builder/shared-forms/PersonalInformation'
 import SocialMedia from '@/components/document-builder/shared-forms/SocialMedia'
 import Summary from '@/components/resume/forms/Summary'
@@ -27,6 +28,7 @@ import Preview from '@/components/resume/preview/Preview'
 import CoverLetterPreview from '@/components/cover-letter/preview/CoverLetterPreview'
 import { AISettingsStatusIndicator } from '@/components/document-builder/ui/AISettingsStatusIndicator'
 import { Tooltip } from '@/components/ui/Tooltip'
+import { BaseButton } from '@/components/ui/BaseButton'
 import { registerServiceWorker } from '@/lib/pwa/registerServiceWorker'
 
 import type { ResumeData } from '@/types'
@@ -130,21 +132,27 @@ export function UnifiedEditor() {
                                         </div>
                                     </div>
 
-                                    <div id="mode-switcher" className="flex overflow-hidden rounded-lg bg-white/5">
-                                        <button
+                                    <div id="mode-switcher" className="flex gap-2">
+                                        <BaseButton
                                             type="button"
                                             onClick={() => setMode('resume')}
-                                            className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${mode === 'resume' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                                            variant={mode === 'resume' ? 'gradient-blue' : 'ghost'}
+                                            size="md"
+                                            fullWidth
+                                            icon={<span>📄</span>}
                                         >
-                                            <span>📄</span> Resume
-                                        </button>
-                                        <button
+                                            Resume
+                                        </BaseButton>
+                                        <BaseButton
                                             type="button"
                                             onClick={() => setMode('coverLetter')}
-                                            className={`flex flex-1 cursor-pointer items-center justify-center gap-2 px-4 py-2 text-sm font-medium transition-all ${mode === 'coverLetter' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white/80'}`}
+                                            variant={mode === 'coverLetter' ? 'gradient-blue' : 'ghost'}
+                                            size="md"
+                                            fullWidth
+                                            icon={<span>✉️</span>}
                                         >
-                                            <span>✉️</span> Cover Letter
-                                        </button>
+                                            Cover Letter
+                                        </BaseButton>
                                     </div>
                                 </div>
 
@@ -175,6 +183,19 @@ export function UnifiedEditor() {
                                         tooltip={tooltips.sections.aiSettings}
                                     >
                                         <AISettings />
+                                    </CollapsibleSection>
+                                </div>
+
+                                <div id="section-job-description">
+                                    <CollapsibleSection
+                                        title="Job Description & Optimization"
+                                        icon={<FileText className="h-4 w-4 text-amber-400" />}
+                                        isExpanded={expandedSection === 'job-description'}
+                                        onToggle={createToggleHandler('job-description')}
+                                        variant="utility"
+                                        tooltip="Tailor your resume by providing the job description"
+                                    >
+                                        <JobDescriptionSection />
                                     </CollapsibleSection>
                                 </div>
 

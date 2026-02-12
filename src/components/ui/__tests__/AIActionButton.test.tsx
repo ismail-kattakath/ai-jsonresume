@@ -131,21 +131,21 @@ describe('AIActionButton', () => {
       render(<AIActionButton {...defaultProps} />)
 
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('px-2', 'py-1', 'text-xs')
+      expect(button).toHaveClass('px-3', 'py-2', 'text-xs')
     })
 
     it('should apply small size classes when size is sm', () => {
       render(<AIActionButton {...defaultProps} size="sm" />)
 
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('px-2', 'py-1', 'text-xs')
+      expect(button).toHaveClass('px-3', 'py-2', 'text-xs')
     })
 
     it('should apply medium size classes when size is md', () => {
       render(<AIActionButton {...defaultProps} size="md" />)
 
       const button = screen.getByRole('button')
-      expect(button).toHaveClass('px-3', 'py-1.5', 'text-sm')
+      expect(button).toHaveClass('px-4', 'py-3', 'text-sm')
     })
   })
 
@@ -162,7 +162,7 @@ describe('AIActionButton', () => {
 
       const button = screen.getByRole('button')
       expect(button).toHaveClass('cursor-not-allowed')
-      expect(button).toHaveClass('text-white/30')
+      expect(button).toHaveClass('opacity-50')
     })
   })
 })
