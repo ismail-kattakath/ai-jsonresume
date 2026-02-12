@@ -44,6 +44,14 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() { }
 }
 
+// Mock ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+  constructor() { }
+  disconnect() { }
+  observe() { }
+  unobserve() { }
+}
+
 // Mock performance API for Next.js third-party scripts (Google Analytics)
 global.performance.mark = jest.fn()
 global.performance.measure = jest.fn()

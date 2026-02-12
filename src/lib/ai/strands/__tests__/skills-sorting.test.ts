@@ -1,4 +1,4 @@
-import { sortSkillsGraph } from '../skills-sorting'
+import { sortSkillsGraph } from '../skills-sorting-graph'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Strands SDK

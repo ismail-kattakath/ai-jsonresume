@@ -1,4 +1,4 @@
-import { analyzeJobDescription, analyzeJobDescriptionGraph } from '../jd-refinement'
+import { analyzeJobDescriptionGraph } from '../jd-refinement-graph'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Strands SDK
@@ -37,54 +37,6 @@ describe('JD Refinement', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-    })
-
-    describe('analyzeJobDescription', () => {
-        it('uses invoke when no onProgress is provided', async () => {
-            const mockInvoke = jest.fn().mockResolvedValue({
-                toString: () => 'Improved JD text',
-            })
-                ; (Agent as jest.Mock).mockImplementation(() => ({
-                    invoke: mockInvoke,
-                }))
-
-            const result = await analyzeJobDescription(mockJD, mockConfig)
-
-            expect(Agent).toHaveBeenCalled()
-            expect(mockInvoke).toHaveBeenCalledWith(mockJD)
-            expect(result).toBe('Improved JD text')
-        })
-
-        it('uses stream when onProgress is provided', async () => {
-            const mockStream = async function* () {
-                yield {
-                    type: 'modelContentBlockDeltaEvent',
-                    delta: { text: 'Streamed ' },
-                }
-                yield {
-                    type: 'modelContentBlockDeltaEvent',
-                    delta: { text: 'content' },
-                }
-            }
-            const onProgress = jest.fn()
-                ; (Agent as jest.Mock).mockImplementation(() => ({
-                    stream: mockStream,
-                }))
-
-            const result = await analyzeJobDescription(mockJD, mockConfig, onProgress)
-
-            expect(Agent).toHaveBeenCalled()
-            expect(onProgress).toHaveBeenCalledWith({
-                content: 'Streamed ',
-                done: false,
-            })
-            expect(onProgress).toHaveBeenCalledWith({
-                content: 'content',
-                done: false,
-            })
-            expect(onProgress).toHaveBeenCalledWith({ content: '', done: true })
-            expect(result).toBe('Streamed content')
-        })
     })
 
     describe('analyzeJobDescriptionGraph', () => {

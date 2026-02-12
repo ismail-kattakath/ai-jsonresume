@@ -1,0 +1,198 @@
+import {
+    OpenAIRequest,
+    OpenAIResponse,
+    OpenAIError,
+    OpenAIConfig,
+} from '@/types/openai'
+
+const REQUEST_TIMEOUT = 120000 // 120 seconds (2 minutes)
+
+/**
+ * Custom error class for OpenAI API errors
+ */
+export class OpenAIAPIError extends Error {
+    constructor(
+        public override message: string,
+        public code?: string,
+        public type?: string
+    ) {
+        super(message)
+        this.name = 'OpenAIAPIError'
+    }
+}
+
+/**
+ * Helper to sanitize OpenAI/Provider errors into user-friendly messages
+ */
+function sanitizeOpenAIError(error: any): string {
+    // 1. Handle string errors directly
+    if (typeof error === 'string') return error
+
+    // 2. Handle standard Error objects
+    const message = error.message || error.toString()
+
+    // 3. Check for specific provider error patterns (LiteLLM, Google, etc.)
+
+    // Rate limits / Quota
+    if (
+        message.includes('RateLimitError') ||
+        message.includes('429') ||
+        message.includes('quota') ||
+        message.includes('Resource has been exhausted')
+    ) {
+        return 'Rate limit exceeded. Please try again later or check your API quota.'
+    }
+
+    // Overloaded server / Service Unavailable
+    if (
+        message.includes('ServiceUnavailableError') ||
+        message.includes('503') ||
+        message.includes('Overloaded')
+    ) {
+        return 'AI Service is currently overloaded. Please try again in a few moments.'
+    }
+
+    // Context length exceeded
+    if (
+        message.includes('context_length_exceeded') ||
+        message.includes('maximum context length')
+    ) {
+        return 'The document is too long for this AI model. Please try shortening your input.'
+    }
+
+    // Invalid API Key
+    if (
+        message.includes('InvalidAuthenticationError') ||
+        message.includes('401') ||
+        message.includes('invalid api key')
+    ) {
+        return 'Invalid API Key. Please check your settings.'
+    }
+
+    // Common raw JSON dumps (try to extract meaningful message)
+    if (message.includes('{') && message.includes('}')) {
+        try {
+            // Attempt to find a nested "message" field in the raw string
+            const match = message.match(/"message":\s*"([^"]+)"/)
+            if (match && match[1]) {
+                return match[1]
+            }
+        } catch (e) {
+            // ignore parsing errors
+        }
+    }
+
+    return message
+}
+
+/**
+ * Makes a non-streaming request to OpenAI-compatible API
+ */
+export async function makeOpenAIRequest(
+    config: OpenAIConfig,
+    request: OpenAIRequest
+): Promise<OpenAIResponse> {
+    try {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json',
+        }
+
+        if (config.apiKey) {
+            headers['Authorization'] = `Bearer ${config.apiKey}`
+        }
+
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT)
+
+        const response = await fetch(`${config.baseURL}/chat/completions`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(request),
+            signal: controller.signal,
+        })
+
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+            let errorMessage = `API request failed with status ${response.status}`
+            try {
+                const errorData: OpenAIError = await response.json()
+                errorMessage = errorData.error.message || errorMessage
+
+                // Sanitize the message before throwing
+                const sanitizedMessage = sanitizeOpenAIError(errorMessage)
+
+                throw new OpenAIAPIError(
+                    sanitizedMessage,
+                    errorData.error.code,
+                    errorData.error.type
+                )
+            } catch (parseError) {
+                if (parseError instanceof OpenAIAPIError) {
+                    throw parseError
+                }
+                throw new OpenAIAPIError(sanitizeOpenAIError(errorMessage))
+            }
+        }
+
+        const data = await response.json()
+        return data as OpenAIResponse
+    } catch (error) {
+        if (error instanceof OpenAIAPIError) {
+            throw error
+        }
+
+        if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                throw new OpenAIAPIError(
+                    'API request timed out. The server took too long to respond.',
+                    'timeout'
+                )
+            }
+
+            if (error.message.includes('fetch')) {
+                throw new OpenAIAPIError(
+                    'Unable to connect to AI server. Please check the URL and ensure the server is running.',
+                    'network_error'
+                )
+            }
+
+            // Sanitize generic errors
+            throw new OpenAIAPIError(sanitizeOpenAIError(error))
+        }
+
+        throw new OpenAIAPIError('An unexpected error occurred')
+    }
+}
+
+/**
+ * Tests the API connection and returns the actual model being used by the server
+ */
+export async function testConnection(config: OpenAIConfig): Promise<{
+    success: boolean
+    modelId?: string
+}> {
+    try {
+        const request: OpenAIRequest = {
+            model: config.model,
+            messages: [
+                {
+                    role: 'user',
+                    content: 'Hello',
+                },
+            ],
+            max_tokens: 5,
+        }
+
+        const response = await makeOpenAIRequest(config, request)
+        return {
+            success: true,
+            modelId: response.model,
+        }
+    } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+            console.error('[OpenAIClient] Connection test failed:', error)
+        }
+        return { success: false }
+    }
+}

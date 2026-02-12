@@ -1,4 +1,4 @@
-import { sortTechStackGraph } from '../techStackSorting'
+import { sortTechStackGraph } from '../tech-stack-sorting-graph'
 import { Agent } from '@strands-agents/sdk'
 
 // Mock the Agent class and createModel

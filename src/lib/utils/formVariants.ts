@@ -11,6 +11,7 @@ export type FormVariant =
   | 'emerald'
   | 'violet'
   | 'blue'
+  | 'amber'
 
 /**
  * Tailwind classes for form variants
@@ -24,4 +25,5 @@ export const variantClasses: Record<FormVariant, string> = {
   emerald: 'focus:border-emerald-400 focus:ring-emerald-400/20',
   violet: 'focus:border-violet-400 focus:ring-violet-400/20',
   blue: 'focus:border-blue-400 focus:ring-blue-400/20',
+  amber: 'focus:border-amber-400 focus:ring-amber-400/20',
 }

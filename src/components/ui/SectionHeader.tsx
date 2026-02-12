@@ -16,6 +16,7 @@ const gradientClasses: Record<FormVariant, string> = {
   emerald: 'from-emerald-500 to-teal-500',
   violet: 'from-violet-500 to-purple-500',
   blue: 'from-blue-500 to-cyan-500',
+  amber: 'from-amber-500 to-orange-500',
 }
 
 /**

@@ -79,16 +79,19 @@ const ModelSelector = ({
             variant="blue"
             disabled={
                 isProviderUnreachable ||
-                (requiresKey && !model.trim())
+                (requiresKey && !model.trim()) ||
+                !currentProvider?.baseURL.trim()
             }
             helpText={
                 isProviderUnreachable
                     ? `✗ ${currentProvider?.name} is unreachable. Please start the server and refresh.`
                     : modelsError
                         ? 'Enter model name manually'
-                        : requiresKey
-                            ? 'Enter API key to load available models'
-                            : 'Enter model name manually if not detected'
+                        : !currentProvider?.baseURL.trim()
+                            ? 'Enter API URL above to load models'
+                            : requiresKey
+                                ? 'Enter API key to load available models'
+                                : 'Enter model name manually if not detected'
             }
         />
     )

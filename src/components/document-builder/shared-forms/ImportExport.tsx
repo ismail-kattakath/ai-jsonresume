@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { analytics } from '@/lib/analytics'
 import { generateJSONFilename } from '@/lib/filenameGenerator'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
+import { BaseButton } from '@/components/ui/BaseButton'
 import type { ResumeData } from '@/types/resume'
 
 interface ImportExportProps {
@@ -164,10 +165,16 @@ const ImportExport = ({
         Import or export your resume in JSON Resume format for portability
         across different resume tools.
       </p>
-      <div className={`grid gap-3 ${hidePrintButton ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
-        <label className="group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-3 text-sm font-medium text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]">
-          <VscJson className="text-lg transition-transform group-hover/btn:rotate-12" />
-          <span>Import JSON Resume</span>
+      <div className={`grid items-stretch gap-3 ${hidePrintButton ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
+        <BaseButton
+          as="label"
+          variant="gradient-blue"
+          size="md"
+          fullWidth
+          icon={<VscJson className="text-base transition-transform group-hover/btn:rotate-12" />}
+          className="group/btn cursor-pointer"
+        >
+          Import JSON Resume
           <input
             aria-label="Import JSON Resume"
             type="file"
@@ -175,22 +182,30 @@ const ImportExport = ({
             onChange={handleImport}
             accept=".json"
           />
-        </label>
+        </BaseButton>
 
         {!hideExportButton && (
-          <button
+          <BaseButton
+            type="button"
             aria-label="Export JSON Resume"
-            className="group/btn inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-3 text-sm font-medium text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+            variant="gradient-green"
+            size="md"
+            fullWidth
             onClick={handleExport}
+            icon={<VscJson className="text-base transition-transform group-hover/btn:rotate-12" />}
+            className="group/btn"
           >
-            <VscJson className="text-lg transition-transform group-hover/btn:rotate-12" />
-            <span>Export JSON Resume</span>
-          </button>
+            Export JSON Resume
+          </BaseButton>
         )}
 
         {!hidePrintButton && (
           <div className="flex">
-            <PrintButton className="w-full justify-center py-3" />
+            <PrintButton
+              variant="unified"
+              className="w-full justify-center"
+              resumeData={resumeData}
+            />
           </div>
         )}
       </div>

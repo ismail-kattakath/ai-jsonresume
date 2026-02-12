@@ -60,9 +60,9 @@ export async function generateCoverLetterGraph(
         printer: false
     })
 
-    if (onProgress) onProgress({ content: '✍️ Drafting tailored cover letter...', done: false })
+    if (onProgress) onProgress({ content: 'Drafting tailored cover letter...', done: false })
 
-    const context = `CANDIDATE: ${resumeData.name}\\nSUMMARY: ${resumeData.summary}\\nEXPERIENCE: ${experienceText}\\nSKILLS: ${skillsText}\\n\\nJD: ${jobDescription}`
+    const context = `CANDIDATE: ${resumeData.name}\nSUMMARY: ${resumeData.summary}\nEXPERIENCE: ${experienceText}\nSKILLS: ${skillsText}\n\nJD: ${jobDescription}`
 
     let currentDraftResult = await writer.invoke(`Create a cover letter based on this data: ${context}`)
     let currentDraft = currentDraftResult.toString()
@@ -71,17 +71,17 @@ export async function generateCoverLetterGraph(
 
     while (iterations < maxIterations) {
         iterations++
-        if (onProgress) onProgress({ content: `🔍 Reviewing draft (Iteration ${iterations})...`, done: false })
+        if (onProgress) onProgress({ content: `Reviewing draft (Iteration ${iterations})...`, done: false })
 
-        const reviewResult = await reviewer.invoke(`Original Data: ${context}\\n\\nDraft Letter: ${currentDraft}`)
+        const reviewResult = await reviewer.invoke(`Original Data: ${context}\n\nDraft Letter: ${currentDraft}`)
         const review = reviewResult.toString()
 
         if (review.startsWith('APPROVED')) {
             break
         } else {
             const critique = review.replace('CRITIQUE:', '').trim()
-            if (onProgress) onProgress({ content: `🛠️ Refining: ${critique.slice(0, 50)}...`, done: false })
-            const refinedResult = await writer.invoke(`Refine this cover letter based on this critique: ${critique}\\n\\nOriginal Data: ${context}\\n\\nLast Draft: ${currentDraft}`)
+            if (onProgress) onProgress({ content: `Refining: ${critique.slice(0, 50)}...`, done: false })
+            const refinedResult = await writer.invoke(`Refine this cover letter based on this critique: ${critique}\n\nOriginal Data: ${context}\n\nLast Draft: ${currentDraft}`)
             currentDraft = refinedResult.toString()
         }
     }

@@ -1,5 +1,6 @@
 import React from 'react'
 import { MdDelete } from 'react-icons/md'
+import { BaseButton } from './BaseButton'
 
 interface DeleteButtonProps {
   onClick: () => void
@@ -17,13 +18,14 @@ export function DeleteButton({
   className = '',
 }: DeleteButtonProps) {
   return (
-    <button
+    <BaseButton
       type="button"
       onClick={onClick}
-      className={`flex-shrink-0 cursor-pointer rounded-lg px-3 py-2 text-red-400 transition-all hover:bg-red-400/10 hover:text-red-300 ${className}`}
+      variant="danger"
+      size="md"
+      icon={<MdDelete className="text-xl" />}
       title={label}
-    >
-      <MdDelete className="text-xl" />
-    </button>
+      className={className}
+    />
   )
 }

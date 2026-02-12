@@ -1,43 +1,34 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Loader2,
 } from 'lucide-react'
-import { toast } from 'sonner'
-import { FormTextarea } from '@/components/ui/FormTextarea'
-import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { useAISettings } from '@/lib/contexts/AISettingsContext'
-import { fetchAvailableModels } from '@/lib/ai/openai-client'
+import { fetchAvailableModels } from '@/lib/ai/models'
 import {
   PROVIDER_PRESETS,
   getProviderByURL,
   CUSTOM_PROVIDER,
 } from '@/lib/ai/providers'
-import { runAIGenerationPipeline, analyzeJobDescriptionGraph } from '@/lib/ai/strands/agent'
 
 // Sub-components
 import ConnectionStatusIndicator from './ai-settings/ConnectionStatusIndicator'
 import ProviderSelector from './ai-settings/ProviderSelector'
 import APIKeyInput from './ai-settings/APIKeyInput'
 import ModelSelector from './ai-settings/ModelSelector'
-import AIPipelineButton from './ai-settings/AIPipelineButton'
 
 const AISettings = () => {
-  const { resumeData, setResumeData } = React.useContext(ResumeContext)
   const {
     settings,
     updateSettings,
     isConfigured,
     connectionStatus,
-    jobDescriptionStatus,
   } = useAISettings()
 
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [loadingModels, setLoadingModels] = useState(false)
   const [modelsError, setModelsError] = useState<string | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [isPipelineRunning, setIsPipelineRunning] = useState(false)
 
   // Initialize selected provider from URL
   const [selectedProvider, setSelectedProvider] = useState<string>(() => {
@@ -88,6 +79,14 @@ const AISettings = () => {
         if (models.length > 0) {
           setAvailableModels(models)
           setModelsError(null)
+
+          // Auto-select first model if current is empty or if we just switched provider
+          // But don't overwrite if the current model is already a valid choice in the list
+          const currentModelIsValid = models.includes(settings.model)
+          if (!settings.model || !currentModelIsValid) {
+            console.log('[AISettings] Auto-selecting first available model:', models[0])
+            updateSettings({ model: models[0] })
+          }
         } else {
           setAvailableModels([])
           setModelsError('No models found or API does not support model listing')
@@ -109,14 +108,26 @@ const AISettings = () => {
     const providerName = e.target.value
     setSelectedProvider(providerName)
 
+    // Clear models immediately to prevent leakage
+    setAvailableModels([])
+    setModelsError(null)
+
     const preset = PROVIDER_PRESETS.find((p) => p.name === providerName)
     if (preset) {
       updateSettings({
         apiUrl: preset.baseURL,
         providerType: preset.providerType,
+        model: preset.commonModels?.[0] || '',
       })
-      if (preset.commonModels && preset.commonModels.length > 0) {
-        updateSettings({ model: preset.commonModels[0] })
+    } else if (providerName === CUSTOM_PROVIDER.name) {
+      // If switching to "OpenAI Compatible", clear URL if it was a preset
+      const currentProvider = getProviderByURL(settings.apiUrl)
+      if (currentProvider) {
+        updateSettings({
+          apiUrl: '',
+          model: '',
+        })
+        setCustomURL('')
       }
     }
   }
@@ -125,69 +136,6 @@ const AISettings = () => {
     const url = e.target.value
     setCustomURL(url)
     updateSettings({ apiUrl: url })
-  }
-
-  const handleRefineJD = async () => {
-    if (!isConfigured || !settings.jobDescription || settings.jobDescription.length < 50) {
-      toast.error('Add more detail to your job description first (min 50 chars)')
-      return
-    }
-
-    setIsAnalyzing(true)
-    const toastId = toast.loading('Refining job description...')
-
-    try {
-      const refinedJD = await analyzeJobDescriptionGraph(
-        settings.jobDescription,
-        {
-          apiUrl: settings.apiUrl,
-          apiKey: settings.apiKey,
-          model: settings.model || 'gpt-4o-mini',
-          providerType: 'openai-compatible',
-        }
-      )
-
-      updateSettings({ jobDescription: refinedJD })
-      toast.success('Job description refined successfully!', { id: toastId })
-    } catch (error) {
-      console.error('[AISettings] Refinement error:', error)
-      toast.error(`Refinement failed: ${(error as Error).message}`, { id: toastId })
-    } finally {
-      setIsAnalyzing(false)
-    }
-  }
-
-  const handleRunPipeline = async () => {
-    if (!isConfigured || !settings.jobDescription) return
-
-    setIsPipelineRunning(true)
-    const toastId = toast.loading('Running AI optimization pipeline...')
-
-    try {
-      const result = await runAIGenerationPipeline(
-        resumeData,
-        settings.jobDescription,
-        {
-          apiUrl: settings.apiUrl,
-          apiKey: settings.apiKey,
-          model: settings.model || 'gpt-4o-mini',
-          providerType: 'openai-compatible',
-        }
-      )
-
-      // Update resume with results
-      setResumeData({
-        ...resumeData,
-        summary: result.summary,
-        workExperience: result.workExperiences,
-      })
-      toast.success('Resume optimized successfully!', { id: toastId })
-    } catch (error) {
-      console.error('[AISettings] Pipeline error:', error)
-      toast.error(`Optimization failed: ${(error as Error).message}`, { id: toastId })
-    } finally {
-      setIsPipelineRunning(false)
-    }
   }
 
   const providerOptions = useMemo(() => [
@@ -266,32 +214,9 @@ const AISettings = () => {
           <span>Fetching models...</span>
         </div>
       )}
-
-      <FormTextarea
-        label="Job Description"
-        name="jobDescription"
-        value={settings.jobDescription}
-        onChange={(e) => updateSettings({ jobDescription: e.target.value })}
-        placeholder="Paste the job description here..."
-        variant="blue"
-        minHeight="160px"
-        onAIAction={handleRefineJD}
-        isAILoading={isAnalyzing}
-        isAIConfigured={isConfigured}
-        aiButtonTitle="Refine with AI"
-        aiShowLabel={false}
-        aiVariant="amber"
-        disabled={isAnalyzing || isPipelineRunning}
-        showCounter={false}
-      />
-
-      <AIPipelineButton
-        onRun={handleRunPipeline}
-        disabled={!isConfigured || !settings.jobDescription || isPipelineRunning || isAnalyzing}
-        isLoading={isPipelineRunning}
-      />
     </div>
   )
 }
+
 
 export default AISettings

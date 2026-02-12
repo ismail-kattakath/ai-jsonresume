@@ -4,55 +4,6 @@ import { AgentConfig } from './types'
 import { createModel } from './factory'
 
 /**
- * Analyzes and improves a job description using a Strands agent.
- *
- * @param jobDescription - The raw job description text
- * @param config - Provider configuration from AISettings
- * @param onProgress - Optional callback for streaming updates
- * @returns The improved job description text
- */
-export async function analyzeJobDescription(
-    jobDescription: string,
-    config: AgentConfig,
-    onProgress?: StreamCallback
-): Promise<string> {
-    const model = createModel(config)
-
-    // Create the agent with a specific persona for JD analysis
-    const agent = new Agent({
-        model,
-        systemPrompt:
-            'You are a professional recruiting assistant and expert resume tailor. ' +
-            'Your task is to analyze the provided job description and improve its clarity, ' +
-            'structure, and keywords without losing its original meaning. ' +
-            'Format it cleanly with clear sections for Responsibilities, Requirements, and Skills. ' +
-            'Only return the improved job description text, no preamble or explanation.',
-        printer: false, // We handle output manually via stream/invoke
-    })
-
-    if (onProgress) {
-        let fullResponse = ''
-        // Stream the response for immediate feedback
-        for await (const event of agent.stream(jobDescription)) {
-            if (
-                event.type === 'modelContentBlockDeltaEvent' &&
-                'text' in event.delta &&
-                typeof event.delta.text === 'string'
-            ) {
-                fullResponse += event.delta.text
-                onProgress({ content: event.delta.text, done: false })
-            }
-        }
-        onProgress({ content: '', done: true })
-        return fullResponse
-    } else {
-        // Simple invocation for non-streaming use cases
-        const result = await agent.invoke(jobDescription)
-        return result.toString()
-    }
-}
-
-/**
  * A multi-agent graph flow that refines a job description through iterative feedback.
  * Uses a Refiner agent and a Reviewer agent.
  *

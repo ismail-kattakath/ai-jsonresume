@@ -90,7 +90,7 @@ export const CUSTOM_PROVIDER: ProviderPreset = {
     baseURL: '',
     providerType: 'openai-compatible',
     description: 'Connect to any OpenAI-compatible API (Ollama, LM Studio, etc.)',
-    requiresAuth: false,
+    requiresAuth: true,
     supportsModels: true,
 }
 

@@ -19,7 +19,7 @@ export interface ExperienceTailoringResult {
  * 4. Fact Checker - Validates factual accuracy (max 2 iterations)
  * 5. Relevance Evaluator - Ensures effective JD alignment (max 2 iterations)
  */
-export async function tailorExperienceToJD(
+export async function tailorExperienceToJDGraph(
     description: string,
     achievements: string[],
     position: string,

@@ -7,11 +7,14 @@ import {
 import {
   loadCredentials,
   saveCredentials,
+} from '@/lib/ai/storage'
+import {
   testConnection,
-} from '@/lib/ai/openai-client'
+} from '@/lib/ai/api'
 
 // Mock dependencies
-jest.mock('@/lib/ai/openai-client')
+jest.mock('@/lib/ai/storage')
+jest.mock('@/lib/ai/api')
 
 const mockLoadCredentials = loadCredentials as jest.MockedFunction<
   typeof loadCredentials
@@ -28,7 +31,7 @@ describe('AISettingsContext', () => {
     jest.clearAllMocks()
     mockLoadCredentials.mockResolvedValue(null)
     mockSaveCredentials.mockResolvedValue(undefined)
-    mockTestConnection.mockResolvedValue(true)
+    mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
   })
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -154,7 +157,7 @@ describe('AISettingsContext', () => {
 
     it('sets connectionStatus to testing during validation', async () => {
       mockTestConnection.mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve(true), 100))
+        () => new Promise((resolve) => setTimeout(() => resolve({ success: true, modelId: 'gpt-4o-mini' }), 100))
       )
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
@@ -172,7 +175,7 @@ describe('AISettingsContext', () => {
     })
 
     it('sets connectionStatus to valid on successful connection', async () => {
-      mockTestConnection.mockResolvedValue(true)
+      mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -189,7 +192,7 @@ describe('AISettingsContext', () => {
     })
 
     it('sets connectionStatus to invalid on failed connection', async () => {
-      mockTestConnection.mockResolvedValue(false)
+      mockTestConnection.mockResolvedValue({ success: false })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -227,7 +230,7 @@ describe('AISettingsContext', () => {
 
       act(() => {
         result.current.updateSettings({
-          jobDescription: 'Short'.repeat(30), // < 100 chars
+          jobDescription: 'Short'.repeat(10), // < 100 chars
         })
       })
 
@@ -281,7 +284,7 @@ describe('AISettingsContext', () => {
 
   describe('isConfigured', () => {
     it('is false when connection is invalid', async () => {
-      mockTestConnection.mockResolvedValue(false)
+      mockTestConnection.mockResolvedValue({ success: false })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -299,7 +302,7 @@ describe('AISettingsContext', () => {
     })
 
     it('is false when job description is invalid', async () => {
-      mockTestConnection.mockResolvedValue(true)
+      mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -317,7 +320,7 @@ describe('AISettingsContext', () => {
     })
 
     it.skip('is true when both connection and job description are valid', async () => {
-      mockTestConnection.mockResolvedValue(true)
+      mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -342,7 +345,7 @@ describe('AISettingsContext', () => {
 
   describe('validateAll', () => {
     it.skip('returns true when all validations pass', async () => {
-      mockTestConnection.mockResolvedValue(true)
+      mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -364,7 +367,7 @@ describe('AISettingsContext', () => {
     })
 
     it('returns false when connection fails', async () => {
-      mockTestConnection.mockResolvedValue(false)
+      mockTestConnection.mockResolvedValue({ success: false })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 
@@ -383,7 +386,7 @@ describe('AISettingsContext', () => {
     })
 
     it.skip('returns false when job description is invalid', async () => {
-      mockTestConnection.mockResolvedValue(true)
+      mockTestConnection.mockResolvedValue({ success: true, modelId: 'gpt-4o-mini' })
 
       const { result } = renderHook(() => useAISettings(), { wrapper })
 

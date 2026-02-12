@@ -2,12 +2,13 @@
 
 import React, { useState, useContext } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
-import AISortButton from '@/components/ui/AISortButton'
+import AIActionButton from '@/components/ui/AIActionButton'
 import { toast } from 'sonner'
 import { useAISettings } from '@/lib/contexts/AISettingsContext'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import { generateJobTitleGraph } from '@/lib/ai/strands/agent'
 import { analytics } from '@/lib/analytics'
+import { FormInput } from '@/components/ui/FormInput'
 import { AILoadingToast } from '@/components/ui/AILoadingToast'
 
 interface AIInputWithButtonProps {
@@ -80,10 +81,11 @@ const AIInputWithButton: React.FC<AIInputWithButtonProps> = ({
               chunk.content.startsWith('**CRITIQUE:**')
 
             if (!isCritique) {
+              const cleanMessage = chunk.content.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, '').trim()
               if (!toastId) {
-                toastId = toast(<AILoadingToast message={chunk.content} />, { duration: Infinity })
+                toastId = toast(<AILoadingToast message={cleanMessage} />, { duration: Infinity })
               } else {
-                toast(<AILoadingToast message={chunk.content} />, { id: toastId, duration: Infinity })
+                toast(<AILoadingToast message={cleanMessage} />, { id: toastId, duration: Infinity })
               }
             }
           }
@@ -127,30 +129,27 @@ const AIInputWithButton: React.FC<AIInputWithButtonProps> = ({
   }
 
   return (
-    <div className={`floating-label-group ${className}`}>
-      <div className="relative">
-        <input
-          type="text"
-          placeholder={placeholder}
-          name={name}
-          className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 pr-10 text-sm text-white transition-all outline-none placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-          value={value}
-          onChange={onChange}
-          disabled={isGenerating}
+    <div className={`relative ${className}`}>
+      <FormInput
+        label={label}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={isGenerating}
+        variant="amber"
+      />
+      <div className="absolute top-1/2 right-2 -translate-y-1/2">
+        <AIActionButton
+          isLoading={isGenerating}
+          onClick={handleGenerate}
+          label={isGenerating ? 'Generating...' : 'Generate by JD'}
+          showLabel={false}
+          isConfigured={isConfigured}
+          variant="amber"
+          size="sm"
         />
-        <div className="absolute top-1/2 right-2 -translate-y-1/2">
-          <AISortButton
-            isConfigured={isConfigured}
-            isLoading={isGenerating}
-            onClick={handleGenerate}
-            label="Generate by JD"
-            showLabel={false}
-            size="sm"
-            variant="amber"
-          />
-        </div>
       </div>
-      <label className="floating-label">{label}</label>
     </div>
   )
 }
