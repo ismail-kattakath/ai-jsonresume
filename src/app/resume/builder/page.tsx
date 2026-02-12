@@ -18,6 +18,7 @@ import PersonalInformation from '@/components/document-builder/shared-forms/Pers
 import Summary from '@/components/resume/forms/Summary'
 import Education from '@/components/resume/forms/Education'
 import CoverLetterContent from '@/components/cover-letter/forms/CoverLetterContent'
+import Projects from '@/components/resume/forms/Projects'
 import PrintButton from '@/components/document-builder/ui/PrintButton'
 import CollapsibleSection from '@/components/document-builder/ui/CollapsibleSection'
 import { AccordionCard } from '@/components/ui/AccordionCard'
@@ -585,6 +586,16 @@ function UnifiedEditor() {
       }
     }
 
+    // Ensure projects are populated if missing from saved data but present in default
+    if (!initialResumeData.projects && defaultResumeData.projects) {
+      const dataWithProjects = {
+        ...initialResumeData,
+        projects: defaultResumeData.projects
+      };
+      setResumeData(dataWithProjects);
+      initialResumeData = dataWithProjects;
+    }
+
     // 2. Migrate skills data if needed
     if (initialResumeData.skills && initialResumeData.skills.length > 0) {
       const needsMigration = initialResumeData.skills.some((skillCategory) =>
@@ -980,6 +991,18 @@ function UnifiedEditor() {
                         tooltip={tooltips.sections.skills}
                       >
                         <SkillsSection />
+                      </CollapsibleSection>
+                    </div>
+
+                    <div id="section-projects">
+                      <CollapsibleSection
+                        title="Featured Projects"
+                        icon={<Briefcase className="h-4 w-4 text-blue-400" />}
+                        isExpanded={expandedSection === 'projects'}
+                        onToggle={createToggleHandler('projects')}
+                        tooltip={tooltips.sections.projects}
+                      >
+                        <Projects />
                       </CollapsibleSection>
                     </div>
 

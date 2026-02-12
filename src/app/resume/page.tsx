@@ -20,6 +20,12 @@ export default function ResumeDownloadPage() {
     let loadedData = defaultResumeData
     if (storedData) {
       loadedData = JSON.parse(storedData)
+
+      // Merge missing projects from default data (if any)
+      if (!loadedData.projects && defaultResumeData.projects) {
+        loadedData.projects = defaultResumeData.projects
+      }
+
       setResumeData(loadedData)
     }
 
@@ -45,8 +51,8 @@ export default function ResumeDownloadPage() {
       value={{
         resumeData,
         setResumeData,
-        handleProfilePicture: () => {},
-        handleChange: () => {},
+        handleProfilePicture: () => { },
+        handleChange: () => { },
         editable: false,
       }}
     >

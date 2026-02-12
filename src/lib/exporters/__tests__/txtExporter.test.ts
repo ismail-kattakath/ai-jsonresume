@@ -56,7 +56,7 @@ describe('txtExporter', () => {
         name: 'Open Source Project',
         link: 'https://github.com/johndoe/project',
         description: 'A popular open source library.',
-        keyAchievements: [{ text: '1000+ stars on GitHub' }],
+        highlights: ['1000+ stars on GitHub'],
         startYear: '2019',
         endYear: 'Present',
       },
@@ -207,7 +207,7 @@ describe('txtExporter', () => {
       expect(result).toContain('Link: https://github.com/johndoe/project')
     })
 
-    it('should format projects with key achievements', () => {
+    it('should format projects with highlights', () => {
       const result = convertResumeToText(mockResumeData)
 
       expect(result).toContain('1000+ stars on GitHub')
@@ -293,7 +293,7 @@ describe('txtExporter', () => {
             name: 'Project A',
             link: '',
             description: 'First project',
-            keyAchievements: [],
+            highlights: [],
             startYear: '2020',
             endYear: 'Present',
           },
@@ -301,7 +301,7 @@ describe('txtExporter', () => {
             name: 'Project B',
             link: '',
             description: 'Second project',
-            keyAchievements: [],
+            highlights: [],
             startYear: '2019',
             endYear: '2020',
           },

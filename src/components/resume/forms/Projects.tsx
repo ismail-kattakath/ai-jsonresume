@@ -7,7 +7,8 @@ import { SectionHeader } from '@/components/ui/SectionHeader'
 import { DeleteButton } from '@/components/ui/DeleteButton'
 import { useArrayForm } from '@/hooks/useArrayForm'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
-import ProjectAchievements from '@/components/resume/forms/ProjectAchievements'
+import ProjectHighlights from '@/components/resume/forms/ProjectHighlights'
+import SortableTagInput from '@/components/ui/SortableTagInput'
 
 const DragDropContext = dynamic(
   () =>
@@ -32,9 +33,7 @@ const Draggable = dynamic(
 )
 
 /**
- * Projects form component - REFACTORED
- * Reduced from 125 lines to ~90 lines using reusable components
- * Note: Old implementation had inconsistent styling - now fixed
+ * Projects form component
  */
 const Projects = () => {
   const { resumeData, setResumeData } = useContext(ResumeContext)
@@ -42,7 +41,8 @@ const Projects = () => {
     name: '',
     link: '',
     description: '',
-    keyAchievements: [],
+    highlights: [],
+    keywords: [],
     startYear: '',
     endYear: '',
   })
@@ -62,6 +62,54 @@ const Projects = () => {
     const [removed] = newProjects.splice(source.index, 1)
     if (removed) {
       newProjects.splice(destination.index, 0, removed)
+      setResumeData({ ...resumeData, projects: newProjects })
+    }
+  }
+
+  const handleAddKeyword = (index: number, keyword: string) => {
+    const project = resumeData.projects?.[index]
+    if (!project) return
+
+    const newProjects = [...(resumeData.projects || [])]
+    const keywords = project.keywords || []
+    newProjects[index] = {
+      ...project,
+      keywords: [...keywords, keyword],
+    }
+    setResumeData({ ...resumeData, projects: newProjects })
+  }
+
+  const handleRemoveKeyword = (index: number, keywordIndex: number) => {
+    const project = resumeData.projects?.[index]
+    if (!project) return
+
+    const newProjects = [...(resumeData.projects || [])]
+    const keywords = [...(project.keywords || [])]
+    keywords.splice(keywordIndex, 1)
+    newProjects[index] = {
+      ...project,
+      keywords,
+    }
+    setResumeData({ ...resumeData, projects: newProjects })
+  }
+
+  const handleReorderKeyword = (
+    index: number,
+    startIndex: number,
+    endIndex: number
+  ) => {
+    const project = resumeData.projects?.[index]
+    if (!project) return
+
+    const newProjects = [...(resumeData.projects || [])]
+    const keywords = [...(project.keywords || [])]
+    const [removed] = keywords.splice(startIndex, 1)
+    if (removed) {
+      keywords.splice(endIndex, 0, removed)
+      newProjects[index] = {
+        ...project,
+        keywords,
+      }
       setResumeData({ ...resumeData, projects: newProjects })
     }
   }
@@ -89,11 +137,10 @@ const Projects = () => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`group flex cursor-grab flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-4 hover:border-white/20 hover:bg-white/10 active:cursor-grabbing ${
-                        snapshot.isDragging
-                          ? 'bg-white/20 outline-2 outline-purple-400 outline-dashed'
-                          : ''
-                      }`}
+                      className={`group flex cursor-grab flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-4 hover:border-white/20 hover:bg-white/10 active:cursor-grabbing ${snapshot.isDragging
+                        ? 'bg-white/20 outline-2 outline-purple-400 outline-dashed'
+                        : ''
+                        }`}
                     >
                       <FormInput
                         label="Project Name"
@@ -125,10 +172,28 @@ const Projects = () => {
 
                       <div>
                         <label className="mb-2 block text-sm font-medium text-white">
-                          Key Achievements
+                          Highlights
                         </label>
-                        <ProjectAchievements
+                        <ProjectHighlights
                           projectIndex={index}
+                          variant="teal"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-white">
+                          Keywords
+                        </label>
+                        <SortableTagInput
+                          tags={project.keywords || []}
+                          onAdd={(tag) => handleAddKeyword(index, tag)}
+                          onRemove={(tagIndex) =>
+                            handleRemoveKeyword(index, tagIndex)
+                          }
+                          onReorder={(startIndex, endIndex) =>
+                            handleReorderKeyword(index, startIndex, endIndex)
+                          }
+                          placeholder="Add keywords..."
                           variant="teal"
                         />
                       </div>

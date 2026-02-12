@@ -33,6 +33,7 @@ export const tooltips = {
       'Certifications, languages, projects, and other relevant information',
     coverLetterContent:
       'Write a compelling cover letter tailored to your target job',
+    projects: 'Showcase your personal projects, open source contributions, and side hustles',
   },
 
   // AI Settings Form

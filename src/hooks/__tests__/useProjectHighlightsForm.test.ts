@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { renderHook, act } from '@testing-library/react'
-import { useProjectAchievementsForm } from '../useProjectAchievementsForm'
+import { useProjectHighlightsForm } from '../useProjectHighlightsForm'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 import type { ResumeData } from '@/types'
 import React from 'react'
@@ -22,10 +22,10 @@ const mockResumeData: ResumeData = {
       startYear: '2020-01-01',
       endYear: '',
       url: 'https://example.com',
-      keyAchievements: [
-        { text: 'Achievement 1' },
-        { text: 'Achievement 2' },
-        { text: 'Achievement 3' },
+      highlights: [
+        'Achievement 1',
+        'Achievement 2',
+        'Achievement 3',
       ],
       technologies: [],
     },
@@ -35,7 +35,7 @@ const mockResumeData: ResumeData = {
       startYear: '2018-01-01',
       endYear: '2019-12-31',
       url: '',
-      keyAchievements: [{ text: 'Previous achievement' }],
+      highlights: ['Previous achievement'],
       technologies: [],
     },
   ],
@@ -43,7 +43,7 @@ const mockResumeData: ResumeData = {
   certifications: [],
 }
 
-describe('useProjectAchievementsForm', () => {
+describe('useProjectHighlightsForm', () => {
   let mockSetResumeData: jest.Mock
 
   const createWrapper = (resumeData: ResumeData) => {
@@ -69,25 +69,25 @@ describe('useProjectAchievementsForm', () => {
   })
 
   describe('Initialization', () => {
-    it('returns achievements for the specified project index', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('returns highlights for the specified project index', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
-      expect(result.current.achievements).toEqual([
-        { text: 'Achievement 1' },
-        { text: 'Achievement 2' },
-        { text: 'Achievement 3' },
+      expect(result.current.highlights).toEqual([
+        'Achievement 1',
+        'Achievement 2',
+        'Achievement 3',
       ])
     })
 
-    it('returns achievements for different project indices', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(1), {
+    it('returns highlights for different project indices', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(1), {
         wrapper: createWrapper(mockResumeData),
       })
 
-      expect(result.current.achievements).toEqual([
-        { text: 'Previous achievement' },
+      expect(result.current.highlights).toEqual([
+        'Previous achievement',
       ])
     })
 
@@ -96,7 +96,7 @@ describe('useProjectAchievementsForm', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
       expect(() => {
-        renderHook(() => useProjectAchievementsForm(999), {
+        renderHook(() => useProjectHighlightsForm(999), {
           wrapper: createWrapper(mockResumeData),
         })
       }).toThrow('Project at index 999 not found')
@@ -106,8 +106,8 @@ describe('useProjectAchievementsForm', () => {
   })
 
   describe('handleChange', () => {
-    it('updates achievement text at specified index', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('updates highlight text at specified index', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -119,13 +119,13 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements[1].text).toBe(
+      expect(newData.projects[0].highlights[1]).toBe(
         'Updated Achievement 2'
       )
     })
 
-    it('preserves other achievements when updating one', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('preserves other highlights when updating one', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -136,13 +136,13 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toHaveLength(3)
-      expect(newData.projects[0].keyAchievements[1].text).toBe('Achievement 2')
-      expect(newData.projects[0].keyAchievements[2].text).toBe('Achievement 3')
+      expect(newData.projects[0].highlights).toHaveLength(3)
+      expect(newData.projects[0].highlights[1]).toBe('Achievement 2')
+      expect(newData.projects[0].highlights[2]).toBe('Achievement 3')
     })
 
     it('does not modify other projects', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -153,15 +153,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[1].keyAchievements).toEqual([
-        { text: 'Previous achievement' },
+      expect(newData.projects[1].highlights).toEqual([
+        'Previous achievement',
       ])
     })
   })
 
   describe('add', () => {
-    it('adds new achievement with provided text', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('adds new highlight with provided text', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -173,14 +173,12 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toHaveLength(4)
-      expect(newData.projects[0].keyAchievements[3]).toEqual({
-        text: 'New Achievement',
-      })
+      expect(newData.projects[0].highlights).toHaveLength(4)
+      expect(newData.projects[0].highlights[3]).toEqual('New Achievement')
     })
 
-    it('trims whitespace from added achievement text', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('trims whitespace from added highlight text', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -191,11 +189,11 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements[3].text).toBe('Spaced Text')
+      expect(newData.projects[0].highlights[3]).toBe('Spaced Text')
     })
 
-    it('does not add achievement if text is empty', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('does not add highlight if text is empty', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -206,8 +204,8 @@ describe('useProjectAchievementsForm', () => {
       expect(mockSetResumeData).not.toHaveBeenCalled()
     })
 
-    it('does not add achievement if text is only whitespace', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('does not add highlight if text is only whitespace', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -218,8 +216,8 @@ describe('useProjectAchievementsForm', () => {
       expect(mockSetResumeData).not.toHaveBeenCalled()
     })
 
-    it('preserves existing achievements when adding new one', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('preserves existing highlights when adding new one', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -230,15 +228,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements[0].text).toBe('Achievement 1')
-      expect(newData.projects[0].keyAchievements[1].text).toBe('Achievement 2')
-      expect(newData.projects[0].keyAchievements[2].text).toBe('Achievement 3')
+      expect(newData.projects[0].highlights[0]).toBe('Achievement 1')
+      expect(newData.projects[0].highlights[1]).toBe('Achievement 2')
+      expect(newData.projects[0].highlights[2]).toBe('Achievement 3')
     })
   })
 
   describe('remove', () => {
-    it('removes achievement at specified index', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('removes highlight at specified index', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -250,15 +248,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toHaveLength(2)
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 1' },
-        { text: 'Achievement 3' },
+      expect(newData.projects[0].highlights).toHaveLength(2)
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 1',
+        'Achievement 3',
       ])
     })
 
-    it('removes first achievement', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('removes first highlight', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -269,14 +267,14 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 2' },
-        { text: 'Achievement 3' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 2',
+        'Achievement 3',
       ])
     })
 
-    it('removes last achievement', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('removes last highlight', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -287,14 +285,14 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 1' },
-        { text: 'Achievement 2' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 1',
+        'Achievement 2',
       ])
     })
 
     it('does not modify other projects', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -305,15 +303,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[1].keyAchievements).toEqual([
-        { text: 'Previous achievement' },
+      expect(newData.projects[1].highlights).toEqual([
+        'Previous achievement',
       ])
     })
   })
 
   describe('reorder', () => {
-    it('reorders achievements from start to end', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('reorders highlights from start to end', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -325,15 +323,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 2' },
-        { text: 'Achievement 3' },
-        { text: 'Achievement 1' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 2',
+        'Achievement 3',
+        'Achievement 1',
       ])
     })
 
-    it('reorders achievements from end to start', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('reorders highlights from end to start', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -344,15 +342,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 3' },
-        { text: 'Achievement 1' },
-        { text: 'Achievement 2' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 3',
+        'Achievement 1',
+        'Achievement 2',
       ])
     })
 
-    it('reorders achievements by one position', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+    it('reorders highlights by one position', () => {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -363,15 +361,15 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 1' },
-        { text: 'Achievement 3' },
-        { text: 'Achievement 2' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 1',
+        'Achievement 3',
+        'Achievement 2',
       ])
     })
 
     it('does not modify other projects', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -382,13 +380,13 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[1].keyAchievements).toEqual([
-        { text: 'Previous achievement' },
+      expect(newData.projects[1].highlights).toEqual([
+        'Previous achievement',
       ])
     })
 
     it('handles reordering to the same position', () => {
-      const { result } = renderHook(() => useProjectAchievementsForm(0), {
+      const { result } = renderHook(() => useProjectHighlightsForm(0), {
         wrapper: createWrapper(mockResumeData),
       })
 
@@ -399,10 +397,10 @@ describe('useProjectAchievementsForm', () => {
       const updateFn = mockSetResumeData.mock.calls[0][0]
       const newData = updateFn(mockResumeData)
 
-      expect(newData.projects[0].keyAchievements).toEqual([
-        { text: 'Achievement 1' },
-        { text: 'Achievement 2' },
-        { text: 'Achievement 3' },
+      expect(newData.projects[0].highlights).toEqual([
+        'Achievement 1',
+        'Achievement 2',
+        'Achievement 3',
       ])
     })
   })

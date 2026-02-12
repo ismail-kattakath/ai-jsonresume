@@ -79,9 +79,8 @@ function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
     name: project.name || '',
     link: stripProtocol(project.url || ''),
     description: project.description || '',
-    keyAchievements: (project.highlights || []).map((highlight) => ({
-      text: highlight,
-    })),
+    highlights: project.highlights || [],
+    keywords: project.keywords || [],
     startYear: project.startDate || '',
     endYear: project.endDate || '',
   }))

@@ -15,7 +15,7 @@ export default function Projects() {
           viewport={{ once: true }}
           className="mb-16 text-center"
         >
-          <h2 className="md3-headline-large mb-4">Featured Projects</h2>
+          <h2 className="md3-headline-large mb-4">Projects</h2>
         </motion.div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

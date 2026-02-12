@@ -48,7 +48,8 @@ export interface Project {
   name: string
   link: string
   description: string
-  keyAchievements: Achievement[]
+  highlights: string[]
+  keywords?: string[]
   startYear: string
   endYear: string
 }

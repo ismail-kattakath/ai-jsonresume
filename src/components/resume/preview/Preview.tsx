@@ -130,18 +130,18 @@ const Preview = () => {
     }
 
     if (
-      source.droppableId.includes('PROJECTS_KEY_ACHIEVEMENT') &&
+      source.droppableId.includes('PROJECTS_HIGHLIGHT') &&
       resumeData.projects
     ) {
       const newProjects = [...resumeData.projects]
       const projectIndex = parseInt(source.droppableId.split('-')[1])
       const project = newProjects[projectIndex]
-      if (project && project.keyAchievements) {
-        const keyAchievements = [...project.keyAchievements]
-        const [removed] = keyAchievements.splice(source.index, 1)
+      if (project && project.highlights) {
+        const highlights = [...project.highlights]
+        const [removed] = highlights.splice(source.index, 1)
         if (removed) {
-          keyAchievements.splice(destination.index, 0, removed)
-          project.keyAchievements = keyAchievements
+          highlights.splice(destination.index, 0, removed)
+          project.highlights = highlights
           setResumeData({ ...resumeData, projects: newProjects })
         }
       }
@@ -351,6 +351,7 @@ const Preview = () => {
                   </p>
                 </div>
               )}
+
               <Droppable droppableId="skills" type="SKILLS">
                 {(provided) => (
                   <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -378,6 +379,98 @@ const Preview = () => {
                   </div>
                 )}
               </Droppable>
+
+              {resumeData.projects && resumeData.projects.length > 0 && (
+                <div className="mb-1">
+                  <h2
+                    className="section-title editable mb-1 border-b-2 border-dashed border-gray-300"
+                    contentEditable={editable}
+                    suppressContentEditableWarning
+                  >
+                    Projects
+                  </h2>
+                  {resumeData.projects.map((project, index) => (
+                    <div key={index} className="mb-1">
+                      <div className="flex flex-col space-y-0.5">
+                        <a
+                          href={project.link ? formatUrl(project.link) : '#'}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="content i-bold editable text-blue-700 hover:underline"
+                          contentEditable={editable}
+                          suppressContentEditableWarning
+                        >
+                          {project.name}
+                        </a>
+                      </div>
+                      <p
+                        className="content editable"
+                        contentEditable={editable}
+                        suppressContentEditableWarning
+                      >
+                        {project.description}
+                      </p>
+                      <Droppable
+                        droppableId={`PROJECTS_HIGHLIGHT-${index}`}
+                        type="PROJECTS_HIGHLIGHT"
+                      >
+                        {(provided) => (
+                          <ul
+                            className="content mt-1 list-disc ps-3.5"
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                          >
+                            {Array.isArray(project.highlights) &&
+                              project.highlights.map((highlight, subIndex) => (
+                                <Draggable
+                                  key={`PROJECT-HIGHLIGHT-${index}-${subIndex}`}
+                                  draggableId={`PROJECTS_HIGHLIGHT-${index}-${subIndex}`}
+                                  index={subIndex}
+                                >
+                                  {(provided, snapshot) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      className={`cursor-grab hover:outline-2 hover:outline-gray-400 hover:outline-dashed active:cursor-grabbing ${snapshot.isDragging &&
+                                        'bg-white outline-2 outline-gray-400 outline-dashed'
+                                        }`}
+                                    >
+                                      <Highlight
+                                        text={highlight}
+                                        keywords={settings.skillsToHighlight}
+                                        isHTML={true}
+                                        className="editable-block"
+                                        contentEditable={editable}
+                                        suppressContentEditableWarning
+                                      />
+                                    </li>
+                                  )}
+                                </Draggable>
+                              ))}
+                            {provided.placeholder}
+                          </ul>
+                        )}
+                      </Droppable>
+                      {project.keywords && project.keywords.length > 0 && (
+                        <div className="mt-1">
+                          <span className="content select-all">
+                            <Highlight
+                              text={project.keywords.join(', ')}
+                              keywords={settings.skillsToHighlight}
+                            />
+                          </span>
+                        </div>
+                      )}
+                      <DateRange
+                        startYear={project.startYear}
+                        endYear={project.endYear}
+                        id={`project-start-end-date-${index}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               <div>
                 {resumeData.education.length > 0 && (
                   <div className="mb-1">
@@ -572,7 +665,7 @@ const Preview = () => {
           </div>
         </DragDropContext>
       </A4PageWrapper>
-    </div>
+    </div >
   )
 }
 
