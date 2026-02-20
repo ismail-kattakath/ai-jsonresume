@@ -90,7 +90,7 @@ describe('Projects', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-      ; (useArrayForm as jest.Mock).mockReturnValue(mockArrayForm)
+    ;(useArrayForm as jest.Mock).mockReturnValue(mockArrayForm)
     window.prompt = jest.fn().mockReturnValue('New Keyword')
   })
 
@@ -235,13 +235,19 @@ describe('Projects', () => {
     })
     expect(mockSetResumeData).not.toHaveBeenCalled()
 
-      // 2. keyword handlers with drift (missing project branch)
-      ; (useArrayForm as jest.Mock).mockReturnValue({
-        ...mockArrayForm,
-        data: [{ name: 'Ghost', keywords: ['Poltergeist'] }],
-      })
+    // 2. keyword handlers with drift (missing project branch)
+    ;(useArrayForm as jest.Mock).mockReturnValue({
+      ...mockArrayForm,
+      data: [{ name: 'Ghost', keywords: ['Poltergeist'] }],
+    })
     render(
-      <ResumeContext.Provider value={{ resumeData: { projects: [] }, setResumeData: mockSetResumeData } as unknown as React.ContextType<typeof ResumeContext>}>
+      <ResumeContext.Provider
+        value={
+          { resumeData: { projects: [] }, setResumeData: mockSetResumeData } as unknown as React.ContextType<
+            typeof ResumeContext
+          >
+        }
+      >
         <Projects />
       </ResumeContext.Provider>
     )
@@ -276,7 +282,7 @@ describe('Projects', () => {
     const dataWithMissingKeywords = {
       projects: [{ name: 'P1', keywords: undefined }],
     }
-      ; (useArrayForm as jest.Mock).mockReturnValue({ ...mockArrayForm, data: dataWithMissingKeywords.projects })
+    ;(useArrayForm as jest.Mock).mockReturnValue({ ...mockArrayForm, data: dataWithMissingKeywords.projects })
     renderComponent(dataWithMissingKeywords)
     const allAddKeywordButtons = screen.queryAllByText('Add Keyword')
     if (allAddKeywordButtons.length > 0) {

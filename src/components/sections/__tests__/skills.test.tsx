@@ -15,12 +15,26 @@ jest.mock('framer-motion', () => ({
       style,
       ...props
     }: Record<string, unknown> & { children?: React.ReactNode }) => <div {...props}>{children}</div>,
-    h2: ({ children, variants, initial, animate, whileInView, transition, viewport, ...props }: Record<string, unknown> & { children?: React.ReactNode }) => (
-      <h2 {...props}>{children}</h2>
-    ),
-    h3: ({ children, variants, initial, animate, whileInView, transition, viewport, ...props }: Record<string, unknown> & { children?: React.ReactNode }) => (
-      <h3 {...props}>{children}</h3>
-    ),
+    h2: ({
+      children,
+      variants,
+      initial,
+      animate,
+      whileInView,
+      transition,
+      viewport,
+      ...props
+    }: Record<string, unknown> & { children?: React.ReactNode }) => <h2 {...props}>{children}</h2>,
+    h3: ({
+      children,
+      variants,
+      initial,
+      animate,
+      whileInView,
+      transition,
+      viewport,
+      ...props
+    }: Record<string, unknown> & { children?: React.ReactNode }) => <h3 {...props}>{children}</h3>,
     span: ({
       children,
       variants,
