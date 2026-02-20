@@ -94,7 +94,7 @@ export default function PrintButton({
         className={`group inline-flex cursor-pointer items-center gap-2 border-l border-purple-700/50 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-xs font-medium text-white transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 ${isUnified ? 'flex-1 justify-center rounded-r-xl' : 'rounded-r-full md:px-6'}`}
       >
         <SiMarkdown className={`${isUnified ? 'text-base' : 'text-lg'} transition-transform group-hover:scale-110`} />
-        <span className={isUnified ? 'hidden' : 'hidden md:inline'}>Markdown</span>
+        <span className={isUnified ? 'hidden' : 'hidden md:inline'}>Copy</span>
       </button>
     </div>
   )
