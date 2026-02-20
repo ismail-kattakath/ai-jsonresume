@@ -10,6 +10,8 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
+    // Map resume.json to a fixture file for CI environments where the real file is gitignored
+    '^@/data/resume\\.json$': '<rootDir>/src/data/resume.fixture.json',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transformIgnorePatterns: ['node_modules/(?!(onborda|react-tooltip|@strands-agents|@google/genai))'],
