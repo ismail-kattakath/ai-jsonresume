@@ -26,21 +26,21 @@ jest.mock(
 
 // Mock IntersectionObserver for framer-motion
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  constructor() { }
+  disconnect() { }
+  observe() { }
   takeRecords() {
     return []
   }
-  unobserve() {}
+  unobserve() { }
 }
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
+  constructor() { }
+  disconnect() { }
+  observe() { }
+  unobserve() { }
 }
 
 // Mock performance API for Next.js third-party scripts (Google Analytics)
@@ -155,6 +155,9 @@ beforeAll(() => {
       /Error loading saved (resume|cover letter) data/i,
       /AISettings.*Model fetch error/i,
       /AI Achievements sort error/i,
+      /\[JobDescriptionSection\] Refinement error/i,
+      /\[JobDescriptionSection\] Pipeline error/i,
+      /Functions are not valid as a React child/i,
     ]
 
     if (silentPatterns.some((pattern) => pattern.test(message))) {

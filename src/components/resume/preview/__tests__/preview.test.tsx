@@ -18,6 +18,20 @@ jest.mock('next/dynamic', () => () => {
   return function MockDynamicComponent({ children, menu, droppableId, onDragEnd }: any) {
     if (onDragEnd) (global as any).__MOCKED_PREVIEW_ON_DRAG_END__ = onDragEnd
     if (menu) return <div data-testid="highlight-menu">{menu()}</div>
+    if (typeof children === 'function') {
+      return (
+        <div data-testid={`dynamic-${droppableId || 'component'}`}>
+          {children(
+            {
+              droppableProps: {},
+              innerRef: jest.fn(),
+              placeholder: null,
+            },
+            { isDragging: false }
+          )}
+        </div>
+      )
+    }
     if (droppableId) return <div data-testid={`droppable-${droppableId}`}>{children}</div>
     return <>{children}</>
   }
