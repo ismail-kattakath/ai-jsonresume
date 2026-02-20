@@ -2,8 +2,9 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import PasswordProtection from '@/components/auth/PasswordProtection'
+import PasswordProtection from '@/components/auth/password-protection'
 import bcrypt from 'bcryptjs'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 
 // Mock the password config
 const mockGetPasswordHash = jest.fn(() => '$2b$10$DROkfTWOCqdekTKMKybP2eD9NIqTHNyAKFgsZCdpEXS9vC2honJfS')
@@ -392,10 +393,14 @@ describe('PasswordProtection Component', () => {
       const submitButton = screen.getByRole('button', { name: /unlock/i })
 
       fireEvent.change(passwordInput, { target: { value: correctPassword } })
-      fireEvent.click(submitButton)
+      console.error('DEBUG: globalThis.suppressPatterns from test:', globalThis.suppressPatterns)
+      await suppressConsoleError(/Authentication error:/i, async () => {
+        console.error('DEBUG: globalThis.suppressPatterns inside suppression:', globalThis.suppressPatterns)
+        fireEvent.click(submitButton)
 
-      await waitFor(() => {
-        expect(screen.getByText('Authentication error. Please try again.')).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText('Authentication error. Please try again.')).toBeInTheDocument()
+        })
       })
     })
   })

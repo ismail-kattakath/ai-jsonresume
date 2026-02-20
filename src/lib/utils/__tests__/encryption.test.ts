@@ -1,5 +1,6 @@
 import { encryptData, decryptData, generateVaultKey } from '@/lib/utils/encryption'
 import { TextEncoder, TextDecoder } from 'util'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 
 global.TextEncoder = TextEncoder as unknown as typeof global.TextEncoder
 global.TextDecoder = TextDecoder as unknown as typeof global.TextDecoder
@@ -77,12 +78,16 @@ describe('encryption utility', () => {
 
       const encrypted = await encryptData(testData, masterKey)
 
-      await expect(decryptData(encrypted, masterKey)).rejects.toThrow('Decryption failed')
+      await suppressConsoleError(/\[Encryption\] Decryption failed:/i, async () => {
+        await expect(decryptData(encrypted, masterKey)).rejects.toThrow('Decryption failed')
+      })
     })
 
     it('handles corrupted base64', async () => {
       // btoa() might throw or atob() might throw
-      await expect(decryptData('!!!invalid-base64!!!', masterKey)).rejects.toThrow()
+      await suppressConsoleError(/\[Encryption\] Decryption failed:/i, async () => {
+        await expect(decryptData('!!!invalid-base64!!!', masterKey)).rejects.toThrow()
+      })
     })
   })
 

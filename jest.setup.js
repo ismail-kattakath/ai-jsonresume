@@ -26,21 +26,21 @@ jest.mock(
 
 // Mock IntersectionObserver for framer-motion
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  constructor() { }
+  disconnect() { }
+  observe() { }
   takeRecords() {
     return []
   }
-  unobserve() {}
+  unobserve() { }
 }
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
+  constructor() { }
+  disconnect() { }
+  observe() { }
+  unobserve() { }
 }
 
 // Mock performance API for Next.js third-party scripts (Google Analytics)
@@ -56,7 +56,7 @@ global.fetch = jest.fn(() =>
 )
 
 // Mock DragAndDrop wrapper components for testing
-jest.mock('@/components/ui/DragAndDrop', () => ({
+jest.mock('@/components/ui/drag-and-drop', () => ({
   DnDContext: ({ children, onDragEnd }) => {
     // Expose for testing if needed
     if (typeof global !== 'undefined') {
@@ -115,6 +115,8 @@ const originalLog = console.log
 const originalWarn = console.warn
 const originalInfo = console.info
 
+globalThis.suppressPatterns = []
+
 beforeAll(() => {
   console.error = (...args) => {
     const message = args
@@ -130,34 +132,22 @@ beforeAll(() => {
       })
       .join(' ')
 
-    const silentPatterns = [
-      /not wrapped in act/i,
-      /nested/i,
-      /classNameArrow/i,
-      /delayShow|delayHide/i,
-      /contentEditable/i,
-      /Invalid file type/i,
-      /Authentication error:/i,
-      /\[Encryption\] Decryption failed:/i,
-      /Validation errors:/i,
-      /Error converting JSON Resume:/i,
-      /Failed to parse achievements sort result:/i,
-      /\[Pipeline\] Failed/i,
-      /Failed to copy to clipboard/i,
-      /Cover Letter generation error/i,
-      /whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i,
-      /validateDOMNesting/i,
-      /cannot be a child of/i,
-      /hydration error/i,
-      /Not implemented: navigation/i,
-      /Failed to parse or decrypt credentials/i,
-      /Failed to parse or decrypt providerKeys/i,
-      /Error loading saved (resume|cover letter) data/i,
-      /AISettings.*Model fetch error/i,
-      /AI Achievements sort error/i,
-    ]
+    /**
+     * Boilerplate library/environmental noise that is difficult or too noisy to localize.
+     *
+     * Strategy:
+     * 1. Application-specific errors (Auth, API, etc.) MUST be localized using
+     *    `suppressConsoleError` in the specific test file.
+     * 2. Only frequent, unavoidable library noise (like React act() warnings caused
+     *    by third-party cleanups) should stay here to keep logs readable.
+     */
+    const silentPatterns = [/not wrapped in act/i, /generation error/i]
 
     if (silentPatterns.some((pattern) => pattern.test(message))) {
+      return
+    }
+
+    if (globalThis.suppressPatterns.some((pattern) => pattern.test(message))) {
       return
     }
 

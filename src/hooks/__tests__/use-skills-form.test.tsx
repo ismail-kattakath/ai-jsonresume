@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react'
-import { useSkillsForm } from '@/hooks/useSkillsForm'
-import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
+import { useSkillsForm } from '@/hooks/use-skills-form'
+import { ResumeContext } from '@/lib/contexts/document-context'
 import type { ResumeData, SkillGroup } from '@/types'
 import { ReactNode } from 'react'
 
@@ -59,17 +60,14 @@ describe('useSkillsForm', () => {
     jest.clearAllMocks()
   })
 
-  it('should throw error when skill type not found', () => {
-    // Suppress console.error for this test
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-
-    expect(() => {
-      renderHook(() => useSkillsForm('NonExistent'), {
-        wrapper,
-      })
-    }).toThrow('Skill type "NonExistent" not found')
-
-    consoleSpy.mockRestore()
+  it('should throw error when skill type not found', async () => {
+    await suppressConsoleError(/Skill type .* not found/i, async () => {
+      expect(() => {
+        renderHook(() => useSkillsForm('NonExistent'), {
+          wrapper,
+        })
+      }).toThrow('Skill type "NonExistent" not found')
+    })
   })
 
   it('should return skills for the specified title', () => {

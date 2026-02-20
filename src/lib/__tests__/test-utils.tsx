@@ -1,8 +1,8 @@
 import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
-import { DocumentContext, DocumentContextType } from '@/lib/contexts/DocumentContext'
-import { AISettingsContext, AISettingsContextType } from '@/lib/contexts/AISettingsContext'
-import resumeData from '@/lib/resumeAdapter'
+import { DocumentContext, DocumentContextType } from '@/lib/contexts/document-context'
+import { AISettingsContext, AISettingsContextType } from '@/lib/contexts/ai-settings-context'
+import resumeData from '@/lib/resume-adapter'
 import type { ResumeData } from '@/types'
 
 /**
@@ -227,6 +227,53 @@ export const mockFormData = {
       url: 'aws.com',
     },
   ],
+}
+
+/**
+ * Suppresses specific console errors that match a pattern during a test action.
+ * Leverages the global.suppressPatterns hook in jest.setup.js.
+ */
+export const suppressConsoleError = async (
+  pattern: RegExp | string | (RegExp | string)[],
+  fn: () => void | Promise<void>
+) => {
+  const patterns = Array.isArray(pattern) ? pattern : [pattern]
+  const regexes = patterns.map((p) => (p instanceof RegExp ? p : new RegExp(p, 'i')))
+
+  // @ts-ignore
+  if (!globalThis.suppressPatterns) globalThis.suppressPatterns = []
+  // @ts-ignore
+  globalThis.suppressPatterns.push(...regexes)
+
+  try {
+    await fn()
+  } finally {
+    // @ts-ignore
+    globalThis.suppressPatterns = globalThis.suppressPatterns.filter((p) => !regexes.includes(p))
+  }
+}
+
+/**
+ * Suppresses specific console logs that match a pattern during a test action.
+ */
+export const suppressConsoleLog = async (
+  pattern: RegExp | string | (RegExp | string)[],
+  fn: () => void | Promise<void>
+) => {
+  const patterns = Array.isArray(pattern) ? pattern : [pattern]
+  const regexes = patterns.map((p) => (p instanceof RegExp ? p : new RegExp(p, 'i')))
+
+  // @ts-ignore
+  if (!globalThis.suppressPatterns) globalThis.suppressPatterns = []
+  // @ts-ignore
+  globalThis.suppressPatterns.push(...regexes)
+
+  try {
+    await fn()
+  } finally {
+    // @ts-ignore
+    globalThis.suppressPatterns = globalThis.suppressPatterns.filter((p) => !regexes.includes(p))
+  }
 }
 
 // Re-export everything from @testing-library/react

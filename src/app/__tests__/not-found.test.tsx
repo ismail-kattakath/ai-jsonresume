@@ -51,14 +51,12 @@ jest.mock('next/link', () => {
 })
 
 // Mock Header component
-jest.mock('@/components/layout/Header', () => {
-  return function MockHeader() {
-    return <div data-testid="mock-header">Header</div>
-  }
-})
+jest.mock('@/components/layout/header', () => ({
+  Header: () => <div data-testid="mock-header">Header</div>,
+}))
 
 // Mock MainLayout component
-jest.mock('@/components/layout/MainLayout', () => {
+jest.mock('@/components/layout/main-layout', () => {
   const MockMainLayout = ({ children, ...props }: React.ComponentProps<'div'>) => {
     return (
       <div data-testid="mock-main-layout" {...props}>

@@ -1,11 +1,12 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
-import Hero from '@/components/sections/Hero'
-import About from '@/components/sections/About'
-import Contact from '@/components/sections/Contact'
-import Experience from '@/components/sections/Experience'
-import Projects from '@/components/sections/Projects'
+import Hero from '@/components/sections/hero'
+import About from '@/components/sections/about'
+import Contact from '@/components/sections/contact'
+import Experience from '@/components/sections/experience'
+import Projects from '@/components/sections/projects'
 
 // Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
@@ -60,7 +61,7 @@ jest.mock('lucide-react', () => ({
 }))
 
 // Mock rescueData and portfolio data
-jest.mock('@/lib/resumeAdapter', () => ({
+jest.mock('@/lib/resume-adapter', () => ({
   name: 'John Doe',
   position: 'Senior Engineer',
   summary: 'A passionate engineer. Second sentence.',
@@ -100,37 +101,62 @@ jest.mock('@/lib/data/portfolio', () => ({
 }))
 
 describe('Hero Component', () => {
-  it('renders name and position from resume data', () => {
-    render(<Hero />)
+  it('renders name and position from resume data', async () => {
+    await suppressConsoleError(
+      [/not valid as a React child/i, /whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i],
+      async () => {
+        render(<Hero />)
+      }
+    )
     expect(screen.getByText('John Doe')).toBeInTheDocument()
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument()
   })
 
-  it('renders social media links correctly', () => {
-    render(<Hero />)
+  it('renders social media links correctly', async () => {
+    await suppressConsoleError(
+      [/whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i],
+      async () => {
+        render(<Hero />)
+      }
+    )
     const linkedinLink = screen.getByTitle('LinkedIn Profile')
     const githubLink = screen.getByTitle('GitHub Profile')
     expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/johndoe')
     expect(githubLink).toHaveAttribute('href', 'https://github.com/johndoe')
   })
 
-  it('renders summary first sentence', () => {
-    render(<Hero />)
+  it('renders summary first sentence', async () => {
+    await suppressConsoleError(
+      [/whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i],
+      async () => {
+        render(<Hero />)
+      }
+    )
     expect(screen.getByText(/A passionate engineer/)).toBeInTheDocument()
   })
 })
 
 describe('About Component', () => {
-  it('renders stats and core competencies', () => {
-    render(<About />)
+  it('renders stats and core competencies', async () => {
+    await suppressConsoleError(
+      [/not valid as a React child/i, /whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i],
+      async () => {
+        render(<About />)
+      }
+    )
     expect(screen.getByText('About Me')).toBeInTheDocument()
     expect(screen.getByText('15+')).toBeInTheDocument()
     expect(screen.getByText('Years Experience')).toBeInTheDocument()
     expect(screen.getByText('GenAI & LLMOps')).toBeInTheDocument()
   })
 
-  it('parses summary correctly into main and achievements', () => {
-    render(<About />)
+  it('parses summary correctly into main and achievements', async () => {
+    await suppressConsoleError(
+      [/whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i],
+      async () => {
+        render(<About />)
+      }
+    )
     // Main summary should have first two sentences
     expect(screen.getByText(/A passionate engineer/)).toBeInTheDocument()
     // Achievements should have the rest

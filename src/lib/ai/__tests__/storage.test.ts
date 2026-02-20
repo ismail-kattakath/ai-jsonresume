@@ -1,4 +1,5 @@
 import { loadCredentials, saveCredentials, clearCredentials } from '@/lib/ai/storage'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import { decryptData } from '@/lib/utils/encryption'
 import { StoredCredentials } from '@/types/openai'
 
@@ -83,8 +84,10 @@ describe('storage', () => {
   it('should return null when localStorage contains invalid JSON', async () => {
     // Bypass saveCredentials and write bad JSON directly
     localStorage.setItem('jsonresume_ai_credentials', 'NOT_VALID_JSON')
-    const loaded = await loadCredentials()
-    expect(loaded).toBeNull()
+    await suppressConsoleError(/Failed to parse or decrypt credentials:/i, async () => {
+      const loaded = await loadCredentials()
+      expect(loaded).toBeNull()
+    })
   })
 
   it('should not encrypt credentials when rememberCredentials is false', async () => {
