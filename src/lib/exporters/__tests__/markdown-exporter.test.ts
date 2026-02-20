@@ -99,9 +99,9 @@ describe('markdownExporter', () => {
     it('should format education correctly', () => {
       const result = convertResumeToMarkdown(mockResumeData)
 
-      expect(result).toContain('### Bachelor of Science @ [University of California](https://berkeley.edu)')
-      expect(result).toContain('2010 - 2014')
-      expect(result).toContain('Major: Computer Science')
+      expect(result).toContain('### Bachelor of Science in Computer Science')
+      expect(result).toContain('2010 - 2014  ')
+      expect(result).toContain('[University of California](https://berkeley.edu)')
     })
 
     it('should include social media links', () => {
@@ -316,6 +316,32 @@ describe('markdownExporter', () => {
 
       expect(result).toContain('University A')
       expect(result).toContain('University B')
+    })
+
+    it('should handle education with missing years', () => {
+      const dataWithPartialEdu: ResumeData = {
+        ...mockResumeData,
+        education: [
+          {
+            school: 'Self Taught',
+            url: '',
+            studyType: 'Cert',
+            area: 'Web Development',
+            startYear: '',
+            endYear: '',
+          },
+        ],
+      }
+
+      const result = convertResumeToMarkdown(dataWithPartialEdu)
+
+      expect(result).toContain('### Cert in Web Development')
+      expect(result).toContain('[Self Taught](#)')
+      // Check that the header index and following line are correct
+      const lines = result.split('\n')
+      const headerIndex = lines.findIndex((l) => l.includes('### Cert in Web Development'))
+      expect(lines[headerIndex + 1]).not.toContain(' - ')
+      expect(lines[headerIndex + 1]).toContain('[Self Taught](#)')
     })
 
     it('should handle multiple projects', () => {
