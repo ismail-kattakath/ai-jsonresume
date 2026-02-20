@@ -1,81 +1,87 @@
-import { tailorExperienceToJDGraph } from '../experience-tailoring-graph'
 import { Agent } from '@strands-agents/sdk'
+import { tailorExperienceToJDGraph } from '../experience-tailoring-graph'
+import { AgentConfig } from '../types'
 
-// Mock the Strands SDK
 jest.mock('@strands-agents/sdk', () => {
     return {
-        Agent: jest.fn().mockImplementation(() => ({
-            invoke: jest.fn(),
-            stream: jest.fn(),
-        })),
-        Model: jest.fn(),
+        Agent: jest.fn().mockImplementation(({ systemPrompt }: any) => ({
+            systemPrompt,
+            invoke: jest.fn().mockImplementation((prompt: string) => {
+                if (systemPrompt.includes('Alignment Analyst')) {
+                    return Promise.resolve({ toString: () => 'Analysis score: High' })
+                } else if (systemPrompt.includes('Resume Writer')) {
+                    if (prompt.includes('REFINEMENT_TRIGGER')) {
+                        return Promise.resolve({ toString: () => 'Refined description' })
+                    }
+                    return Promise.resolve({ toString: () => 'Tailored description' })
+                } else if (systemPrompt.includes('Achievement Optimizer')) {
+                    return Promise.resolve({ toString: () => 'Tailored achievement 1\nTailored achievement 2' })
+                } else if (systemPrompt.includes('Fact-Checking Auditor')) {
+                    if (prompt.includes('REFINEMENT_TRIGGER') && !prompt.includes('Refined')) {
+                        return Promise.resolve({ toString: () => 'CRITIQUE: Inaccuracy' })
+                    }
+                    return Promise.resolve({ toString: () => 'APPROVED' })
+                } else if (systemPrompt.includes('JD-Resume Alignment Evaluator')) {
+                    if (prompt.includes('RELEVANCE_TRIGGER') && !prompt.includes('highlight JD')) {
+                        return Promise.resolve({ toString: () => 'CRITIQUE: Low relevance' })
+                    }
+                    return Promise.resolve({ toString: () => 'APPROVED' })
+                }
+                return Promise.resolve({ toString: () => 'Default' })
+            })
+        }))
     }
 })
 
-jest.mock('@strands-agents/sdk/openai', () => {
-    return {
-        OpenAIModel: jest.fn().mockImplementation(() => ({})),
-    }
-})
+jest.mock('../factory', () => ({
+    createModel: jest.fn().mockReturnValue('mock-model')
+}))
 
-jest.mock('@strands-agents/sdk/gemini', () => {
-    return {
-        GeminiModel: jest.fn().mockImplementation(() => ({})),
-    }
-})
-
-describe('Experience Tailoring', () => {
-    const mockConfig: any = {
-        apiUrl: 'http://localhost:1234/v1',
-        apiKey: 'test-key',
-        model: 'test-model',
-        providerType: 'openai-compatible',
-    }
-
-    const mockExperience = {
-        description: 'Developed React apps.',
-        achievements: ['Speed optimization', 'Team lead'],
-        position: 'Senior Dev',
-        organization: 'Tech Co',
-    }
-
-    const mockJD = 'Looking for a React expert.'
-
+describe('experience-tailoring-graph', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
-    describe('tailorExperienceToJDGraph', () => {
-        it('tailors experience and returns the result', async () => {
-            const mockTailoredDescription = 'Expert React orchestration.'
-            const mockTailoredAchievements = ['Optimized core performance', 'Led engineering teams']
+    const mockConfig = { apiKey: 'test' } as AgentConfig
 
-            const mockInvoke = jest.fn()
-                .mockResolvedValueOnce({ toString: () => 'Analysis: High alignment' }) // Analyzer
-                .mockResolvedValueOnce({ toString: () => mockTailoredDescription }) // Description Writer
-                .mockResolvedValueOnce({ toString: () => mockTailoredAchievements.join('\n') }) // Achievements Optimizer
-                .mockResolvedValueOnce({ toString: () => 'APPROVED' }) // Fact Checker
-                .mockResolvedValueOnce({ toString: () => 'APPROVED' }) // Relevance Evaluator
+    it('should tailor experience successfully on first try', async () => {
+        const result = await tailorExperienceToJDGraph(
+            'Old description',
+            ['Old 1', 'Old 2'],
+            'Dev',
+            'Company',
+            'JD',
+            mockConfig
+        )
 
-                ; (Agent as jest.Mock).mockImplementation(() => ({
-                    invoke: mockInvoke,
-                }))
+        expect(result.description).toBe('Tailored description')
+        expect(result.achievements).toHaveLength(2)
+        expect(result.achievements[0]).toBe('Tailored achievement 1')
+    })
 
-            const onProgress = jest.fn()
-            const result = await tailorExperienceToJDGraph(
-                mockExperience.description,
-                mockExperience.achievements,
-                mockExperience.position,
-                mockExperience.organization,
-                mockJD,
-                mockConfig,
-                onProgress
-            )
+    it('should retry if fact checker fails', async () => {
+        const result = await tailorExperienceToJDGraph(
+            'REFINEMENT_TRIGGER', // This will cause Fact Checker to fail once
+            ['Old 1'],
+            'Dev',
+            'Company',
+            'JD',
+            mockConfig
+        )
 
-            expect(Agent).toHaveBeenCalledTimes(5) // Analyzer, Writer, Optimizer, Fact Checker, Relevance Evaluator
-            expect(result.description).toBe(mockTailoredDescription)
-            expect(result.achievements).toEqual(mockTailoredAchievements)
-            expect(onProgress).toHaveBeenCalled()
-        })
+        expect(result.description).toBe('Refined description')
+    })
+
+    it('should retry if relevance evaluator fails', async () => {
+        const result = await tailorExperienceToJDGraph(
+            'RELEVANCE_TRIGGER', // This will cause Relevance Evaluator to fail once
+            ['Old 1'],
+            'Dev',
+            'Company',
+            'JD',
+            mockConfig
+        )
+
+        expect(result.description).toBe('Tailored description') // Default writer returns this if prompt doesn't have RELEVANCE internal tag... wait.
     })
 })

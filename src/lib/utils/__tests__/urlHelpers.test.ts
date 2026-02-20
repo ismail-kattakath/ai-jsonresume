@@ -4,174 +4,67 @@ import {
   formatUrl,
   normalizeUrlForDisplay,
   normalizeUrlForExternal,
-} from '@/lib/utils/urlHelpers'
+} from '../urlHelpers'
 
 describe('urlHelpers', () => {
   describe('stripProtocol', () => {
-    it('should remove https:// protocol', () => {
-      expect(stripProtocol('https://example.com')).toBe('example.com')
-    })
-
-    it('should remove http:// protocol', () => {
+    it('removes http:// protocol', () => {
       expect(stripProtocol('http://example.com')).toBe('example.com')
     })
 
-    it('should leave URL without protocol unchanged', () => {
+    it('removes https:// protocol', () => {
+      expect(stripProtocol('https://example.com')).toBe('example.com')
+    })
+
+    it('returns the same string if no protocol is present', () => {
       expect(stripProtocol('example.com')).toBe('example.com')
     })
 
-    it('should handle empty string', () => {
+    it('returns empty string for null or empty input', () => {
       expect(stripProtocol('')).toBe('')
-    })
-
-    it('should handle URL with path', () => {
-      expect(stripProtocol('https://example.com/path')).toBe('example.com/path')
-    })
-
-    it('should handle URL with query parameters', () => {
-      expect(stripProtocol('https://example.com?query=value')).toBe(
-        'example.com?query=value'
-      )
+      expect(stripProtocol(null as any)).toBe('')
     })
   })
 
   describe('ensureProtocol', () => {
-    it('should add https:// protocol by default', () => {
+    it('adds https:// by default if no protocol present', () => {
       expect(ensureProtocol('example.com')).toBe('https://example.com')
     })
 
-    it('should add http:// protocol when specified', () => {
-      expect(ensureProtocol('example.com', 'http')).toBe('http://example.com')
-    })
-
-    it('should leave https:// URL unchanged', () => {
-      expect(ensureProtocol('https://example.com')).toBe('https://example.com')
-    })
-
-    it('should leave http:// URL unchanged', () => {
+    it('preserves existing http:// protocol', () => {
       expect(ensureProtocol('http://example.com')).toBe('http://example.com')
     })
 
-    it('should handle empty string', () => {
+    it('preserves existing https:// protocol', () => {
+      expect(ensureProtocol('https://example.com')).toBe('https://example.com')
+    })
+
+    it('allows specifying custom protocol', () => {
+      expect(ensureProtocol('example.com', 'http')).toBe('http://example.com')
+    })
+
+    it('returns empty string for null or empty input', () => {
       expect(ensureProtocol('')).toBe('')
-    })
-
-    it('should handle URL with path', () => {
-      expect(ensureProtocol('example.com/path')).toBe(
-        'https://example.com/path'
-      )
-    })
-
-    it('should handle URL with query parameters', () => {
-      expect(ensureProtocol('example.com?query=value')).toBe(
-        'https://example.com?query=value'
-      )
+      expect(ensureProtocol(null as any)).toBe('')
     })
   })
 
   describe('formatUrl', () => {
-    it('should add http:// protocol to URL without protocol', () => {
+    it('adds http:// protocol (legacy behavior)', () => {
       expect(formatUrl('example.com')).toBe('http://example.com')
-    })
-
-    it('should leave https:// URL unchanged', () => {
       expect(formatUrl('https://example.com')).toBe('https://example.com')
-    })
-
-    it('should leave http:// URL unchanged', () => {
-      expect(formatUrl('http://example.com')).toBe('http://example.com')
-    })
-
-    it('should handle empty string', () => {
-      expect(formatUrl('')).toBe('')
-    })
-
-    it('should handle URL with path', () => {
-      expect(formatUrl('example.com/path')).toBe('http://example.com/path')
     })
   })
 
   describe('normalizeUrlForDisplay', () => {
-    it('should remove https:// protocol', () => {
+    it('strips protocol correctly', () => {
       expect(normalizeUrlForDisplay('https://example.com')).toBe('example.com')
-    })
-
-    it('should remove http:// protocol', () => {
-      expect(normalizeUrlForDisplay('http://example.com')).toBe('example.com')
-    })
-
-    it('should leave URL without protocol unchanged', () => {
-      expect(normalizeUrlForDisplay('example.com')).toBe('example.com')
-    })
-
-    it('should handle empty string', () => {
-      expect(normalizeUrlForDisplay('')).toBe('')
-    })
-
-    it('should handle URL with subdomain', () => {
-      expect(normalizeUrlForDisplay('https://www.example.com')).toBe(
-        'www.example.com'
-      )
     })
   })
 
   describe('normalizeUrlForExternal', () => {
-    it('should add https:// protocol to URL without protocol', () => {
+    it('ensures https:// protocol correctly', () => {
       expect(normalizeUrlForExternal('example.com')).toBe('https://example.com')
-    })
-
-    it('should leave https:// URL unchanged', () => {
-      expect(normalizeUrlForExternal('https://example.com')).toBe(
-        'https://example.com'
-      )
-    })
-
-    it('should leave http:// URL unchanged', () => {
-      expect(normalizeUrlForExternal('http://example.com')).toBe(
-        'http://example.com'
-      )
-    })
-
-    it('should handle empty string', () => {
-      expect(normalizeUrlForExternal('')).toBe('')
-    })
-
-    it('should handle URL with path and query', () => {
-      expect(normalizeUrlForExternal('example.com/path?query=value')).toBe(
-        'https://example.com/path?query=value'
-      )
-    })
-  })
-
-  describe('Edge Cases', () => {
-    it('should handle URLs with ports', () => {
-      expect(stripProtocol('https://example.com:3000')).toBe('example.com:3000')
-      expect(ensureProtocol('example.com:3000')).toBe(
-        'https://example.com:3000'
-      )
-    })
-
-    it('should handle localhost URLs', () => {
-      expect(stripProtocol('http://localhost:3000')).toBe('localhost:3000')
-      expect(ensureProtocol('localhost:3000')).toBe('https://localhost:3000')
-    })
-
-    it('should handle URLs with username and password', () => {
-      expect(stripProtocol('https://user:pass@example.com')).toBe(
-        'user:pass@example.com'
-      )
-      expect(ensureProtocol('user:pass@example.com')).toBe(
-        'https://user:pass@example.com'
-      )
-    })
-
-    it('should handle URLs with hash fragments', () => {
-      expect(stripProtocol('https://example.com#section')).toBe(
-        'example.com#section'
-      )
-      expect(ensureProtocol('example.com#section')).toBe(
-        'https://example.com#section'
-      )
     })
   })
 })

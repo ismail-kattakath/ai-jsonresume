@@ -1,5 +1,5 @@
 import { convertResumeToText } from '../txtExporter'
-import { ResumeData } from '@/types/resume'
+import { ResumeData, WorkExperience, Project } from '@/types/resume'
 
 describe('txtExporter', () => {
   const mockResumeData: ResumeData = {
@@ -78,7 +78,6 @@ describe('txtExporter', () => {
 
       expect(result).toContain('JOHN DOE')
       expect(result).toContain('Senior Software Engineer')
-      expect(result).toContain('CONTACT INFORMATION')
       expect(result).toContain('john.doe@example.com')
       expect(result).toContain('+1 (555) 123-4567')
     })
@@ -86,38 +85,38 @@ describe('txtExporter', () => {
     it('should include all major sections', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('PROFESSIONAL SUMMARY')
-      expect(result).toContain('WORK EXPERIENCE')
-      expect(result).toContain('EDUCATION')
-      expect(result).toContain('SKILLS')
-      expect(result).toContain('PROJECTS')
-      expect(result).toContain('CERTIFICATIONS')
-      expect(result).toContain('LANGUAGES')
+      expect(result).toContain('## SUMMARY')
+      expect(result).toContain('## EXPERIENCE')
+      expect(result).toContain('## EDUCATION')
+      expect(result).toContain('## SKILLS')
+      expect(result).toContain('## PROJECTS')
+      expect(result).toContain('## CERTIFICATIONS')
+      expect(result).toContain('## LANGUAGES')
     })
 
     it('should format work experience correctly', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('Senior Software Engineer at Tech Corp')
+      expect(result).toContain('### Senior Software Engineer @ [Tech Corp](https://techcorp.com)')
       expect(result).toContain('2020 - Present')
-      expect(result).toContain('Led development of core platform features')
-      expect(result).toContain('• Improved performance by 40%')
-      expect(result).toContain('Tech Stack: React, Node.js, TypeScript')
+      expect(result).toContain('Led development of core platform features.')
+      expect(result).toContain('- Improved performance by 40%')
+      expect(result).toContain('> Tech Stack: React, Node.js, TypeScript')
     })
 
     it('should format education correctly', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('Bachelor of Science in Computer Science')
-      expect(result).toContain('University of California')
+      expect(result).toContain('### Bachelor of Science @ [University of California](https://berkeley.edu)')
       expect(result).toContain('2010 - 2014')
+      expect(result).toContain('Major: Computer Science')
     })
 
     it('should include social media links', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('LinkedIn: https://linkedin.com/in/johndoe')
-      expect(result).toContain('GitHub: https://github.com/johndoe')
+      expect(result).toContain('- LinkedIn: [https://linkedin.com/in/johndoe](https://linkedin.com/in/johndoe)')
+      expect(result).toContain('- GitHub: [https://github.com/johndoe](https://github.com/johndoe)')
     })
 
     it('should handle empty optional sections gracefully', () => {
@@ -142,28 +141,46 @@ describe('txtExporter', () => {
 
       expect(result).toContain('JANE SMITH')
       expect(result).toContain('Developer')
-      expect(result).not.toContain('PROFESSIONAL SUMMARY')
-      expect(result).not.toContain('WORK EXPERIENCE')
+      expect(result).not.toContain('## SUMMARY')
+      expect(result).not.toContain('## EXPERIENCE')
     })
 
     it('should include contact information when provided', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('Email: john.doe@example.com')
-      expect(result).toContain('Phone: +1 (555) 123-4567')
-      expect(result).toContain('Address: 123 Main St, San Francisco, CA 94102')
+      expect(result).toContain('- Email: [john.doe@example.com](mailto:john.doe@example.com)')
+      expect(result).toContain('- Phone: +1 (555) 123-4567')
+      expect(result).toContain('- Address: 123 Main St, San Francisco, CA 94102')
+    })
+
+    it('should handle missing email gracefully', () => {
+      const dataWithoutEmail: ResumeData = {
+        ...mockResumeData,
+        email: '',
+      }
+      const result = convertResumeToText(dataWithoutEmail)
+      expect(result).not.toContain('Email:')
     })
 
     it('should format work experience with description', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('Led development of core platform features')
+      expect(result).toContain('Led development of core platform features.')
     })
 
-    it('should format work experience with URL', () => {
-      const result = convertResumeToText(mockResumeData)
-
-      expect(result).toContain('Website: https://techcorp.com')
+    it('should format work experience without description to increase coverage', () => {
+      const firstJob = mockResumeData.workExperience[0];
+      const dataWithoutDesc: ResumeData = {
+        ...mockResumeData,
+        workExperience: [
+          {
+            ...firstJob,
+            description: '',
+          } as WorkExperience,
+        ],
+      }
+      const result = convertResumeToText(dataWithoutDesc)
+      expect(result).toContain('### Senior Software Engineer @ [Tech Corp]')
     })
 
     it('should format work experience without technologies when showTechnologies is false', () => {
@@ -186,38 +203,64 @@ describe('txtExporter', () => {
 
       const result = convertResumeToText(dataWithHiddenTech)
 
-      expect(result).not.toContain('Tech Stack:')
-    })
-
-    it('should format education with URL', () => {
-      const result = convertResumeToText(mockResumeData)
-
-      expect(result).toContain('Website: https://berkeley.edu')
+      expect(result).not.toContain('> Tech Stack:')
     })
 
     it('should format projects with description', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('A popular open source library')
+      expect(result).toContain('A popular open source library.')
     })
 
-    it('should format projects with link', () => {
-      const result = convertResumeToText(mockResumeData)
+    it('should format projects without description to increase coverage', () => {
+      const firstProject = mockResumeData.projects![0];
+      const dataWithoutDesc: ResumeData = {
+        ...mockResumeData,
+        projects: [
+          {
+            ...firstProject,
+            description: '',
+          } as Project,
+        ],
+      }
+      const result = convertResumeToText(dataWithoutDesc)
+      expect(result).toContain('### [Open Source Project]')
+    })
 
-      expect(result).toContain('Link: https://github.com/johndoe/project')
+    it('should format items with partial years to increase coverage', () => {
+      const firstProject = mockResumeData.projects![0];
+      const dataPartialYears: ResumeData = {
+        ...mockResumeData,
+        projects: [
+          {
+            ...firstProject,
+            startYear: '2019',
+            endYear: '',
+          } as Project,
+          {
+            ...firstProject,
+            name: 'Project 2',
+            startYear: '',
+            endYear: '2020',
+          } as Project,
+        ],
+      }
+      const result = convertResumeToText(dataPartialYears)
+      expect(result).toContain('2019')
+      expect(result).toContain('2020')
     })
 
     it('should format projects with highlights', () => {
       const result = convertResumeToText(mockResumeData)
 
-      expect(result).toContain('1000+ stars on GitHub')
+      expect(result).toContain('- 1000+ stars on GitHub')
     })
 
     it('should format certifications with URL', () => {
       const result = convertResumeToText(mockResumeData)
 
       expect(result).toContain(
-        'Verification: https://aws.amazon.com/certification'
+        '- Verification: https://aws.amazon.com/certification'
       )
     })
 

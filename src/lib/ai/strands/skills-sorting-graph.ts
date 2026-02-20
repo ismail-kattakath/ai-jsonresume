@@ -5,7 +5,9 @@ import { AgentConfig } from './types'
 import { createModel } from './factory'
 
 export interface SkillsSortResult {
-    sortedSkills: string[]
+    groupOrder: string[]
+    skillOrder: Record<string, string[]>
+    sortedSkills?: string[] // Legacy or simplified format
     missingSkills?: string[]
 }
 

@@ -1,13 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import WorkExperience from '../WorkExperience'
+import { SkillsSection } from '../SkillsSection'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
 
 // Mock Hooks
 jest.mock('@/lib/contexts/AISettingsContext', () => ({
     useAISettings: () => ({ settings: {}, updateSettings: jest.fn(), isConfigured: true })
 }))
-jest.mock('@/hooks/useArrayForm', () => ({
-    useArrayForm: () => ({ data: [{ organization: 'Test Org' }], handleChange: jest.fn(), add: jest.fn(), remove: jest.fn() })
+jest.mock('@/hooks/useSkillGroupsManagement', () => ({
+    useSkillGroupsManagement: () => ({ addGroup: jest.fn(), removeGroup: jest.fn(), renameGroup: jest.fn(), reorderGroups: jest.fn() })
 }))
 jest.mock('@/hooks/useAccordion', () => ({
     useAccordion: () => ({ isExpanded: () => true, toggleExpanded: jest.fn(), expandNew: jest.fn(), updateAfterReorder: jest.fn() })
@@ -20,12 +20,12 @@ jest.mock('@/components/ui/DragAndDrop', () => ({
     DnDDraggable: ({ children }: any) => children({ dragHandleProps: {}, draggableProps: {}, innerRef: jest.fn() }, { isDragging: false })
 }))
 
-jest.mock('../KeyAchievements', () => ({
+jest.mock('../Skill', () => ({
     __esModule: true,
-    default: () => <div>Mocked Key Achievements</div>
+    default: ({ title }: any) => <div>Mocked Skill: {title}</div>
 }))
 
-const mockResumeData = { workExperience: [{ organization: 'Test Org', url: '', position: '', startYear: '', endYear: '', description: '', keyAchievements: [], technologies: [] }] } as any
+const mockResumeData = { skills: [{ title: 'Languages', skills: [] }] } as any
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -35,10 +35,18 @@ const Wrapper = ({ children }: { children: React.ReactNode }) => {
     )
 }
 
-describe('WorkExperience', () => {
+describe('SkillsSection', () => {
     it('renders correctly', () => {
-        render(<Wrapper><WorkExperience /></Wrapper>)
-        expect(screen.getByText('Add Experience')).toBeInTheDocument()
-        expect(screen.getByDisplayValue('Test Org')).toBeInTheDocument()
+        render(<Wrapper><SkillsSection /></Wrapper>)
+        expect(screen.getByText('Add Skill Group')).toBeInTheDocument()
+    })
+
+    it('toggles Add Skill Group input', () => {
+        render(<Wrapper><SkillsSection /></Wrapper>)
+
+        const addButton = screen.getByText('Add Skill Group')
+        fireEvent.click(addButton)
+
+        expect(screen.getByPlaceholderText('e.g., Frontend, Backend, DevOps...')).toBeInTheDocument()
     })
 })

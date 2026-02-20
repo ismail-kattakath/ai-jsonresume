@@ -100,19 +100,31 @@ export function SkillsSection() {
             const sortResult = await sortPromise
             if (toastId) toast.dismiss(toastId)
 
-            const sortedSkillNames = sortResult.sortedSkills
-            const updatedSkills = resumeData.skills.map((group) => ({
-                ...group,
-                skills: group.skills
-                    .slice()
-                    .sort((a, b) => {
-                        const aIndex = sortedSkillNames.indexOf(a.text)
-                        const bIndex = sortedSkillNames.indexOf(b.text)
-                        if (aIndex === -1) return 1
-                        if (bIndex === -1) return -1
-                        return aIndex - bIndex
-                    }),
-            }))
+            const { groupOrder, skillOrder } = sortResult
+
+            // 1. Sort the skill groups based on groupOrder
+            const updatedSkills = [...resumeData.skills]
+                .sort((a, b) => {
+                    const aIndex = groupOrder.indexOf(a.title)
+                    const bIndex = groupOrder.indexOf(b.title)
+                    if (aIndex === -1) return 1
+                    if (bIndex === -1) return -1
+                    return aIndex - bIndex
+                })
+                // 2. Sort skills within each group based on skillOrder
+                .map((group) => {
+                    const orderForThisGroup = skillOrder[group.title] || []
+                    return {
+                        ...group,
+                        skills: [...group.skills].sort((a, b) => {
+                            const aIndex = orderForThisGroup.indexOf(a.text)
+                            const bIndex = orderForThisGroup.indexOf(b.text)
+                            if (aIndex === -1) return 1
+                            if (bIndex === -1) return -1
+                            return aIndex - bIndex
+                        }),
+                    }
+                })
 
             setResumeData({ ...resumeData, skills: updatedSkills })
             toast.success('Skills optimized and sorted by job relevance!')
