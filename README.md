@@ -1,7 +1,7 @@
-# JSONResume To Everything
+# AI JSONResume
 
-[![Deploy to GitHub Pages](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml/badge.svg)](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml)
-[![codecov](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything/graph/badge.svg?token=04e118ab-ec2a-4f3d-8819-fdbfff34f105)](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything)
+[![Deploy to GitHub Pages](https://github.com/ismail-kattakath/ai-jsonresume/actions/workflows/deploy.yml/badge.svg)](https://github.com/ismail-kattakath/ai-jsonresume/actions/workflows/deploy.yml)
+[![codecov](https://codecov.io/gh/ismail-kattakath/ai-jsonresume/graph/badge.svg?token=04e118ab-ec2a-4f3d-8819-fdbfff34f105)](https://codecov.io/gh/ismail-kattakath/ai-jsonresume)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fismail.kattakath.com)](https://ismail.kattakath.com)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/7/m801867933-5facdf2dbeb3392754ea6a61)](https://stats.uptimerobot.com/dgusp6ainA)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0.4-black?logo=next.js)](https://nextjs.org/)
@@ -42,8 +42,8 @@ Transform one JSON Resume into a complete portfolio ecosystem: responsive websit
 
 ```bash
 # Fork this repository on GitHub, then:
-git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-cd jsonresume-to-everything
+git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+cd ai-jsonresume
 ```
 
 ### 2. Install & Run
@@ -122,7 +122,7 @@ code src/data/resume.json
 3. Source: **GitHub Actions**
 4. Done! Your site deploys automatically on every push to `main`
 
-Your portfolio will be live at: `https://YOUR-USERNAME.github.io/jsonresume-to-everything/`
+Your portfolio will be live at: `https://YOUR-USERNAME.github.io/ai-jsonresume/`
 
 **Want a custom domain?** See [Custom Domain Setup](#custom-domain-optional) below.
 
@@ -310,7 +310,7 @@ graph TD
 3. **Access your site**:
 
    ```text
-   https://YOUR-USERNAME.github.io/jsonresume-to-everything/
+   https://YOUR-USERNAME.github.io/ai-jsonresume/
    ```
 
 **What happens automatically:**

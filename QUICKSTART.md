@@ -27,7 +27,7 @@
 3. **Source:** Select "GitHub Actions"
 4. **Done!** Your site will be live at:
    ```
-   https://YOUR-USERNAME.github.io/jsonresume-to-everything/
+   https://YOUR-USERNAME.github.io/ai-jsonresume/
    ```
 
 **Note:** First deployment takes 3-5 minutes
@@ -289,8 +289,8 @@ The fastest way to get started with a consistent development environment:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-cd jsonresume-to-everything
+git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+cd ai-jsonresume
 
 # Open in VS Code
 code .
@@ -329,8 +329,8 @@ Develop entirely in the cloud, no local setup needed:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-cd jsonresume-to-everything
+git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+cd ai-jsonresume
 
 # Install dependencies (requires Node.js 18+)
 npm install

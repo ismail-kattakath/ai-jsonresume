@@ -387,7 +387,7 @@ The application automatically fetches available models from your API provider us
 **OpenRouter Special Handling:** OpenRouter requires additional headers:
 
 ```
-HTTP-Referer: https://github.com/ismail-kattakath/jsonresume-to-everything
+HTTP-Referer: https://github.com/ismail-kattakath/ai-jsonresume
 X-Title: JSON Resume to Everything
 ```
 
@@ -722,7 +722,7 @@ For issues or questions:
 2. Review console for errors (F12 → Console)
 3. Verify your provider's status page
 4. Test API with curl independently
-5. Open issue on GitHub: https://github.com/ismail-kattakath/jsonresume-to-everything/issues
+5. Open issue on GitHub: https://github.com/ismail-kattakath/ai-jsonresume/issues
 
 ## Credits
 

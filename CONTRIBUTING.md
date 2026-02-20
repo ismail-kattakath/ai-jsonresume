@@ -53,13 +53,13 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
 2. **Clone** your fork locally:
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-   cd jsonresume-to-everything
+   git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+   cd ai-jsonresume
    ```
 
 3. **Add upstream** remote:
    ```bash
-   git remote add upstream https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
+   git remote add upstream https://github.com/YOUR-USERNAME/ai-jsonresume.git
    ```
 
 ### Install Dependencies
@@ -674,8 +674,8 @@ npm install                    # Reinstall dependencies
 - **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md)
 - **Quick Start**: See [QUICKSTART.md](./QUICKSTART.md)
 - **Development**: See [CLAUDE.md](./CLAUDE.md)
-- **Issues**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues
-- **Discussions**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/discussions
+- **Issues**: https://github.com/YOUR-USERNAME/ai-jsonresume/issues
+- **Discussions**: https://github.com/YOUR-USERNAME/ai-jsonresume/discussions
 
 ---
 

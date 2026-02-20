@@ -99,7 +99,7 @@ For comprehensive testing information:
 ## Project Structure
 
 ```
-jsonresume-to-everything/
+ai-jsonresume/
 ├── docs/                              # Documentation
 │   ├── README.md                      # This file
 │   ├── PASSWORD_PROTECTION_SETUP.md   # Setup guide

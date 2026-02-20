@@ -67,8 +67,8 @@ describe('fetchAvailableModels', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: 'Bearer sk-or-test',
-          'HTTP-Referer': 'https://github.com/ismail-kattakath/jsonresume-to-everything',
-          'X-Title': 'JSON Resume to Everything',
+          'HTTP-Referer': 'https://github.com/ismail-kattakath/ai-jsonresume',
+          'X-Title': 'AI JSONResume',
         }),
       })
     )
