@@ -25,9 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Custom-styled cards with icons and descriptions
     - Covers: editor overview, dual mode, preview, import/export, AI settings, forms, skills, print, drag-and-drop, auto-save
   - Comprehensive UX documentation:
-    - docs/TOOLTIP_SYSTEM.md - Tooltip integration guide
-    - docs/ONBOARDING_GUIDE.md - Onboarding tour customization guide
-    - docs/UX_ENHANCEMENTS_PLAN.md - Complete implementation plan with technology decisions
+  - docs/FEATURES.md - Feature guides (Tooltips, Preview, AI)
+  - docs/DEVELOPMENT.md - Complete development and roadmap plans
 
 - Comprehensive documentation system:
   - ARCHITECTURE.md - Deep technical reference
@@ -126,9 +125,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - CLAUDE.md - Architecture and development guidelines
   - CONTRIBUTING.md - Contribution guidelines with testing section
   - CHANGELOG.md - Version history
-  - docs/DEFAULT_DATA_SETUP.md - Data customization guide
-  - docs/PASSWORD_PROTECTION_SETUP.md - Auth setup guide
-  - docs/AI_CONTENT_GENERATOR.md - AI content generation guide (cover letters, summaries)
+  - docs/CONFIGURATION.md - Comprehensive setup and configuration guide
+  - docs/FEATURES.md - Feature guides
+  - docs/DEVELOPMENT.md - Internal plans and roadmap
   - docs/README.md - Documentation index
 
 ### Technical Details
@@ -267,8 +266,8 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on:
 ## Support
 
 - **Documentation**: [docs/](./docs/)
-- **Issues**: https://github.com/YOUR-USERNAME/ai-jsonresume/issues
-- **Discussions**: https://github.com/YOUR-USERNAME/ai-jsonresume/discussions
+- **Issues**: https://github.com/ismail-kattakath/ai-jsonresume/issues
+- **Discussions**: https://github.com/ismail-kattakath/ai-jsonresume/discussions
 
 ---
 
@@ -278,4 +277,4 @@ MIT License - See [LICENSE](./LICENSE) for details
 
 ---
 
-**Note**: This changelog is maintained manually. For a complete commit history, see the [GitHub commits page](https://github.com/YOUR-USERNAME/ai-jsonresume/commits/main).
+**Note**: This changelog is maintained manually. For a complete commit history, see the [GitHub commits page](https://github.com/ismail-kattakath/ai-jsonresume/commits/main).

@@ -42,7 +42,7 @@ Transform one JSON Resume into a complete portfolio ecosystem: responsive websit
 
 ```bash
 # Fork this repository on GitHub, then:
-git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+git clone https://github.com/ismail-kattakath/ai-jsonresume.git
 cd ai-jsonresume
 ```
 
@@ -103,7 +103,7 @@ code src/data/resume.json
 }
 ```
 
-**Need detailed guidance?** See the **[Default Data Setup Guide](./docs/DEFAULT_DATA_SETUP.md)** for:
+**Need detailed guidance?** See the **[Configuration & Setup Guide](./docs/CONFIGURATION.md)** for:
 
 - Complete field explanations
 - Best practices for each section
@@ -122,7 +122,7 @@ code src/data/resume.json
 3. Source: **GitHub Actions**
 4. Done! Your site deploys automatically on every push to `main`
 
-Your portfolio will be live at: `https://YOUR-USERNAME.github.io/ai-jsonresume/`
+Your portfolio will be live at: `https://ismail-kattakath.github.io/ai-jsonresume/`
 
 **Want a custom domain?** See [Custom Domain Setup](#custom-domain-optional) below.
 
@@ -139,7 +139,7 @@ Update `src/data/resume.json` → `basics` section:
 - Website URL
 - Social media profiles (GitHub, LinkedIn)
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-2-update-personal-information-basics)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 2️⃣ Work Experience
 
@@ -150,7 +150,7 @@ Update `src/data/resume.json` → `work` array:
 - Achievements with metrics
 - Technologies used
 
-**Takes 15 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-4-update-work-experience-work)
+**Takes 15 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 3️⃣ Skills
 
@@ -160,7 +160,7 @@ Update `src/data/resume.json` → `skills` array:
 - List technologies and tools
 - Indicate proficiency levels
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-6-update-skills)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 4️⃣ Education & Certifications
 
@@ -169,7 +169,7 @@ Update `src/data/resume.json`:
 - `education` array - degrees and schools
 - `certificates` array - certifications
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-5-update-education)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 5️⃣ Password Protection (Optional - Disabled by Default)
 
@@ -185,7 +185,7 @@ echo "NEXT_PUBLIC_EDIT_PASSWORD_HASH=<your-hash>" > .env.local
 # 3. Add to GitHub Secrets for production
 ```
 
-**Takes 5 minutes** | [Complete Setup Guide →](./docs/PASSWORD_PROTECTION_SETUP.md)
+**Takes 5 minutes** | [Complete Setup Guide →](./docs/CONFIGURATION.md#3-password-protection-optional)
 
 ## 🎯 What You Get
 
@@ -265,12 +265,12 @@ graph TD
 
 ### Essential Guides
 
-| Guide                                                                | Purpose                          | Time Required |
-| -------------------------------------------------------------------- | -------------------------------- | ------------- |
-| **[Default Data Setup](./docs/DEFAULT_DATA_SETUP.md)**               | ⭐ Customize your portfolio data | 30 min        |
-| **[Password Protection Setup](./docs/PASSWORD_PROTECTION_SETUP.md)** | Secure edit pages                | 5 min         |
-| **[AI Content Generator](./docs/AI_CONTENT_GENERATOR.md)**           | Setup AI features                | 10 min        |
-| **[Docs Overview](./docs/README.md)**                                | Documentation index              | 2 min         |
+| Guide                                                | Purpose                          | Time Required |
+| ---------------------------------------------------- | -------------------------------- | ------------- |
+| **[Configuration & Setup](./docs/CONFIGURATION.md)** | ⭐ Customize your portfolio data | 30 min        |
+| **[Feature Guides](./docs/FEATURES.md)**             | AI features, preview, tooltips   | 10 min        |
+| **[Development Roadmap](./docs/DEVELOPMENT.md)**     | Internal plans and refactoring   | 10 min        |
+| **[Docs Overview](./docs/README.md)**                | Documentation index              | 2 min         |
 
 ### Quick Reference
 
@@ -284,7 +284,7 @@ graph TD
 
 **Having issues?**
 
-- Check [Troubleshooting Guide](./docs/DEFAULT_DATA_SETUP.md#troubleshooting)
+- Check [Troubleshooting Guide](./docs/CONFIGURATION.md#5-troubleshooting)
 - Run tests: `npm test` to verify functionality
 - Open a GitHub issue
 
@@ -310,7 +310,7 @@ graph TD
 3. **Access your site**:
 
    ```text
-   https://YOUR-USERNAME.github.io/ai-jsonresume/
+   https://ismail-kattakath.github.io/ai-jsonresume/
    ```
 
 **What happens automatically:**
@@ -339,7 +339,7 @@ Want `portfolio.yourdomain.com` instead of GitHub's URL?
    ```text
    Type: CNAME
    Host: portfolio (or @)
-   Value: YOUR-USERNAME.github.io
+   Value: ismail-kattakath.github.io
    TTL: 3600
    ```
 
@@ -395,7 +395,7 @@ npm test:watch
 - ✅ Data import/export
 - ✅ Security features (bcrypt hashing)
 
-See [Test Documentation](./docs/PASSWORD_PROTECTION_TESTS.md) for details.
+See [Development Roadmap](./docs/DEVELOPMENT.md) for details.
 
 ## 🛠️ Development Commands
 

@@ -27,7 +27,7 @@
 3. **Source:** Select "GitHub Actions"
 4. **Done!** Your site will be live at:
    ```
-   https://YOUR-USERNAME.github.io/ai-jsonresume/
+   https://ismail-kattakath.github.io/ai-jsonresume/
    ```
 
 **Note:** First deployment takes 3-5 minutes
@@ -223,7 +223,7 @@ git push origin main
    ```
    Type: CNAME
    Host: portfolio (or @)
-   Value: YOUR-USERNAME.github.io
+   Value: ismail-kattakath.github.io
    TTL: 3600
    ```
 
@@ -250,7 +250,7 @@ git push origin main
 2. **Access Cover Letter Editor:**
 
    ```
-   https://YOUR-SITE.com/cover-letter/edit
+   https://ismail.kattakath.com/cover-letter/edit
    ```
 
 3. **Click "Generate with AI"**
@@ -289,7 +289,7 @@ The fastest way to get started with a consistent development environment:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+git clone https://github.com/ismail-kattakath/ai-jsonresume.git
 cd ai-jsonresume
 
 # Open in VS Code
@@ -329,7 +329,7 @@ Develop entirely in the cloud, no local setup needed:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/ai-jsonresume.git
+git clone https://github.com/ismail-kattakath/ai-jsonresume.git
 cd ai-jsonresume
 
 # Install dependencies (requires Node.js 18+)
@@ -466,10 +466,10 @@ node scripts/generate-password-hash.mjs "new-password"
 
 ### Documentation
 
-- **Full Guide:** `docs/DEFAULT_DATA_SETUP.md` (detailed customization)
+- **Full Guide:** `docs/CONFIGURATION.md` (detailed customization)
 - **Architecture:** `ARCHITECTURE.md` (technical reference)
-- **Password Setup:** `docs/PASSWORD_PROTECTION_SETUP.md`
-- **AI Features:** `docs/AI_CONTENT_GENERATOR.md`
+- **Password Setup:** `docs/CONFIGURATION.md#3-password-protection-optional`
+- **AI Features:** `docs/CONFIGURATION.md#2-ai-configuration`
 - **Tests:** Run `npm test` to see current test results
 
 ### Support Channels

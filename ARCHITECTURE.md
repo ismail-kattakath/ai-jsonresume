@@ -1551,6 +1551,6 @@ Wraps preview components with CSS transform scaling on mobile:
 - ✅ GPU-accelerated performance (CSS transforms)
 - ✅ Zero desktop impact (no wrapper overhead)
 
-**Documentation:** See [docs/MOBILE_PREVIEW.md](./docs/MOBILE_PREVIEW.md) for complete details, testing, and troubleshooting.
+**Documentation:** See [docs/FEATURES.md](./docs/FEATURES.md#2-mobile-preview-scaling) for complete details, testing, and troubleshooting.
 
 ---
