@@ -53,13 +53,13 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
 2. **Clone** your fork locally:
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-   cd jsonresume-to-everything
+   git clone https://github.com/[your-username]/ai-jsonresume.git
+   cd ai-jsonresume
    ```
 
 3. **Add upstream** remote:
    ```bash
-   git remote add upstream https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
+   git remote add upstream https://github.com/ismail-kattakath/ai-jsonresume.git
    ```
 
 ### Install Dependencies
@@ -501,14 +501,14 @@ update stuff
 
 ### Documentation Files
 
-| File                   | Purpose                       | Update When                   |
-| ---------------------- | ----------------------------- | ----------------------------- |
-| `README.md`            | Project overview, quick start | Major features, setup changes |
-| `ARCHITECTURE.md`      | Technical deep-dive           | Architecture changes          |
-| `QUICKSTART.md`        | User setup guide              | User-facing changes           |
-| `CLAUDE_CODE_GUIDE.md` | Development guide             | Development workflows         |
-| `docs/*.md`            | Feature-specific docs         | Relevant feature changes      |
-| `CHANGELOG.md`         | Version history               | User-facing changes           |
+| File              | Purpose                       | Update When                   |
+| ----------------- | ----------------------------- | ----------------------------- |
+| `README.md`       | Project overview, quick start | Major features, setup changes |
+| `ARCHITECTURE.md` | Technical deep-dive           | Architecture changes          |
+| `QUICKSTART.md`   | User setup guide              | User-facing changes           |
+| `CLAUDE.md`       | Development guide             | Development workflows         |
+| `docs/*.md`       | Feature-specific docs         | Relevant feature changes      |
+| `CHANGELOG.md`    | Version history               | User-facing changes           |
 
 ### Documentation Standards
 
@@ -596,7 +596,7 @@ Mockups, examples, or references.
 
 - Update tests in `src/components/auth/__tests__/`
 - Update integration tests
-- Update `docs/PASSWORD_PROTECTION_SETUP.md`
+- Update `docs/CONFIGURATION.md#3-password-protection-optional`
 - Test both enabled and disabled states
 
 ### AI Features
@@ -604,7 +604,7 @@ Mockups, examples, or references.
 **If modifying AI integration:**
 
 - Test with multiple providers (OpenAI, local)
-- Update `docs/AI_CONTENT_GENERATOR.md`
+- Update `docs/FEATURES.md#1-ai-content-generator`
 - Test all content types (cover letters, summaries)
 - Verify streaming functionality (Server-Sent Events)
 - Test error handling (network, API errors)
@@ -674,8 +674,8 @@ npm install                    # Reinstall dependencies
 - **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md)
 - **Quick Start**: See [QUICKSTART.md](./QUICKSTART.md)
 - **Development**: See [CLAUDE.md](./CLAUDE.md)
-- **Issues**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues
-- **Discussions**: https://github.com/YOUR-USERNAME/jsonresume-to-everything/discussions
+- **Issues**: https://github.com/ismail-kattakath/ai-jsonresume/issues
+- **Discussions**: https://github.com/ismail-kattakath/ai-jsonresume/discussions
 
 ---
 

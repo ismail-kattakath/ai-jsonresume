@@ -24,8 +24,8 @@ export async function fetchAvailableModels(config: Pick<OpenAIConfig, 'baseURL' 
         headers['Authorization'] = `Bearer ${config.apiKey}`
       }
       if (isOpenRouter) {
-        headers['HTTP-Referer'] = 'https://github.com/ismail-kattakath/jsonresume-to-everything'
-        headers['X-Title'] = 'JSON Resume to Everything'
+        headers['HTTP-Referer'] = 'https://github.com/ismail-kattakath/ai-jsonresume'
+        headers['X-Title'] = 'AI JSONResume'
       }
     }
 

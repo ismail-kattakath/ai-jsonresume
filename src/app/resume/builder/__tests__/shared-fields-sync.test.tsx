@@ -1,7 +1,7 @@
 /**
  * Integration Tests: Shared Fields Synchronization Between Resume and Cover Letter Tabs
  * Tests that Personal Information and Social Media sections stay in sync across both tabs
- * Issue #96: https://github.com/ismail-kattakath/jsonresume-to-everything/issues/96
+ * Issue #96: https://github.com/ismail-kattakath/ai-jsonresume/issues/96
  */
 
 import React from 'react'

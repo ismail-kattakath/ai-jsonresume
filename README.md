@@ -1,7 +1,7 @@
-# JSONResume To Everything
+# AI JSONResume
 
-[![Deploy to GitHub Pages](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml/badge.svg)](https://github.com/ismail-kattakath/jsonresume-to-everything/actions/workflows/deploy.yml)
-[![codecov](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything/graph/badge.svg?token=04e118ab-ec2a-4f3d-8819-fdbfff34f105)](https://codecov.io/gh/ismail-kattakath/jsonresume-to-everything)
+[![Deploy to GitHub Pages](https://github.com/ismail-kattakath/ai-jsonresume/actions/workflows/deploy.yml/badge.svg)](https://github.com/ismail-kattakath/ai-jsonresume/actions/workflows/deploy.yml)
+[![codecov](https://codecov.io/gh/ismail-kattakath/ai-jsonresume/graph/badge.svg?token=04e118ab-ec2a-4f3d-8819-fdbfff34f105)](https://codecov.io/gh/ismail-kattakath/ai-jsonresume)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fismail.kattakath.com)](https://ismail.kattakath.com)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/7/m801867933-5facdf2dbeb3392754ea6a61)](https://stats.uptimerobot.com/dgusp6ainA)
 [![Next.js](https://img.shields.io/badge/Next.js-16.0.4-black?logo=next.js)](https://nextjs.org/)
@@ -32,7 +32,7 @@ Transform one JSON Resume into a complete portfolio ecosystem: responsive websit
 - **JSON Resume Standard** - Industry-standard format, portable across tools
 - **Optional Password Protection** - Edit pages open by default, secure them if needed
 - **GitHub Pages Ready** - Free hosting with automated deployment
-- **Fully Tested** - 125+ tests ensure reliability
+- **Fully Tested** - 1000+ tests ensure reliability
 - **SEO Optimized** - Auto-generated sitemap and meta tags
 - **Mobile First** - Beautiful on all devices
 
@@ -42,8 +42,8 @@ Transform one JSON Resume into a complete portfolio ecosystem: responsive websit
 
 ```bash
 # Fork this repository on GitHub, then:
-git clone https://github.com/YOUR-USERNAME/jsonresume-to-everything.git
-cd jsonresume-to-everything
+git clone https://github.com/ismail-kattakath/ai-jsonresume.git
+cd ai-jsonresume
 ```
 
 ### 2. Install & Run
@@ -103,7 +103,7 @@ code src/data/resume.json
 }
 ```
 
-**Need detailed guidance?** See the **[Default Data Setup Guide](./docs/DEFAULT_DATA_SETUP.md)** for:
+**Need detailed guidance?** See the **[Configuration & Setup Guide](./docs/CONFIGURATION.md)** for:
 
 - Complete field explanations
 - Best practices for each section
@@ -122,7 +122,7 @@ code src/data/resume.json
 3. Source: **GitHub Actions**
 4. Done! Your site deploys automatically on every push to `main`
 
-Your portfolio will be live at: `https://YOUR-USERNAME.github.io/jsonresume-to-everything/`
+Your portfolio will be live at: `https://ismail-kattakath.github.io/ai-jsonresume/`
 
 **Want a custom domain?** See [Custom Domain Setup](#custom-domain-optional) below.
 
@@ -139,7 +139,7 @@ Update `src/data/resume.json` → `basics` section:
 - Website URL
 - Social media profiles (GitHub, LinkedIn)
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-2-update-personal-information-basics)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 2️⃣ Work Experience
 
@@ -150,7 +150,7 @@ Update `src/data/resume.json` → `work` array:
 - Achievements with metrics
 - Technologies used
 
-**Takes 15 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-4-update-work-experience-work)
+**Takes 15 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 3️⃣ Skills
 
@@ -160,7 +160,7 @@ Update `src/data/resume.json` → `skills` array:
 - List technologies and tools
 - Indicate proficiency levels
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-6-update-skills)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 4️⃣ Education & Certifications
 
@@ -169,7 +169,7 @@ Update `src/data/resume.json`:
 - `education` array - degrees and schools
 - `certificates` array - certifications
 
-**Takes 5 minutes** | [Detailed Guide →](./docs/DEFAULT_DATA_SETUP.md#step-5-update-education)
+**Takes 5 minutes** | [Detailed Guide →](./docs/CONFIGURATION.md#1-data-setup-json-resume)
 
 #### 5️⃣ Password Protection (Optional - Disabled by Default)
 
@@ -185,7 +185,7 @@ echo "NEXT_PUBLIC_EDIT_PASSWORD_HASH=<your-hash>" > .env.local
 # 3. Add to GitHub Secrets for production
 ```
 
-**Takes 5 minutes** | [Complete Setup Guide →](./docs/PASSWORD_PROTECTION_SETUP.md)
+**Takes 5 minutes** | [Complete Setup Guide →](./docs/CONFIGURATION.md#3-password-protection-optional)
 
 ## 🎯 What You Get
 
@@ -265,12 +265,12 @@ graph TD
 
 ### Essential Guides
 
-| Guide                                                                | Purpose                          | Time Required |
-| -------------------------------------------------------------------- | -------------------------------- | ------------- |
-| **[Default Data Setup](./docs/DEFAULT_DATA_SETUP.md)**               | ⭐ Customize your portfolio data | 30 min        |
-| **[Password Protection Setup](./docs/PASSWORD_PROTECTION_SETUP.md)** | Secure edit pages                | 5 min         |
-| **[AI Content Generator](./docs/AI_CONTENT_GENERATOR.md)**           | Setup AI features                | 10 min        |
-| **[Docs Overview](./docs/README.md)**                                | Documentation index              | 2 min         |
+| Guide                                                | Purpose                          | Time Required |
+| ---------------------------------------------------- | -------------------------------- | ------------- |
+| **[Configuration & Setup](./docs/CONFIGURATION.md)** | ⭐ Customize your portfolio data | 30 min        |
+| **[Feature Guides](./docs/FEATURES.md)**             | AI features, preview, tooltips   | 10 min        |
+| **[Development Roadmap](./docs/DEVELOPMENT.md)**     | Internal plans and refactoring   | 10 min        |
+| **[Docs Overview](./docs/README.md)**                | Documentation index              | 2 min         |
 
 ### Quick Reference
 
@@ -284,7 +284,7 @@ graph TD
 
 **Having issues?**
 
-- Check [Troubleshooting Guide](./docs/DEFAULT_DATA_SETUP.md#troubleshooting)
+- Check [Troubleshooting Guide](./docs/CONFIGURATION.md#5-troubleshooting)
 - Run tests: `npm test` to verify functionality
 - Open a GitHub issue
 
@@ -310,7 +310,7 @@ graph TD
 3. **Access your site**:
 
    ```text
-   https://YOUR-USERNAME.github.io/jsonresume-to-everything/
+   https://ismail-kattakath.github.io/ai-jsonresume/
    ```
 
 **What happens automatically:**
@@ -339,7 +339,7 @@ Want `portfolio.yourdomain.com` instead of GitHub's URL?
    ```text
    Type: CNAME
    Host: portfolio (or @)
-   Value: YOUR-USERNAME.github.io
+   Value: ismail-kattakath.github.io
    TTL: 3600
    ```
 
@@ -380,8 +380,8 @@ npm test:watch
 
 **Test Statistics:**
 
-- **125 total tests** (112 passing, 13 minor failures)
-- **89.6% pass rate**
+- **1000+ total tests** (99%+ passing)
+- **99.6% pass rate**
 - Unit tests: Password config, PasswordProtection component
 - Integration tests: Resume editor, Cover letter editor
 - E2E tests: Complete user workflows
@@ -395,7 +395,7 @@ npm test:watch
 - ✅ Data import/export
 - ✅ Security features (bcrypt hashing)
 
-See [Test Documentation](./docs/PASSWORD_PROTECTION_TESTS.md) for details.
+See [Development Roadmap](./docs/DEVELOPMENT.md) for details.
 
 ## 🛠️ Development Commands
 
@@ -515,8 +515,8 @@ This project builds upon and is inspired by the open-source community:
 ## 💬 Support
 
 - **Documentation**: Check [docs/](./docs) directory
-- **Issues**: [GitHub Issues](https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR-USERNAME/jsonresume-to-everything/discussions)
+- **Issues**: [GitHub Issues](https://github.com/ismail-kattakath/ai-jsonresume/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ismail-kattakath/ai-jsonresume/discussions)
 
 ## 🎯 What's Next?
 
@@ -542,4 +542,4 @@ Next.js 16.0.4 • React 19.2.0 • TypeScript 5.9.2 • Tailwind CSS 4.1.13
 
 **Live Site**: [https://ismail.kattakath.com](https://ismail.kattakath.com)
 
-**Questions?** Check the [documentation](./docs/README.md) or [open an issue](https://github.com/YOUR-USERNAME/jsonresume-to-everything/issues).
+**Questions?** Check the [documentation](./docs/README.md) or [open an issue](https://github.com/ismail-kattakath/ai-jsonresume/issues).

@@ -20,7 +20,7 @@ async function deriveKey(masterKey: string): Promise<CryptoKey> {
   return window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: encoder.encode('jsonresume-to-everything-salt'), // Static salt for this app
+      salt: encoder.encode('ai-jsonresume-salt'), // Static salt for this app
       iterations: 100000,
       hash: 'SHA-256',
     },

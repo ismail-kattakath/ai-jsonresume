@@ -17,7 +17,7 @@
 // - Simply don't set the environment variable
 // - Edit pages will be accessible without authentication
 //
-// See docs/PASSWORD_PROTECTION_SETUP.md for complete guide
+// See docs/CONFIGURATION.md#3-password-protection-optional for complete guide
 
 // Helper to check if we're in a browser environment
 function isBrowser(): boolean {
