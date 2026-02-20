@@ -1,5 +1,5 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import userEvent from '@testing-library/user-event'
 import KeyAchievements from '@/components/resume/forms/key-achievements'
 import { useKeyAchievementsForm } from '@/hooks/use-key-achievements-form'
@@ -280,10 +280,13 @@ describe('KeyAchievements Component', () => {
 
       renderComponent()
       const sortBtn = screen.getByTestId('ai-action-button')
-      await userEvent.click(sortBtn)
 
-      await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('API failed')
+      await suppressConsoleError(/AI Achievements sort error:/i, async () => {
+        await userEvent.click(sortBtn)
+
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('API failed')
+        })
       })
       expect(mockUseKeyAchievementsForm.setAchievements).not.toHaveBeenCalled()
     })
@@ -293,10 +296,13 @@ describe('KeyAchievements Component', () => {
 
       renderComponent()
       const sortBtn = screen.getByTestId('ai-action-button')
-      await userEvent.click(sortBtn)
 
-      await waitFor(() => {
-        expect(toast.error).toHaveBeenCalledWith('Failed to sort achievements')
+      await suppressConsoleError(/AI Achievements sort error:/i, async () => {
+        await userEvent.click(sortBtn)
+
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Failed to sort achievements')
+        })
       })
     })
 

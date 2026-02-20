@@ -1,4 +1,5 @@
 import { convertToJSONResume, convertFromJSONResume } from '@/lib/json-resume'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import type { ResumeData, JSONResume } from '@/types'
 
 // Mock the modules that jsonResume depends on
@@ -343,10 +344,12 @@ describe('convertFromJSONResume', () => {
     expect(result!.position).toBe('Engineer')
   })
 
-  it('returns null when validation fails', () => {
+  it('returns null when validation fails', async () => {
     validateJSONResume.mockReturnValueOnce({ valid: false, errors: ['Missing field'] })
-    const result = convertFromJSONResume(makeJSONResume())
-    expect(result).toBeNull()
+    await suppressConsoleError(/Validation errors:/i, async () => {
+      const result = convertFromJSONResume(makeJSONResume())
+      expect(result).toBeNull()
+    })
   })
 
   it('includes website from basics.url at start of socialMedia', () => {
@@ -561,11 +564,13 @@ describe('convertFromJSONResume', () => {
     expect(result!.email).toBe('')
   })
 
-  it('returns null when an exception is thrown', () => {
+  it('returns null when an exception is thrown', async () => {
     validateJSONResume.mockImplementationOnce(() => {
       throw new Error('Unexpected error')
     })
-    const result = convertFromJSONResume(makeJSONResume())
-    expect(result).toBeNull()
+    await suppressConsoleError(/Error converting JSON Resume:/i, async () => {
+      const result = convertFromJSONResume(makeJSONResume())
+      expect(result).toBeNull()
+    })
   })
 })

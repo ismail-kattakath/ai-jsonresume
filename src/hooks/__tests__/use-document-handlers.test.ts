@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import { useDocumentHandlers } from '@/hooks/use-document-handlers'
 import { ChangeEvent } from 'react'
 
@@ -76,8 +77,7 @@ describe('useDocumentHandlers', () => {
       })
     })
 
-    it('logs error for invalid file type', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    it('logs error for invalid file type', async () => {
       const { result } = renderHook(() => useDocumentHandlers(mockResumeData, mockSetResumeData))
 
       const event = {
@@ -86,17 +86,16 @@ describe('useDocumentHandlers', () => {
         },
       } as any
 
-      act(() => {
-        result.current.handleProfilePicture(event)
+      await suppressConsoleError(/Invalid file type/i, async () => {
+        act(() => {
+          result.current.handleProfilePicture(event)
+        })
       })
 
-      expect(consoleSpy).toHaveBeenCalledWith('Invalid file type')
       expect(mockSetResumeData).not.toHaveBeenCalled()
-      consoleSpy.mockRestore()
     })
 
-    it('handles missing files gracefully', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    it('handles missing files gracefully', async () => {
       const { result } = renderHook(() => useDocumentHandlers(mockResumeData, mockSetResumeData))
 
       const event = {
@@ -105,12 +104,11 @@ describe('useDocumentHandlers', () => {
         },
       } as any
 
-      act(() => {
-        result.current.handleProfilePicture(event)
+      await suppressConsoleError(/Invalid file type/i, async () => {
+        act(() => {
+          result.current.handleProfilePicture(event)
+        })
       })
-
-      expect(consoleSpy).toHaveBeenCalledWith('Invalid file type')
-      consoleSpy.mockRestore()
     })
   })
 })

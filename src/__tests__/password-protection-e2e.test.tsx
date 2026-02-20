@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import ResumeEditPage from '@/app/resume/builder/page'
 import bcrypt from 'bcryptjs'
@@ -362,10 +363,12 @@ describe('Password Protection - End-to-End Workflows', () => {
       fireEvent.change(screen.getByLabelText('Password'), {
         target: { value: correctPassword },
       })
-      fireEvent.click(screen.getByRole('button', { name: /unlock/i }))
+      await suppressConsoleError(/Authentication error:/i, async () => {
+        fireEvent.click(screen.getByRole('button', { name: /unlock/i }))
 
-      await waitFor(() => {
-        expect(screen.getByText('Authentication error. Please try again.')).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText('Authentication error. Please try again.')).toBeInTheDocument()
+        })
       })
 
       // Should still be on password screen

@@ -1,6 +1,7 @@
 import { sortAchievementsGraph } from '@/lib/ai/strands/achievements-sorting-graph'
 import { AgentConfig } from '@/lib/ai/strands/types'
 import { Agent } from '@strands-agents/sdk'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 
 jest.mock('@strands-agents/sdk', () => {
   return {
@@ -36,11 +37,6 @@ describe('achievementsSortingGraph', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.spyOn(console, 'error').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    ;(console.error as jest.Mock).mockRestore()
   })
 
   it('should sort achievements successfully on first try', async () => {
@@ -61,12 +57,10 @@ describe('achievementsSortingGraph', () => {
           toString: () => 'CRITIQUE: Reorder\n{"rankedIndices": [0, 1]}',
         }),
       }))
-      .mockImplementationOnce(() => ({
-        invoke: jest.fn().mockResolvedValue({ toString: () => 'APPROVED' }),
-      }))
-
-    const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
-    expect(result.rankedIndices).toEqual([0, 1])
+    await suppressConsoleError(/Raw JSON:/i, async () => {
+      const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
+      expect(result.rankedIndices).toEqual([0, 1])
+    })
   })
 
   it('should fallback to original order on invalid JSON', async () => {
@@ -78,9 +72,11 @@ describe('achievementsSortingGraph', () => {
         invoke: jest.fn().mockResolvedValue({ toString: () => 'not-json' }),
       }))
 
-    const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
-    // Fallback is [0, 1]
-    expect(result.rankedIndices).toEqual([0, 1])
+    await suppressConsoleError([/Failed to parse achievements sort result:/i, /Raw JSON:/i], async () => {
+      const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
+      // Fallback is [0, 1]
+      expect(result.rankedIndices).toEqual([0, 1])
+    })
   })
 
   it('should fallback if indices are missing', async () => {
@@ -92,8 +88,10 @@ describe('achievementsSortingGraph', () => {
         invoke: jest.fn().mockResolvedValue({ toString: () => '{"rankedIndices": [0]}' }), // Missing index 1
       }))
 
-    const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
-    expect(result.rankedIndices).toEqual([0, 1])
+    await suppressConsoleError([/Failed to parse achievements sort result:/i, /Raw JSON:/i], async () => {
+      const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
+      expect(result.rankedIndices).toEqual([0, 1])
+    })
   })
 
   it('should handle iteration limit in review loop', async () => {
@@ -103,8 +101,10 @@ describe('achievementsSortingGraph', () => {
       }),
     }))
 
-    const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
-    // Even if it fails, it returns the last valid-ish one it got or fallback
-    expect(result.rankedIndices).toEqual([1, 0])
+    await suppressConsoleError([/Failed to parse achievements sort result:/i, /Raw JSON:/i], async () => {
+      const result = await sortAchievementsGraph(achievements, 'Dev', 'Company', 'JD', mockConfig)
+      // Even if it fails, it returns the last valid-ish one it got or fallback
+      expect(result.rankedIndices).toEqual([1, 0])
+    })
   })
 })

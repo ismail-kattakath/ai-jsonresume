@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import ExternalRedirect from '@/components/ui/external-redirect'
 
@@ -26,7 +27,9 @@ describe('ExternalRedirect', () => {
 
   it('redirects when url is provided', async () => {
     const url = 'https://example.com'
-    render(<ExternalRedirect url={url} label="test site" />)
+    await suppressConsoleError(/Not implemented: navigation/i, async () => {
+      render(<ExternalRedirect url={url} label="test site" />)
+    })
 
     // If we can't reliably mock replace, we verify the spinner is shown
     // which only happens in the url branch

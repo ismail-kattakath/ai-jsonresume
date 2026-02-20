@@ -1,5 +1,5 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import AIDocumentGeneratorModal from '@/components/document-builder/shared-forms/ai-document-generator-modal'
 import { generateCoverLetterGraph } from '@/lib/ai/strands/agent'
@@ -118,5 +118,26 @@ describe('AIDocumentGeneratorModal', () => {
     expect(apiKeyInput).toHaveAttribute('type', 'password')
     fireEvent.click(toggleButton)
     expect(apiKeyInput).toHaveAttribute('type', 'text')
+  })
+
+  it('handles generation failure', async () => {
+    ;(generateCoverLetterGraph as jest.Mock).mockRejectedValue(new Error('Generation failed'))
+
+    const { container } = render(<AIDocumentGeneratorModal {...mockProps} />)
+
+    // Setup form
+    fireEvent.change(getApiKeyInput(container), { target: { value: 'test-key' } })
+    fireEvent.change(getJobDescriptionTextarea(container), { target: { value: 'test-jd' } })
+
+    const generateButton = screen.getByRole('button', { name: /Generate Cover Letter/i })
+
+    await suppressConsoleError(/Cover Letter generation error/i, async () => {
+      fireEvent.click(generateButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(/Generation failed/i)).toBeInTheDocument()
+        expect(toast.error).toHaveBeenCalledWith('Generation failed', expect.any(Object))
+      })
+    })
   })
 })

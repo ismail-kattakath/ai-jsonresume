@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { renderHook, act } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import { useUnifiedData } from '@/hooks/use-unified-data'
 
 // Mock the modules that read from the file system
@@ -97,11 +98,13 @@ describe('useUnifiedData', () => {
     expect(result.current.resumeData.projects.length).toBeGreaterThan(0)
   })
 
-  it('should handle corrupted resume localStorage gracefully (JSON parse error)', () => {
+  it('should handle corrupted resume localStorage gracefully (JSON parse error)', async () => {
     localStorage.setItem('resumeData', 'NOT_VALID_JSON')
     // Should not throw, should use default data
-    const { result } = renderHook(() => useUnifiedData())
-    expect(result.current.resumeData.name).toBe('Default User')
+    await suppressConsoleError(/Error loading saved resume data:/i, async () => {
+      const { result } = renderHook(() => useUnifiedData())
+      expect(result.current.resumeData.name).toBe('Default User')
+    })
   })
 
   it('should migrate skills when they are stored as plain strings', () => {
@@ -194,11 +197,13 @@ describe('useUnifiedData', () => {
     expect(result.current.coverLetterData.content).toBe('Default cover letter content')
   })
 
-  it('should handle corrupted cover letter localStorage gracefully', () => {
+  it('should handle corrupted cover letter localStorage gracefully', async () => {
     localStorage.setItem('coverLetterData', '{invalid json}')
-    const { result } = renderHook(() => useUnifiedData())
     // Should fall back to defaults without throwing
-    expect(result.current.coverLetterData.content).toBe('Default cover letter content')
+    await suppressConsoleError(/Error loading saved cover letter data:/i, async () => {
+      const { result } = renderHook(() => useUnifiedData())
+      expect(result.current.coverLetterData.content).toBe('Default cover letter content')
+    })
   })
 
   it('should save resume data to localStorage when it changes', () => {

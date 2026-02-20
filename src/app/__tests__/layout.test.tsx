@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import RootLayout, { metadata } from '@/app/layout'
 
 // Mock BackgroundImage component
@@ -23,22 +24,26 @@ jest.mock('@/config/metadata', () => ({
 // No mock needed for Html/Body here if they aren't used
 
 describe('RootLayout', () => {
-  it('should render children inside body', () => {
-    render(
-      <RootLayout>
-        <div data-testid="test-child">Test Content</div>
-      </RootLayout>
-    )
+  it('should render children inside body', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div data-testid="test-child">Test Content</div>
+        </RootLayout>
+      )
+    })
 
     expect(screen.getByTestId('test-child')).toBeInTheDocument()
   })
 
-  it('should render BackgroundImage component with correct props', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should render BackgroundImage component with correct props', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const bg = screen.getByTestId('background-image')
     expect(bg).toBeInTheDocument()
@@ -46,24 +51,28 @@ describe('RootLayout', () => {
     expect(bg).toHaveAttribute('data-with-overlay', 'true')
   })
 
-  it('should have html element with lang attribute', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should have html element with lang attribute', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     // Check that html element exists in the document with lang attribute
     const html = document.documentElement
     expect(html).toHaveAttribute('lang', 'en')
   })
 
-  it('should include favicon link in head', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should include favicon link in head', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const head = document.querySelector('head')
     const faviconLink = head?.querySelector('link[rel="icon"]')
@@ -71,60 +80,70 @@ describe('RootLayout', () => {
     expect(faviconLink).toHaveAttribute('type', 'image/png')
   })
 
-  it('should include apple-touch-icon link in head', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should include apple-touch-icon link in head', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const head = document.querySelector('head')
     const appleTouchIcon = head?.querySelector('link[rel="apple-touch-icon"]')
     expect(appleTouchIcon).toHaveAttribute('href', '/favicon/apple-touch-icon.png')
   })
 
-  it('should include manifest link in head', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should include manifest link in head', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const head = document.querySelector('head')
     const manifest = head?.querySelector('link[rel="manifest"]')
     expect(manifest).toHaveAttribute('href', '/favicon/site.webmanifest')
   })
 
-  it('should apply antialiased to body', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should apply antialiased to body', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const body = document.body
     expect(body).toHaveClass('antialiased')
     // System fonts are used, no custom font variables needed
   })
 
-  it('should apply minHeight style to body', () => {
-    render(
-      <RootLayout>
-        <div>Test</div>
-      </RootLayout>
-    )
+  it('should apply minHeight style to body', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div>Test</div>
+        </RootLayout>
+      )
+    })
 
     const body = document.body
     expect(body).toHaveStyle({ minHeight: '100vh' })
   })
 
-  it('should render multiple children correctly', () => {
-    render(
-      <RootLayout>
-        <div data-testid="child-1">Child 1</div>
-        <div data-testid="child-2">Child 2</div>
-      </RootLayout>
-    )
+  it('should render multiple children correctly', async () => {
+    await suppressConsoleError([/hydration error/i, /validateDOMNesting/i, /cannot be a child of/i], async () => {
+      render(
+        <RootLayout>
+          <div data-testid="child-1">Child 1</div>
+          <div data-testid="child-2">Child 2</div>
+        </RootLayout>
+      )
+    })
 
     expect(screen.getByTestId('child-1')).toBeInTheDocument()
     expect(screen.getByTestId('child-2')).toBeInTheDocument()

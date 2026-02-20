@@ -5,7 +5,7 @@ import { Tooltip, CustomTooltip } from '@/components/ui/tooltip'
 // Override the global react-tooltip mock from jest.setup.js for this file
 // since we need to test our wrapper component behavior
 jest.mock('react-tooltip', () => ({
-  Tooltip: (props: React.HTMLAttributes<HTMLDivElement>) => <div data-testid="react-tooltip" {...props} />,
+  Tooltip: ({ classNameArrow, delayShow, delayHide, ...props }: any) => <div data-testid="react-tooltip" {...props} />,
 }))
 
 describe('Tooltip', () => {

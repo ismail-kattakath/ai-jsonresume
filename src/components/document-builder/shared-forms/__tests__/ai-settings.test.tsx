@@ -1,5 +1,5 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import AISettings from '@/components/document-builder/shared-forms/ai-settings'
 import { useAISettings } from '@/lib/contexts/ai-settings-context'
@@ -90,16 +90,18 @@ describe('AISettings Component', () => {
 
   it('handles model fetch error', async () => {
     ;(fetchAvailableModels as jest.Mock).mockRejectedValue(new Error('Fetch failed'))
-    render(<AISettings />)
+    await suppressConsoleError(/AISettings.*Model fetch error/i, async () => {
+      render(<AISettings />)
 
-    // The component might show "Enter model name manually" or a similar hint in the helpText
-    // of the Model input when fetching fails
-    await waitFor(
-      () => {
-        expect(fetchAvailableModels).toHaveBeenCalled()
-      },
-      { timeout: 2000 }
-    )
+      // The component might show "Enter model name manually" or a similar hint in the helpText
+      // of the Model input when fetching fails
+      await waitFor(
+        () => {
+          expect(fetchAvailableModels).toHaveBeenCalled()
+        },
+        { timeout: 2000 }
+      )
+    })
 
     // When fetching fails, it usually falls back to manual input or shows an error message
     // Let's check for the manual input fallback

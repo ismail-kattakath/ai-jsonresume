@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import JobDescriptionSection from '@/components/document-builder/shared-forms/job-description-section'
 import { ResumeContext } from '@/lib/contexts/document-context'
@@ -248,10 +249,13 @@ describe('JobDescriptionSection', () => {
 
     renderComponent(mockResumeData, settingsWithLongJD)
     const refineButton = screen.getByText(/Refine with AI/i)
-    fireEvent.click(refineButton)
 
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalled()
+    await suppressConsoleError(/Refinement error/i, async () => {
+      fireEvent.click(refineButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalled()
+      })
     })
   })
 
@@ -280,10 +284,13 @@ describe('JobDescriptionSection', () => {
 
     renderComponent(mockResumeData, settingsWithLongJD)
     const pipelineButton = screen.getByTestId('ai-pipeline-button')
-    fireEvent.click(pipelineButton)
 
-    await waitFor(() => {
-      expect(toast.error).toHaveBeenCalled()
+    await suppressConsoleError(/Pipeline error/i, async () => {
+      fireEvent.click(pipelineButton)
+
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalled()
+      })
     })
   })
 
@@ -291,6 +298,12 @@ describe('JobDescriptionSection', () => {
     const longJD = 'a'.repeat(60)
     const settingsWithLongJD = { ...mockAISettings, jobDescription: longJD }
     const updateSettingsMock = jest.fn()
+
+    ;(aiAgent.runAIGenerationPipeline as jest.Mock).mockResolvedValue({
+      refinedJD: 'Final Refined JD',
+      summary: 'Final Summary',
+      workExperiences: [],
+    })
 
     render(
       <AISettingsContext.Provider
