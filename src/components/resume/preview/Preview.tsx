@@ -23,6 +23,7 @@ import { formatUrl } from '@/lib/utils/formatUrl'
 import Image from 'next/image'
 import React, { useContext } from 'react'
 import { ResumeContext } from '@/lib/contexts/DocumentContext'
+import { splitTextIntoSentences } from '@/lib/utils/stringHelpers'
 import dynamic from 'next/dynamic'
 import Language from '@/components/resume/preview/Language'
 import Certification from '@/components/resume/preview/Certification'
@@ -337,9 +338,8 @@ const Preview = () => {
                     contentEditable={editable}
                     suppressContentEditableWarning
                   >
-                    {resumeData.summary
-                      .split(/(?<=[.!?])\s+/)
-                      .map((sentence, index, array) => (
+                    {splitTextIntoSentences(resumeData.summary).map(
+                      (sentence, index, array) => (
                         <React.Fragment key={index}>
                           <Highlight
                             text={`⦿ ${sentence}`}
@@ -347,7 +347,8 @@ const Preview = () => {
                           />
                           {index < array.length - 1 && <br />}
                         </React.Fragment>
-                      ))}
+                      )
+                    )}
                   </p>
                 </div>
               )}

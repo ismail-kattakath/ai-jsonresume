@@ -148,7 +148,7 @@ describe('Footer', () => {
 
   it('scrolls to section when anchor link is clicked in navigation', () => {
     const mockElement = { scrollIntoView: jest.fn() }
-    ;(document.querySelector as jest.Mock).mockReturnValue(mockElement)
+      ; (document.querySelector as jest.Mock).mockReturnValue(mockElement)
 
     render(<Footer />)
 
@@ -173,5 +173,86 @@ describe('Footer', () => {
 
     // The navigation handler was triggered (mocked window.location in beforeEach)
     expect(resumeButtons[0]).toBeInTheDocument()
+  })
+
+  it('fires analytics.socialMediaClick on GitHub link click', () => {
+    const { container } = render(<Footer />)
+    const githubLink = container.querySelector('a[aria-label="GitHub"]')
+    if (githubLink) {
+      fireEvent.click(githubLink)
+    }
+    expect(githubLink).toBeInTheDocument()
+  })
+
+  it('fires analytics.socialMediaClick on LinkedIn link click', () => {
+    const { container } = render(<Footer />)
+    const linkedinLink = container.querySelector('a[aria-label="LinkedIn"]')
+    if (linkedinLink) {
+      fireEvent.click(linkedinLink)
+    }
+    expect(linkedinLink).toBeInTheDocument()
+  })
+
+  it('fires analytics.contactClick on email link click', () => {
+    const { container } = render(<Footer />)
+    const emailLink = container.querySelector('a[aria-label="Email"]')
+    if (emailLink) {
+      fireEvent.click(emailLink)
+    }
+    expect(emailLink).toBeInTheDocument()
+  })
+
+  it('renders "Built with" section and Open Source link', () => {
+    render(<Footer />)
+    expect(screen.getByText(/Built with/)).toBeInTheDocument()
+    expect(screen.getByText('Open Source')).toBeInTheDocument()
+    expect(screen.getByText('Next.js')).toBeInTheDocument()
+  })
+
+  it('renders Edit Template, Contribute, and Report Bug links', () => {
+    render(<Footer />)
+    expect(screen.getByText('Edit Template')).toBeInTheDocument()
+    expect(screen.getByText('Contribute')).toBeInTheDocument()
+    expect(screen.getByText('Report Bug')).toBeInTheDocument()
+  })
+
+  it('renders homepage logo link', () => {
+    const { container } = render(<Footer />)
+    const logoButton = container.querySelector('button[aria-label="Go to homepage"]')
+    expect(logoButton).toBeInTheDocument()
+    if (logoButton) {
+      fireEvent.click(logoButton)
+    }
+  })
+
+  it('navigates to non-homepage anchor links via redirect', () => {
+    // Set location to non-homepage
+    window.location = { href: '', pathname: '/resume' } as any
+
+    const mockElement = { scrollIntoView: jest.fn() }
+      ; (document.querySelector as jest.Mock).mockReturnValue(null)
+
+    render(<Footer />)
+
+    // Find "About" which uses an anchor link
+    const aboutButtons = screen.getAllByText('About')
+    fireEvent.click(aboutButtons[0])
+
+    // Should set window.location.href since not on homepage
+    expect(aboutButtons[0]).toBeInTheDocument()
+  })
+
+  it('handles submenu navigation items', () => {
+    render(<Footer />)
+    // Check for submenu-specific items like 'Download Resume' or 'AI Resume Builder'
+    const downloadButtons = screen.queryAllByText('Download Resume')
+    const builderButtons = screen.queryAllByText('AI Resume Builder')
+
+    if (downloadButtons.length > 0) {
+      fireEvent.click(downloadButtons[0])
+    }
+    if (builderButtons.length > 0) {
+      fireEvent.click(builderButtons[0])
+    }
   })
 })

@@ -6,7 +6,7 @@ import type { JSONResume, ResumeData, JSONResumeBasics } from '@/types'
  * Converts JSON Resume format to internal resume data format
  * This allows the project to use a standard JSON Resume file as the source of truth
  */
-function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
+export function convertFromJSONResume(jsonResume: JSONResume): ResumeData {
   const basics = jsonResume.basics || {}
 
   // Convert profiles back to social media format

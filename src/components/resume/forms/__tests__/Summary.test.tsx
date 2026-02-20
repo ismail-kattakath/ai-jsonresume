@@ -259,11 +259,9 @@ describe('Summary Component', () => {
 
       mockSetResumeData.mockClear()
 
-      console.error('[TEST DEBUG] Clicking button')
       // Click the AI generation button
       const aiButton = screen.getByRole('button', { name: /generate by jd/i })
       aiButton.click()
-      console.error('[TEST DEBUG] Clicked')
 
       // Wait for AI generation to complete and setResumeData to be called
       await waitFor(() => {

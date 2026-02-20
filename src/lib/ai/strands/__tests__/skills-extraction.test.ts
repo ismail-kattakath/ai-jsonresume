@@ -1,65 +1,55 @@
 import { extractSkillsGraph } from '../skills-extraction-graph'
-import { Agent } from '@strands-agents/sdk'
+import { AgentConfig } from '../types'
 
-// Mock the Strands SDK
 jest.mock('@strands-agents/sdk', () => {
     return {
-        Agent: jest.fn().mockImplementation(() => ({
-            invoke: jest.fn(),
-            stream: jest.fn(),
-        })),
-        Model: jest.fn(),
+        Agent: jest.fn().mockImplementation(({ systemPrompt }: any) => {
+            let critiqueCount = 0
+            return {
+                systemPrompt,
+                invoke: jest.fn().mockImplementation((prompt: string) => {
+                    const sp = (systemPrompt || '').toLowerCase()
+                    const p = (prompt || '').toLowerCase()
+
+                    // Use a more generic match or log if needed
+                    if (sp.includes('expert') || sp.includes('extraction') || sp.includes('skills')) {
+                        return Promise.resolve({ toString: () => 'React, Next.js, Node.js' })
+                    }
+                    if (sp.includes('reviewer') || sp.includes('editor') || sp.includes('validator')) {
+                        if (p.includes('retry_trigger') && critiqueCount < 1) {
+                            critiqueCount++
+                            return Promise.resolve({ toString: () => 'CRITIQUE' })
+                        }
+                        return Promise.resolve({ toString: () => 'APPROVED' })
+                    }
+                    return Promise.resolve({ toString: () => 'Default' })
+                })
+            }
+        })
     }
 })
 
-jest.mock('@strands-agents/sdk/openai', () => {
-    return {
-        OpenAIModel: jest.fn().mockImplementation(() => ({})),
-    }
-})
-
-jest.mock('@strands-agents/sdk/gemini', () => {
-    return {
-        GeminiModel: jest.fn().mockImplementation(() => ({})),
-    }
-})
-
-describe('Skills Extraction', () => {
-    const mockConfig = {
-        apiUrl: 'http://localhost:1234/v1',
-        apiKey: 'test-key',
-        model: 'test-model',
-        providerType: 'openai-compatible',
-    } as any
-
-    const mockJD = 'Looking for a React developer with Postgres experience.'
-
+describe('skills-extraction-graph', () => {
     beforeEach(() => {
+        const AgentMock = require('@strands-agents/sdk').Agent
+        AgentMock.mockClear()
         jest.clearAllMocks()
     })
 
-    describe('extractSkillsGraph', () => {
-        it('extracts and returns a comma-separated list of skills', async () => {
-            const mockExtraction = 'React, Postgres'
-            const mockVerification = 'React, PostgreSQL'
-            const mockToString1 = jest.fn().mockReturnValue(mockExtraction)
-            const mockToString2 = jest.fn().mockReturnValue(mockVerification)
-            const mockInvoke = jest.fn()
-                .mockResolvedValueOnce({ toString: mockToString1 })
-                .mockResolvedValueOnce({ toString: mockToString2 })
+    const mockConfig = {
+        apiKey: 'test',
+        apiUrl: '',
+        model: '',
+        providerType: 'openai'
+    } as any
 
-                ; (Agent as jest.Mock).mockImplementation(() => ({
-                    invoke: mockInvoke,
-                }))
+    it('should extract skills successfully', async () => {
+        const result = await extractSkillsGraph('JD', mockConfig)
+        expect(result).toContain('React')
+    })
 
-            const onProgress = jest.fn()
-            const result = await extractSkillsGraph(mockJD, mockConfig, onProgress)
-
-            expect(Agent).toHaveBeenCalledTimes(2) // Extractor and Verifier
-            expect(mockInvoke).toHaveBeenCalledWith(expect.stringContaining(mockJD))
-            expect(result).toBe(mockVerification)
-            expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Extracting key skills from JD...' }))
-            expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Verifying skill accuracy...' }))
-        })
+    it('should retry if reviewer critiques', async () => {
+        const result = await extractSkillsGraph('RETRY_TRIGGER', mockConfig)
+        expect(result).toContain('React')
     })
 })

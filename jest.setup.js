@@ -114,30 +114,63 @@ jest.mock('@lottiefiles/dotlottie-react', () => ({
 }))
 // Suppress React act() warnings and intentional test console.errors
 const originalError = console.error
+const originalLog = console.log
+const originalWarn = console.warn
+const originalInfo = console.info
+
 beforeAll(() => {
   console.error = (...args) => {
-    const message = args[0]?.toString() || ''
-    // Suppress React act() warnings (expected in async tests)
-    if (message.includes('not wrapped in act')) return
-    // Suppress intentional auth error test
-    if (message.includes('Authentication error:')) return
-    // Suppress framer-motion prop warnings in tests
-    if (message.includes('whileHover')) return
-    if (message.includes('whileTap')) return
-    if (message.includes('whileInView')) return
-    if (message.includes('animate')) return
-    if (message.includes('initial')) return
-    if (message.includes('variants')) return
-    if (message.includes('transition')) return
-    if (message.includes('viewport')) return
-    if (message.includes('validateDOMNesting')) return
-    if (message.includes('cannot be a child of')) return
-    if (message.includes('hydration error')) return
-    if (message.includes('Not implemented: navigation')) return
-    originalError.call(console, ...args)
+    const message = args
+      .map((arg) => {
+        if (arg && typeof arg === 'object') {
+          try {
+            return arg.stack || arg.message || JSON.stringify(arg)
+          } catch (e) {
+            return String(arg)
+          }
+        }
+        return String(arg)
+      })
+      .join(' ')
+
+    const silentPatterns = [
+      /not wrapped in act/i,
+      /nested/i,
+      /classNameArrow/i,
+      /delayShow|delayHide/i,
+      /contentEditable/i,
+      /Invalid file type/i,
+      /Authentication error:/i,
+      /\[Encryption\] Decryption failed:/i,
+      /Validation errors:/i,
+      /Error converting JSON Resume:/i,
+      /Failed to parse achievements sort result:/i,
+      /\[Pipeline\] Failed/i,
+      /Failed to copy to clipboard/i,
+      /Cover Letter generation error/i,
+      /whileHover|whileTap|whileInView|animate|initial|variants|transition|viewport/i,
+      /validateDOMNesting/i,
+      /cannot be a child of/i,
+      /hydration error/i,
+      /Not implemented: navigation/i,
+    ]
+
+    if (silentPatterns.some((pattern) => pattern.test(message))) {
+      return
+    }
+
+    originalError.apply(console, args)
   }
+
+  // Silence all logs and warnings in tests by default
+  console.log = jest.fn()
+  console.info = jest.fn()
+  console.warn = jest.fn()
 })
 
 afterAll(() => {
   console.error = originalError
+  console.log = originalLog
+  console.warn = originalWarn
+  console.info = originalInfo
 })
