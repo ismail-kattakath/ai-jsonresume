@@ -14,10 +14,9 @@ interface OnDeviceGeneratorProps {
  * Downloads the model file via fetch() with real streaming byte progress,
  * then creates a blob: URL and passes it to useLlm.
  *
- * Why: the underlying MediaPipe library only fires progress at 10% (start) and 100%
- * (done) with no intermediate events. To show real progress we stream-download first.
+ * It uses the browser's Cache API to persist the 555MB download across page reloads.
  */
-const MODEL_CACHE_KEY = 'on-device-model-blob'
+const CACHE_NAME = 'ai-models-v1'
 /** HuggingFace access token — required for gated Gemma models */
 // @ts-expect-error - Next.js requires dot notation for build-time replacement
 const HF_TOKEN = process.env.NEXT_PUBLIC_HF_TOKEN || ''
@@ -33,12 +32,24 @@ async function downloadWithProgress(
   onProgress: (status: DownloadStatus) => void,
   signal: AbortSignal
 ): Promise<string> {
-  const cached = sessionStorage.getItem(MODEL_CACHE_KEY)
-  if (cached) {
-    onProgress({ loadedBytes: 555 * 1024 * 1024, totalBytes: 555 * 1024 * 1024, isDone: true })
-    return cached
+  // 1. Check if the model is already in the persistent Cache API
+  try {
+    const cache = await caches.open(CACHE_NAME)
+    const cachedResponse = await cache.match(url)
+    if (cachedResponse) {
+      // We have the file! Simulate immediate 100% progress
+      const contentLength = cachedResponse.headers.get('content-length')
+      const total = contentLength ? parseInt(contentLength, 10) : 555 * 1024 * 1024
+      onProgress({ loadedBytes: total, totalBytes: total, isDone: true })
+
+      const blob = await cachedResponse.blob()
+      return URL.createObjectURL(blob)
+    }
+  } catch {
+    // Ignore cache errors and fallback to network
   }
 
+  // 2. Not in cache, start network download
   const headers: HeadersInit = {}
   if (HF_TOKEN) headers['Authorization'] = `Bearer ${HF_TOKEN}`
 
@@ -67,14 +78,25 @@ async function downloadWithProgress(
 
   onProgress({ loadedBytes: received, totalBytes: total, isDone: true })
 
+  // 3. Create blob from chunks
   const blob = new Blob(chunks as unknown as BlobPart[])
-  const blobUrl = URL.createObjectURL(blob)
+
+  // 4. Save to Cache API for next time (in the background)
   try {
-    sessionStorage.setItem(MODEL_CACHE_KEY, blobUrl)
+    const cache = await caches.open(CACHE_NAME)
+    const responseToCache = new Response(blob, {
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': received.toString(),
+      },
+    })
+    // Do not await this, let it save in the background so we don't block the UI
+    cache.put(url, responseToCache).catch(() => {})
   } catch {
-    /* quota exceeded, fine */
+    // Ignore cache save errors (e.g. quota exceeded)
   }
-  return blobUrl
+
+  return URL.createObjectURL(blob)
 }
 
 /**
