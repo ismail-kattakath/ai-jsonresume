@@ -79,11 +79,19 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
+      - name: Restore Jest cache
+        uses: actions/cache@v4
+        with:
+          path: .jest-cache
+          key: jest-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: |
+            jest-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
       - name: Download resume data
         run: npm run download-resume-json
 
       - name: Run tests and collect coverage
-        run: npm run test:coverage -- --coverageThreshold='{}'
+        run: npm run test:coverage -- --cacheDirectory=.jest-cache --coverageThreshold='{}'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
