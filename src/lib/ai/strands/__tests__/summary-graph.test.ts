@@ -128,6 +128,27 @@ describe('summaryGraph', () => {
     expect(result).toBe('Written')
   })
 
+  it('should return last summary with warnings after max iterations with onProgress', async () => {
+    ;(Agent as unknown as jest.Mock).mockImplementation(({ systemPrompt }: { systemPrompt: string }) => ({
+      systemPrompt,
+      invoke: jest.fn().mockImplementation((_prompt: string) => {
+        if (systemPrompt.includes('Resume Strategy Analyst')) return Promise.resolve({ toString: () => 'Analyst' })
+        if (systemPrompt.includes('Resume Writer')) return Promise.resolve({ toString: () => 'Written' })
+        return Promise.resolve({ toString: () => 'CRITIQUE: Keep going' })
+      }),
+    }))
+
+    const mockResumeData = { workExperience: [] }
+    const onProgress = jest.fn()
+    const result = await generateSummaryGraph(mockResumeData as unknown as ResumeData, 'JD', mockConfig, onProgress)
+
+    expect(result).toBe('Written')
+    expect(onProgress).toHaveBeenCalledWith({
+      content: 'Generated with minor validation warnings.',
+      done: true,
+    })
+  })
+
   it('should extract correct allowed skills and test tool callback', async () => {
     let validationCallback: (args: Record<string, unknown>) => string = () => ''
     ;(tool as unknown as jest.Mock).mockImplementationOnce(

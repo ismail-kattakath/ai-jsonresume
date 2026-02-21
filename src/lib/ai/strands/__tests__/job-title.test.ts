@@ -79,4 +79,21 @@ describe('jobTitleGraph', () => {
 
     expect(result).toBe('Strikethrough Code Italic')
   })
+  it('should exhaust iterations if reviewer keeps critiquing', async () => {
+    ;(Agent as unknown as jest.Mock)
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Analysis' }),
+      }))
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Generated Title' }),
+      }))
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'CRITIQUE: Always bad' }),
+      }))
+
+    const result = await generateJobTitleGraph(mockResumeData as unknown as ResumeData, 'JD', mockConfig)
+
+    // Should return the last generated title despite critiques
+    expect(result).toBe('Generated Title')
+  })
 })

@@ -80,4 +80,32 @@ describe('coverLetterGraph', () => {
     const result = await generateCoverLetterGraph({ name: 'John' } as unknown as ResumeData, 'JD', mockConfig)
     expect(result).toBeDefined()
   })
+
+  it('should exhaust iterations if reviewer keeps critiquing', async () => {
+    ;(Agent as unknown as jest.Mock)
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Initial Draft' }),
+      }))
+      .mockImplementationOnce(() => ({
+        // Even if we refine, reviewer just keeps saying CRITIQUE
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'CRITIQUE: Always bad' }),
+      }))
+
+    const result = await generateCoverLetterGraph(mockResumeData as unknown as ResumeData, 'JD', mockConfig)
+    expect(result).toBeDefined()
+  })
+
+  it('should exhaust iterations without onProgress', async () => {
+    ;(Agent as unknown as jest.Mock)
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Initial Draft' }),
+      }))
+      .mockImplementationOnce(() => ({
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'CRITIQUE: Always bad' }),
+      }))
+
+    // No onProgress passed
+    const result = await generateCoverLetterGraph(mockResumeData as unknown as ResumeData, 'JD', mockConfig, undefined)
+    expect(result).toBeDefined()
+  })
 })

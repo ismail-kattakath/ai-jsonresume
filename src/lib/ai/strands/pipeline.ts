@@ -201,9 +201,7 @@ export async function runAIGenerationPipeline(
   // Serial experience tailoring sub-task (runs concurrently with summary + skills)
   const tailoringTask = async (): Promise<WorkExperience[]> => {
     const tailored: WorkExperience[] = []
-    for (let i = 0; i < workExperiences.length; i++) {
-      const exp = workExperiences[i]
-      if (!exp) continue
+    for (const [i, exp] of workExperiences.entries()) {
       const expStep = phase2bBaseStep + 2 + i // after summary step and skills step
       currentStep = expStep
       onProgress?.({
@@ -286,12 +284,11 @@ export async function runAIGenerationPipeline(
   ])
 
   // Transform SkillsSortResult back to SkillGroup[]
+  // Build a safe lookup map from the skill order result to avoid dynamic bracket access
+  const skillOrderMap = new Map<string, string[]>(Object.entries(skillsResult.skillOrder))
   const sortedSkills: SkillGroup[] = skillsResult.groupOrder.map((groupTitle) => {
     const originalGroup = resumeData.skills?.find((g) => g.title === groupTitle)
-    const skillsInGroup =
-      (Object.prototype.hasOwnProperty.call(skillsResult.skillOrder, groupTitle)
-        ? skillsResult.skillOrder[groupTitle]
-        : []) || []
+    const skillsInGroup = skillOrderMap.get(groupTitle) ?? []
     return {
       title: groupTitle,
       skills: skillsInGroup.map((skillText) => ({

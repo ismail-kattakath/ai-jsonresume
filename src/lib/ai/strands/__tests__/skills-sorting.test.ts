@@ -169,4 +169,26 @@ describe('skillsSortingGraph', () => {
     const result = await sortSkillsGraph(mockSkills, 'JD', mockConfig)
     expect(result.groupOrder).toContain('G1')
   })
+
+  it('should handle skill groups with undefined skills array', async () => {
+    const skillsWithoutArray = [{ title: 'G1', skills: undefined }] as unknown as SkillGroup[]
+    const result = await sortSkillsGraph(skillsWithoutArray, 'JD', mockConfig)
+    expect(result).toBeDefined()
+    expect(result.groupOrder).toContain('G1')
+  })
+
+  it('should handle non-Error objects thrown during JSON parse', async () => {
+    // Force JSON.parse to throw a string instead of an Error object
+    const parseSpy = jest.spyOn(JSON, 'parse').mockImplementation(() => {
+      throw 'String error thrown'
+    })
+
+    // It will exhaust max iterations and then fail in the fallback,
+    // thereby covering the non-Error catch block inside the loop.
+    await expect(sortSkillsGraph(mockSkills, 'JD', mockConfig)).rejects.toThrow(
+      'Failed to generate a valid skill sorting result after multiple attempts.'
+    )
+
+    parseSpy.mockRestore()
+  })
 })

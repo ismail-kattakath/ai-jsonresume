@@ -290,6 +290,30 @@ describe('runAIGenerationPipeline', () => {
     expect(onProgress).not.toHaveBeenCalledWith(expect.objectContaining({ message: 'Done writing!' }))
   })
 
+  it('covers tailoring onProgress callback content path', async () => {
+    ;(analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
+    ;(generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+    ;(generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
+    ;(tailorExperienceToJDGraph as jest.Mock).mockImplementation(
+      async (desc, ach, title, org, jd, tech, config, onProgress) => {
+        // Fire a progress event with content and done: false — exercises the inner branch
+        onProgress({ content: 'Tailoring...', done: false })
+        // Fire a progress event with done: true — should be filtered out
+        onProgress({ content: 'done', done: true })
+        return { description: 'D', achievements: ['A'], techStack: [] }
+      }
+    )
+    ;(sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
+    ;(extractSkillsGraph as jest.Mock).mockResolvedValue('skills')
+    ;(generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+
+    const onProgress = jest.fn()
+    await runAIGenerationPipeline(mockResumeData, mockJobDescription, mockConfig, onProgress)
+
+    expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ message: 'Tailoring...' }))
+    expect(onProgress).not.toHaveBeenCalledWith(expect.objectContaining({ message: 'done' }))
+  })
+
   it('covers skills transformation edge cases (missing group in original or result)', async () => {
     const resumeWithEmptySkills = {
       ...mockResumeData,
@@ -319,5 +343,50 @@ describe('runAIGenerationPipeline', () => {
       title: 'NonExistent',
       skills: [{ text: 'React', highlight: undefined }],
     })
+  })
+
+  it('handles work experience with undefined keyAchievements (covers || [] branch)', async () => {
+    const resumeWithUndefinedAchievements = {
+      ...mockResumeData,
+      workExperience: [
+        {
+          organization: 'Corp',
+          url: '',
+          position: 'Dev',
+          startYear: '2020',
+          endYear: '2021',
+          description: 'Did stuff',
+          keyAchievements: undefined,
+        },
+      ],
+    } as unknown as ResumeData
+
+    ;(analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
+    ;(generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+    ;(generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
+    ;(tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
+      description: 'Tailored desc',
+      achievements: ['Achievement'],
+      techStack: [],
+    })
+    ;(sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
+    ;(extractSkillsGraph as jest.Mock).mockResolvedValue('skills')
+    ;(generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+
+    const result = await runAIGenerationPipeline(resumeWithUndefinedAchievements, mockJobDescription, mockConfig)
+
+    // tailorExperienceToJDGraph should receive empty array (keyAchievements || [] fallback)
+    expect(tailorExperienceToJDGraph).toHaveBeenCalledWith(
+      expect.any(String),
+      [], // keyAchievements || [] resolves to []
+      expect.any(String),
+      expect.any(String),
+      expect.any(String),
+      undefined,
+      mockConfig,
+      expect.any(Function),
+      expect.any(Object)
+    )
+    expect(result.workExperiences).toHaveLength(1)
   })
 })
