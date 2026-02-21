@@ -1,6 +1,7 @@
 import { StreamCallback } from '@/types/openai'
 import { TailoringAgents } from '@/lib/ai/strands/experience-tailoring/agents'
-import { KeywordExtractionResult, EnrichmentMapResult } from '@/lib/ai/strands/experience-tailoring/types'
+import { EnrichmentMapResult } from '@/lib/ai/strands/experience-tailoring/types'
+import { KeywordExtractionResult } from '@/lib/ai/strands/types'
 import { extractToolOutput, runAgentStream } from '@/lib/ai/strands/experience-tailoring/utils'
 
 import { TailoringInvocationState } from '@/lib/ai/strands/experience-tailoring/types'
@@ -14,33 +15,40 @@ export async function runAchievementsStage(
   state: TailoringInvocationState,
   onProgress?: StreamCallback
 ): Promise<void> {
-  const { jobDescription, originalAchievements, analysis } = state
+  const { jobDescription, originalAchievements, analysis, context } = state
 
-  onProgress?.({ content: 'Extracting JD keywords...', done: false })
-  // Stage 2a: Extract missing JD keywords
-  const keywordExtractionPrompt =
-    `Job Description:\n${jobDescription}\n\n` +
-    `Original Achievements:\n${originalAchievements.join('\n')}\n\n` +
-    `Identify JD keywords missing from the achievements for ATS optimization.`
+  let extractedKeywords: KeywordExtractionResult
 
-  await runAgentStream(
-    await agents.keywordExtractor.stream(keywordExtractionPrompt),
-    onProgress,
-    'Extracting Keywords',
-    {
-      silentText: true,
-    }
-  )
+  if (context?.keywords) {
+    onProgress?.({ content: 'Using pre-extracted JD keywords...', done: false })
+    extractedKeywords = context.keywords
+  } else {
+    onProgress?.({ content: 'Extracting JD keywords...', done: false })
+    // Stage 2a: Extract missing JD keywords
+    const keywordExtractionPrompt =
+      `Job Description:\n${jobDescription}\n\n` +
+      `Original Achievements:\n${originalAchievements.join('\n')}\n\n` +
+      `Identify JD keywords missing from the achievements for ATS optimization.`
 
-  const extractedKeywords = extractToolOutput<KeywordExtractionResult>(
-    agents.keywordExtractor.messages,
-    'finalize_keyword_extraction',
-    {
-      missingKeywords: [],
-      criticalKeywords: [],
-      niceToHaveKeywords: [],
-    }
-  )
+    await runAgentStream(
+      await agents.keywordExtractor.stream(keywordExtractionPrompt),
+      onProgress,
+      'Extracting Keywords',
+      {
+        silentText: true,
+      }
+    )
+
+    extractedKeywords = extractToolOutput<KeywordExtractionResult>(
+      agents.keywordExtractor.messages,
+      'finalize_keyword_extraction',
+      {
+        missingKeywords: [],
+        criticalKeywords: [],
+        niceToHaveKeywords: [],
+      }
+    )
+  }
 
   onProgress?.({ content: 'Classifying keywords for achievements...', done: false })
 

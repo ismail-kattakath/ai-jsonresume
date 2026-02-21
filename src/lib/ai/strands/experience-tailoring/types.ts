@@ -1,3 +1,5 @@
+import { KeywordExtractionResult, OptimizationContext } from '@/lib/ai/strands/types'
+
 /**
  * Result of the experience tailoring process.
  */
@@ -5,15 +7,6 @@ export interface ExperienceTailoringResult {
   description: string
   achievements: string[]
   techStack?: string[]
-}
-
-/**
- * Structured output from the keyword extractor agent.
- */
-export interface KeywordExtractionResult {
-  missingKeywords: string[]
-  criticalKeywords: string[]
-  niceToHaveKeywords: string[]
 }
 
 /**
@@ -50,4 +43,5 @@ export interface TailoringInvocationState {
   rewrittenDescription?: string
   rewrittenAchievements?: string[]
   finalTechStack?: string[]
+  context?: OptimizationContext
 }

@@ -1,4 +1,4 @@
-import { AgentConfig } from '@/lib/ai/strands/types'
+import { AgentConfig, OptimizationContext, KeywordExtractionResult } from '@/lib/ai/strands/types'
 import { analyzeJobDescriptionGraph } from '@/lib/ai/strands/jd-refinement-graph'
 import { generateJobTitleGraph } from '@/lib/ai/strands/job-title-graph'
 import { generateSummaryGraph } from '@/lib/ai/strands/summary-graph'
@@ -6,6 +6,8 @@ import { tailorExperienceToJDGraph } from '@/lib/ai/strands/experience-tailoring
 import { sortSkillsGraph } from '@/lib/ai/strands/skills-sorting-graph'
 import { extractSkillsGraph } from '@/lib/ai/strands/skills-extraction-graph'
 import { generateCoverLetterGraph } from '@/lib/ai/strands/cover-letter-graph'
+import { createTailoringAgents } from '@/lib/ai/strands/experience-tailoring/agents'
+import { runAgentStream, extractToolOutput } from '@/lib/ai/strands/experience-tailoring/utils'
 import type { ResumeData, WorkExperience, SkillGroup } from '@/types'
 
 /**
@@ -23,6 +25,7 @@ export interface PipelineProgress {
   workExperiences?: WorkExperience[]
   skills?: SkillGroup[]
   coverLetter?: string
+  extractedSkills?: string
 }
 
 /**
@@ -35,15 +38,31 @@ export interface PipelineResult {
   workExperiences: WorkExperience[]
   skills: SkillGroup[]
   coverLetter: string
+  extractedSkills: string
 }
 
 /**
- * Orchestrates all AI generation jobs sequentially:
- * 1. Refine Job Description
- * 2. Generate Summary (using refined JD)
- * 3. Tailor each Work Experience (using refined JD)
+ * Orchestrates all AI generation jobs in 4 optimised parallel phases:
  *
- * Sequential execution reduces load on AI model and prevents rate limiting.
+ * Phase 1 (parallel):
+ *   - Refine Job Description
+ *   - Extract Skills from raw JD (only needs raw JD, no dependency on refinement)
+ *
+ * Phase 2a (parallel, after refined JD ready):
+ *   - Generate Job Title
+ *   - Pre-extract JD keywords (once, shared across all work experiences)
+ *
+ * Phase 2b (parallel, after Phase 2a):
+ *   - Generate Summary
+ *   - Sort Skills
+ *   - Tailor each Work Experience (serial within this sub-task to avoid rate limiting)
+ *
+ * Phase 3 (sequential, after Phase 2b):
+ *   - Generate Cover Letter (genuinely depends on all prior outputs)
+ *
+ * This design eliminates redundant JD keyword extraction (was N+1 calls, now 1),
+ * removes unnecessary sequential blocking between independent graphs, and preserves
+ * the ability to call each individual graph standalone from UI buttons.
  */
 export async function runAIGenerationPipeline(
   resumeData: ResumeData,
@@ -52,155 +71,227 @@ export async function runAIGenerationPipeline(
   onProgress?: (progress: PipelineProgress) => void
 ): Promise<PipelineResult> {
   const workExperiences = resumeData.workExperience || []
-  const totalSteps = 6 + workExperiences.length
+
+  // Step count: Phase1(2) + Phase2a(2) + Phase2b(1+1+N) + Phase3(1)
+  const totalSteps = 7 + workExperiences.length
   let currentStep = 0
 
-  // 1. JD Refinement
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 1 (parallel): JD Refinement  +  Skills Extraction
+  //   extractSkillsGraph only needs the raw JD, so it can start immediately.
+  //   Running it here saves N_experiences × tailoring_time of waiting later.
+  // ─────────────────────────────────────────────────────────────────────────
   currentStep++
+  const phase1Step = currentStep
   onProgress?.({
-    currentStep,
+    currentStep: phase1Step,
     totalSteps,
-    message: 'Refining job description...',
+    message: 'Analyzing job description & extracting skills (parallel)...',
     done: false,
   })
 
-  const refinedJD = await analyzeJobDescriptionGraph(jobDescription, config, (progress) => {
-    if (progress.content && !progress.done) {
-      onProgress?.({
-        currentStep,
-        totalSteps,
-        message: progress.content,
-        done: false,
-      })
-    }
-  })
+  const [refinedJD, extractedSkills] = await Promise.all([
+    analyzeJobDescriptionGraph(jobDescription, config, (progress) => {
+      if (progress.content && !progress.done) {
+        onProgress?.({
+          currentStep: phase1Step,
+          totalSteps,
+          message: progress.content,
+          done: false,
+        })
+      }
+    }),
+    extractSkillsGraph(jobDescription, config),
+  ])
 
-  // 2. Job Title
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 2a (parallel): Job Title  +  JD Keyword Extraction
+  //   Both depend only on refinedJD and produce independent outputs.
+  //   Pre-extracting keywords ONCE here means every tailorExperienceToJDGraph
+  //   call receives them via OptimizationContext and skips its own extraction.
+  // ─────────────────────────────────────────────────────────────────────────
   currentStep++
+  const phase2aStep = currentStep
   onProgress?.({
-    currentStep,
+    currentStep: phase2aStep,
     totalSteps,
-    message: 'Generating job title...',
-    done: false,
-    refinedJD,
-  })
-
-  const jobTitle = await generateJobTitleGraph(resumeData, refinedJD, config, (progress) => {
-    if (progress.content && !progress.done) {
-      onProgress?.({
-        currentStep,
-        totalSteps,
-        message: progress.content,
-        done: false,
-        refinedJD,
-      })
-    }
-  })
-
-  // 3. Summary
-  currentStep++
-  onProgress?.({
-    currentStep,
-    totalSteps,
-    message: 'Generating summary...',
+    message: 'Generating job title & analyzing JD keywords (parallel)...',
     done: false,
     refinedJD,
-    jobTitle,
+    extractedSkills,
   })
 
-  const summary = await generateSummaryGraph(resumeData, refinedJD, config, (progress) => {
-    if (progress.content && !progress.done) {
-      onProgress?.({
-        currentStep,
-        totalSteps,
-        message: progress.content,
-        done: false,
-        refinedJD,
-        jobTitle,
-      })
-    }
-  })
+  const tailoringAgents = createTailoringAgents(config)
+  const allAchievements = workExperiences.flatMap((exp) => (exp.keyAchievements || []).map((a) => a.text))
 
-  // 4. Experience Tailoring (Serial)
-  const tailoredExperiences: WorkExperience[] = []
-  for (let i = 0; i < workExperiences.length; i++) {
-    currentStep++
-    const exp = workExperiences[i]!
-    onProgress?.({
-      currentStep,
-      totalSteps,
-      message: `Tailoring ${exp.organization} experience (${i + 1}/${workExperiences.length})...`,
-      done: false,
-      refinedJD,
-      jobTitle,
-      summary,
-      workExperiences: [...tailoredExperiences, ...workExperiences.slice(i)],
-    })
+  const keywordExtractionPrompt =
+    `Job Description:\n${refinedJD}\n\n` +
+    `Overall Resume Achievements:\n${allAchievements.join('\n')}\n\n` +
+    `Identify JD keywords missing from the achievements for ATS optimization.`
 
-    const tailored = await tailorExperienceToJDGraph(
-      exp.description,
-      (exp.keyAchievements || []).map((a) => a.text),
-      jobTitle, // Use generated job title as position context
-      exp.organization,
-      refinedJD,
-      exp.technologies,
-      config,
-      (progress) => {
-        if (progress.content && !progress.done) {
+  const [jobTitle] = await Promise.all([
+    generateJobTitleGraph(resumeData, refinedJD, config, (progress) => {
+      if (progress.content && !progress.done) {
+        onProgress?.({
+          currentStep: phase2aStep,
+          totalSteps,
+          message: progress.content,
+          done: false,
+          refinedJD,
+          extractedSkills,
+        })
+      }
+    }),
+    runAgentStream(
+      await tailoringAgents.keywordExtractor.stream(keywordExtractionPrompt),
+      (p) => {
+        if (p.content && !p.done) {
           onProgress?.({
-            currentStep,
+            currentStep: phase2aStep,
             totalSteps,
-            message: progress.content,
+            message: `JD Strategy: ${p.content}`,
             done: false,
             refinedJD,
-            jobTitle,
-            summary,
-            workExperiences: [...tailoredExperiences, ...workExperiences.slice(i)],
+            extractedSkills,
           })
         }
-      }
-    )
+      },
+      'Extracting Keywords',
+      { silentText: true }
+    ),
+  ])
 
-    tailoredExperiences.push({
-      ...exp,
-      description: tailored.description,
-      keyAchievements: tailored.achievements.map((text) => ({ text })),
-      technologies: tailored.techStack,
-    })
+  const extractedKeywords = extractToolOutput<KeywordExtractionResult>(
+    tailoringAgents.keywordExtractor.messages,
+    'finalize_keyword_extraction',
+    {
+      missingKeywords: [],
+      criticalKeywords: [],
+      niceToHaveKeywords: [],
+    }
+  )
+
+  const optimizationContext: OptimizationContext = {
+    refinedJD,
+    keywords: extractedKeywords,
+    extractedSkills,
+    jobTitle,
   }
 
-  // 5. Skills Sorting
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 2b (parallel): Summary  +  Skills Sorting  +  Experience Tailoring
+  //   All three depend on refinedJD + jobTitle + keywords, but are fully
+  //   independent of each other.
+  //   • Summary and Skills Sorting run concurrently.
+  //   • Experience Tailoring loop remains serial to avoid rate limiting,
+  //     but now runs in parallel with Summary and Skills Sorting.
+  // ─────────────────────────────────────────────────────────────────────────
   currentStep++
+  const phase2bBaseStep = currentStep
   onProgress?.({
-    currentStep,
+    currentStep: phase2bBaseStep,
     totalSteps,
-    message: 'Sorting skills...',
+    message: 'Generating summary, sorting skills & tailoring experiences (parallel)...',
     done: false,
     refinedJD,
     jobTitle,
-    summary,
-    workExperiences: tailoredExperiences,
+    extractedSkills,
   })
 
-  const skillsResult = await sortSkillsGraph(resumeData.skills || [], refinedJD, config, (progress) => {
-    if (progress.content && !progress.done) {
+  // Serial experience tailoring sub-task (runs concurrently with summary + skills)
+  const tailoringTask = async (): Promise<WorkExperience[]> => {
+    const tailored: WorkExperience[] = []
+    for (let i = 0; i < workExperiences.length; i++) {
+      const exp = workExperiences[i]
+      if (!exp) continue
+      const expStep = phase2bBaseStep + 2 + i // after summary step and skills step
+      currentStep = expStep
       onProgress?.({
-        currentStep,
+        currentStep: expStep,
         totalSteps,
-        message: progress.content,
+        message: `Tailoring ${exp.organization} experience (${i + 1}/${workExperiences.length})...`,
         done: false,
         refinedJD,
         jobTitle,
-        summary,
-        workExperiences: tailoredExperiences,
+        extractedSkills,
+        workExperiences: [...tailored, ...workExperiences.slice(i)],
+      })
+
+      const result = await tailorExperienceToJDGraph(
+        exp.description,
+        (exp.keyAchievements || []).map((a) => a.text),
+        jobTitle,
+        exp.organization,
+        refinedJD,
+        exp.technologies,
+        config,
+        (progress) => {
+          if (progress.content && !progress.done) {
+            onProgress?.({
+              currentStep: expStep,
+              totalSteps,
+              message: progress.content,
+              done: false,
+              refinedJD,
+              jobTitle,
+              extractedSkills,
+              workExperiences: [...tailored, ...workExperiences.slice(i)],
+            })
+          }
+        },
+        optimizationContext
+      )
+
+      tailored.push({
+        ...exp,
+        description: result.description,
+        keyAchievements: result.achievements.map((text) => ({ text })),
+        technologies: result.techStack,
       })
     }
-  })
+    return tailored
+  }
+
+  const summaryStep = phase2bBaseStep
+  const skillsSortStep = phase2bBaseStep + 1
+
+  const [summary, skillsResult, tailoredExperiences] = await Promise.all([
+    generateSummaryGraph(resumeData, refinedJD, config, (progress) => {
+      if (progress.content && !progress.done) {
+        onProgress?.({
+          currentStep: summaryStep,
+          totalSteps,
+          message: progress.content,
+          done: false,
+          refinedJD,
+          jobTitle,
+          extractedSkills,
+        })
+      }
+    }),
+    sortSkillsGraph(resumeData.skills || [], refinedJD, config, (progress) => {
+      if (progress.content && !progress.done) {
+        onProgress?.({
+          currentStep: skillsSortStep,
+          totalSteps,
+          message: progress.content,
+          done: false,
+          refinedJD,
+          jobTitle,
+          extractedSkills,
+        })
+      }
+    }),
+    tailoringTask(),
+  ])
 
   // Transform SkillsSortResult back to SkillGroup[]
   const sortedSkills: SkillGroup[] = skillsResult.groupOrder.map((groupTitle) => {
     const originalGroup = resumeData.skills?.find((g) => g.title === groupTitle)
-    const skillsInGroup = skillsResult.skillOrder[groupTitle] || []
+    const skillsInGroup =
+      (Object.prototype.hasOwnProperty.call(skillsResult.skillOrder, groupTitle)
+        ? skillsResult.skillOrder[groupTitle]
+        : []) || []
     return {
       title: groupTitle,
       skills: skillsInGroup.map((skillText) => ({
@@ -210,38 +301,12 @@ export async function runAIGenerationPipeline(
     }
   })
 
-  // 6. Skills Extraction
-  currentStep++
-  onProgress?.({
-    currentStep,
-    totalSteps,
-    message: 'Extracting keywords...',
-    done: false,
-    refinedJD,
-    jobTitle,
-    summary,
-    workExperiences: tailoredExperiences,
-    skills: sortedSkills,
-  })
-
-  const _extractedKeywords = await extractSkillsGraph(refinedJD, config, (progress) => {
-    if (progress.content && !progress.done) {
-      onProgress?.({
-        currentStep,
-        totalSteps,
-        message: progress.content,
-        done: false,
-        refinedJD,
-        jobTitle,
-        summary,
-        workExperiences: tailoredExperiences,
-        skills: sortedSkills,
-      })
-    }
-  })
-
-  // 7. Cover Letter (User listed as #8)
-  currentStep++
+  // ─────────────────────────────────────────────────────────────────────────
+  // PHASE 3 (sequential): Cover Letter
+  //   Genuinely needs all prior outputs: tailored experiences, sorted skills,
+  //   summary, and job title.
+  // ─────────────────────────────────────────────────────────────────────────
+  currentStep = totalSteps - 1
   onProgress?.({
     currentStep,
     totalSteps,
@@ -252,6 +317,7 @@ export async function runAIGenerationPipeline(
     summary,
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
+    extractedSkills,
   })
 
   const coverLetter = await generateCoverLetterGraph(
@@ -270,6 +336,7 @@ export async function runAIGenerationPipeline(
           summary,
           workExperiences: tailoredExperiences,
           skills: sortedSkills,
+          extractedSkills,
         })
       }
     }
@@ -286,6 +353,7 @@ export async function runAIGenerationPipeline(
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
     coverLetter,
+    extractedSkills,
   })
 
   return {
@@ -295,5 +363,6 @@ export async function runAIGenerationPipeline(
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
     coverLetter,
+    extractedSkills,
   }
 }
