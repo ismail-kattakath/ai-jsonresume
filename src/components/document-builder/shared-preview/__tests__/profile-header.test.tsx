@@ -118,6 +118,27 @@ describe('ProfileHeader Component', () => {
       expect(githubLink).toHaveAttribute('aria-label', 'GitHub')
       expect(githubLink).toHaveAttribute('title', 'GitHub')
     })
+
+    it('renders nationality and visa status in correct format', () => {
+      const dataWithNationality = {
+        ...mockResumeData,
+        nationality: 'Indian',
+        visaStatus: 'H1B',
+      }
+      renderWithContext(dataWithNationality)
+      expect(screen.getByText('Indian')).toBeInTheDocument()
+      expect(screen.getByText('H1B')).toBeInTheDocument()
+      // Verify they are rendered together (implied by existence in this specific test setup)
+    })
+
+    it('does not render visa status if nationality is missing', () => {
+      const dataWithOnlyVisa = {
+        ...mockResumeData,
+        visaStatus: 'H1B',
+      }
+      renderWithContext(dataWithOnlyVisa)
+      expect(screen.queryByText('H1B')).not.toBeInTheDocument()
+    })
   })
 
   describe('ContentEditable', () => {
@@ -151,7 +172,7 @@ describe('ProfileHeader Component', () => {
   describe('Social Media Editing', () => {
     it('updates social media link when edited and blurred', () => {
       const { container } = renderWithContext()
-      const links = container.querySelectorAll('.grid a')
+      const links = container.querySelectorAll('.social-media-container a')
       const githubLink = links[0] as HTMLElement
 
       // Simulate editing the link
@@ -185,7 +206,7 @@ describe('ProfileHeader Component', () => {
         socialMedia: undefined as unknown as ResumeData['socialMedia'],
       }
       const { container } = renderWithContext(dataWithoutSocial)
-      expect(container.querySelector('.grid')).toBeInTheDocument()
+      expect(container.querySelector('.social-media-container')).toBeInTheDocument()
     })
 
     it('renders all supported social media icons', () => {
@@ -215,13 +236,13 @@ describe('ProfileHeader Component', () => {
   describe('Accessibility', () => {
     it('has proper aria-label for social media links', () => {
       const { container } = renderWithContext()
-      const links = container.querySelectorAll('.grid a')
+      const links = container.querySelectorAll('.social-media-container a')
       expect(links[0]).toHaveAttribute('aria-label', 'GitHub')
     })
 
     it('opens social media links in new tab', () => {
       const { container } = renderWithContext()
-      const links = container.querySelectorAll('.grid a')
+      const links = container.querySelectorAll('.social-media-container a')
       expect(links[0]).toHaveAttribute('target', '_blank')
       expect(links[0]).toHaveAttribute('rel', 'noreferrer')
     })

@@ -1,10 +1,4 @@
 import {
-  FaGithub,
-  FaLinkedin,
-  FaTwitter,
-  FaFacebook,
-  FaInstagram,
-  FaYoutube,
   FaBold,
   FaItalic,
   FaPlus,
@@ -13,14 +7,10 @@ import {
   FaAlignCenter,
   FaAlignRight,
   FaUnderline,
-  FaGlobe,
 } from 'react-icons/fa'
-import { MdEmail, MdLocationOn, MdPhone, MdPublic, MdWorkOutline } from 'react-icons/md'
 import Skills from '@/components/resume/preview/skills'
 import DateRange from '@/lib/utils/date-range'
-import ContactInfo from '@/components/document-builder/shared-preview/contact-info'
 import { formatUrl } from '@/lib/utils/format-url'
-import Image from 'next/image'
 import React, { useContext } from 'react'
 import { ResumeContext } from '@/lib/contexts/document-context'
 import { splitTextIntoSentences } from '@/lib/utils/string-helpers'
@@ -30,6 +20,7 @@ import Certification from '@/components/resume/preview/certification'
 import useKeyboardShortcut from '@/hooks/use-keyboard-shortcut'
 import { useAISettings } from '@/lib/contexts/ai-settings-context'
 import { Highlight } from '@/components/ui/highlight'
+import ProfileHeader from '@/components/document-builder/shared-preview/profile-header'
 import type { DropResult } from '@hello-pangea/dnd'
 
 const DragDropContext = dynamic(
@@ -64,15 +55,6 @@ const HighlightMenu = dynamic(
 const Preview = () => {
   const { settings } = useAISettings()
   const { resumeData, setResumeData, editable = true } = useContext(ResumeContext)
-  const icons = [
-    { name: 'github', icon: <FaGithub /> },
-    { name: 'linkedin', icon: <FaLinkedin /> },
-    { name: 'twitter', icon: <FaTwitter /> },
-    { name: 'facebook', icon: <FaFacebook /> },
-    { name: 'instagram', icon: <FaInstagram /> },
-    { name: 'youtube', icon: <FaYoutube /> },
-    { name: 'website', icon: <FaGlobe /> },
-  ]
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source } = result
@@ -188,79 +170,8 @@ const Preview = () => {
           )}
         />
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="relative mb-2 flex flex-col items-center border-b-2 border-dashed border-gray-300 pb-1">
-            {resumeData.profilePicture && resumeData.profilePicture.length > 0 && (
-              <div className="absolute top-0 left-0 h-24 w-24 overflow-hidden border border-[black]">
-                <Image
-                  src={resumeData.profilePicture}
-                  alt="profile"
-                  width={100}
-                  height={100}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            )}
-            <h1 className="name editable" contentEditable={editable} suppressContentEditableWarning>
-              {resumeData.name}
-            </h1>
-            <h2 className="profession editable" contentEditable={editable} suppressContentEditableWarning>
-              {resumeData.position}
-            </h2>
-            <ContactInfo
-              mainclass="flex flex-row gap-4 mb-1 contact"
-              linkclass="inline-flex items-center gap-1"
-              teldata={resumeData.contactInformation}
-              emaildata={resumeData.email}
-              addressdata={resumeData.address}
-              nationalitydata={resumeData.nationality}
-              visadata={resumeData.visaStatus}
-              telicon={<MdPhone />}
-              emailicon={<MdEmail />}
-              addressicon={<MdLocationOn />}
-              nationalityicon={<MdPublic />}
-              visaicon={<MdWorkOutline />}
-            />
-            <div className="social-media-container mb-1 flex flex-row gap-4">
-              {resumeData.socialMedia.map((socialMedia, index) => {
-                const handleSocialMediaBlur = (e: React.FocusEvent<HTMLAnchorElement>) => {
-                  const newSocialMedia = [...resumeData.socialMedia]
-                  const item = newSocialMedia[index]
-                  if (item) {
-                    item.link = e.target.innerText
-                    setResumeData({
-                      ...resumeData,
-                      socialMedia: newSocialMedia,
-                    })
-                  }
-                }
-
-                return (
-                  <a
-                    href={formatUrl(socialMedia.link)}
-                    aria-label={socialMedia.socialMedia}
-                    key={index}
-                    title={socialMedia.socialMedia}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="content align-center editable inline-flex items-center justify-center gap-1 text-blue-700 hover:underline"
-                    contentEditable={editable}
-                    suppressContentEditableWarning
-                    onBlur={handleSocialMediaBlur}
-                    // Prevent text overflowing, If the socialMedia.link string is longer than 32 characters, apply the wordWrap and display styles to this <a> tag.
-                    // wordWrap: "break-word" breaks the text onto the next line if it's too long,
-                    // display: "inline-block" is necessary for wordWrap to work on an inline element like <a>.
-                  >
-                    {icons.map((icon, index) => {
-                      if (icon.name === socialMedia.socialMedia.toLowerCase()) {
-                        return <span key={index}>{icon.icon}</span>
-                      }
-                    })}
-                    {socialMedia.link}
-                  </a>
-                )
-              })}
-            </div>
-          </div>
+          <ProfileHeader />
+          {/* two column start */}
           {/* two column start */}
           <div className="grid grid-cols-8 gap-6">
             <div className="col-span-3 space-y-2 bg-[#fefefe]">
