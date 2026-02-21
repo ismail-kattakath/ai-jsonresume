@@ -70,7 +70,7 @@ jobs:
   build:
     name: Build
     needs: install
-    uses: ./.github/workflows/_build.yml
+    uses: ./.github/workflows/reusable-build.yml
     secrets:
       NEXT_PUBLIC_EDIT_PASSWORD_HASH: ${{ secrets.NEXT_PUBLIC_EDIT_PASSWORD_HASH }}
       NEXT_PUBLIC_HF_TOKEN: ${{ secrets.NEXT_PUBLIC_HF_TOKEN }}
