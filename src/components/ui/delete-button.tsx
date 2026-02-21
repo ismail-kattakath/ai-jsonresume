@@ -1,5 +1,5 @@
 import React from 'react'
-import { MdDelete } from 'react-icons/md'
+import { FaTrash } from 'react-icons/fa'
 import { BaseButton } from './base-button'
 
 interface DeleteButtonProps {
@@ -19,7 +19,7 @@ export function DeleteButton({ onClick, label = 'Delete', className = '' }: Dele
       onClick={onClick}
       variant="danger"
       size="md"
-      icon={<MdDelete className="text-xl" />}
+      icon={<FaTrash className="text-xl" />}
       title={label}
       className={className}
     />

@@ -7,7 +7,7 @@ import { useSkillGroupsManagement } from '@/hooks/use-skill-groups-management'
 import { useAccordion } from '@/hooks/use-accordion'
 import { sortSkillsGraph, extractSkillsGraph } from '@/lib/ai/strands/agent'
 import { toast } from 'sonner'
-import { MdAddCircle } from 'react-icons/md'
+import { FaPlusCircle } from 'react-icons/fa'
 import { DnDContext, DnDDroppable, DnDDraggable } from '@/components/ui/drag-and-drop'
 import { AccordionCard } from '@/components/ui/accordion-card'
 import { SkillGroupHeader } from './skill-group-header'
@@ -279,7 +279,7 @@ export function SkillsSection() {
             data-tooltip-id="app-tooltip"
             data-tooltip-content={tooltips.skills.addGroup}
           >
-            <MdAddCircle className="text-lg" />
+            <FaPlusCircle className="text-lg" />
             <span>Add Skill Group</span>
           </button>
           <AIActionButton

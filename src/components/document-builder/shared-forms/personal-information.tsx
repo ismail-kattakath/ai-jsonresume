@@ -87,14 +87,49 @@ const PersonalInformation = ({}) => {
           <label className="floating-label">Visa Status</label>
         </div>
         <div className="floating-label-group md:col-span-2">
-          <input
-            type="file"
-            name="profileImage"
-            accept="image/*"
-            className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white transition-all outline-none file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-blue-600 file:to-cyan-600 file:px-4 file:py-2 file:text-white file:transition-shadow file:hover:shadow-lg focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20"
-            onChange={handleProfilePicture}
-            placeholder="Profile Picture"
-          />
+          <div className="relative flex w-full items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 transition-all focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400/20">
+            <div className="relative overflow-hidden">
+              <input
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                onChange={handleProfilePicture}
+              />
+              <button
+                type="button"
+                className="rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 text-sm font-medium text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
+              >
+                Choose File
+              </button>
+            </div>
+            <span className="flex-1 truncate text-sm text-white/70">
+              {resumeData.profilePicture ? 'Picture loaded' : 'No file chosen'}
+            </span>
+            {resumeData.profilePicture && (
+              <button
+                type="button"
+                onClick={() => setResumeData({ ...resumeData, profilePicture: '' })}
+                className="rounded-full bg-red-500/20 p-1.5 text-red-400 transition-colors hover:bg-red-500/30"
+                title="Clear photo"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            )}
+          </div>
           <label className="floating-label">Photo</label>
         </div>
       </div>

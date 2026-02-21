@@ -13,7 +13,6 @@ interface ContactInfoProps {
   nationalitydata?: string
   visadata?: string
   nationalityicon?: React.ReactNode
-  visaicon?: React.ReactNode
 }
 
 const ContactInfo = ({
@@ -28,7 +27,6 @@ const ContactInfo = ({
   nationalitydata = '',
   visadata = '',
   nationalityicon,
-  visaicon,
 }: ContactInfoProps) => {
   const { resumeData, setResumeData, editable = true } = useContext(ResumeContext)
 
@@ -101,26 +99,33 @@ const ContactInfo = ({
         </a>
       )}
       {nationalitydata && nationalitydata.trim() !== '' && (
-        <a
-          aria-label="Nationality"
-          className={`${linkclass} editable`}
-          contentEditable={editable}
-          suppressContentEditableWarning
-          onBlur={handleNationalityBlur}
-        >
-          {nationalityicon} {nationalitydata}
-        </a>
-      )}
-      {visadata && visadata.trim() !== '' && (
-        <a
-          aria-label="Visa Status"
-          className={`${linkclass} editable`}
-          contentEditable={editable}
-          suppressContentEditableWarning
-          onBlur={handleVisaBlur}
-        >
-          {visaicon} {visadata}
-        </a>
+        <div className={`${linkclass} inline-flex items-center`}>
+          {nationalityicon}
+          <span
+            className="editable"
+            contentEditable={editable}
+            suppressContentEditableWarning
+            onBlur={handleNationalityBlur}
+            aria-label="Nationality"
+          >
+            {nationalitydata}
+          </span>
+          {visadata && visadata.trim() !== '' && (
+            <span className="flex items-center">
+              (
+              <span
+                className="editable"
+                contentEditable={editable}
+                suppressContentEditableWarning
+                onBlur={handleVisaBlur}
+                aria-label="Visa Status"
+              >
+                {visadata}
+              </span>
+              )
+            </span>
+          )}
+        </div>
       )}
     </div>
   )

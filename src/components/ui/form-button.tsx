@@ -1,4 +1,4 @@
-import { MdAddCircle, MdRemoveCircle } from 'react-icons/md'
+import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa'
 import { BaseButton } from './base-button'
 
 interface FormButtonProps {
@@ -17,7 +17,7 @@ const FormButton = ({ size, remove, add, label = 'Item' }: FormButtonProps) => {
         aria-label={`Add ${label}`}
         variant="red"
         size="sm"
-        icon={<MdAddCircle className="text-lg" />}
+        icon={<FaPlusCircle className="text-lg" />}
       >
         Add {label}
       </BaseButton>
@@ -28,7 +28,7 @@ const FormButton = ({ size, remove, add, label = 'Item' }: FormButtonProps) => {
           aria-label={`Remove ${label}`}
           variant="red"
           size="sm"
-          icon={<MdRemoveCircle className="text-lg" />}
+          icon={<FaMinusCircle className="text-lg" />}
         >
           Remove {label}
         </BaseButton>

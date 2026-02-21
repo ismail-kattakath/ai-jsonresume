@@ -1,6 +1,6 @@
 'use client'
 
-import { MdPictureAsPdf } from 'react-icons/md'
+import { FaFilePdf } from 'react-icons/fa'
 import { SiMarkdown } from 'react-icons/si'
 import { generatePDFFilename } from '@/lib/filename-generator'
 import { convertResumeToMarkdown } from '@/lib/exporters/markdown-exporter'
@@ -79,9 +79,7 @@ export default function PrintButton({
         aria-label="Print to PDF"
         className={`group inline-flex cursor-pointer items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 text-xs font-medium text-white transition-all hover:scale-[1.02] hover:from-purple-700 hover:to-pink-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none active:scale-[0.98] ${isUnified ? 'flex-1 justify-center rounded-l-xl' : 'rounded-l-full md:px-6'}`}
       >
-        <MdPictureAsPdf
-          className={`${isUnified ? 'text-base' : 'text-lg'} transition-transform group-hover:scale-110`}
-        />
+        <FaFilePdf className={`${isUnified ? 'text-base' : 'text-lg'} transition-transform group-hover:scale-110`} />
         <span className={isUnified ? 'hidden' : 'hidden md:inline'}>Print</span>
       </button>
 
