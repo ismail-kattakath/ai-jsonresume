@@ -13,6 +13,7 @@ test_results.json
 lint*.json
 *_report.*
 jsdoc_warnings.txt
+audit.json
 
 src/data/resume.json
 # Environment variables (ignore all except example)
