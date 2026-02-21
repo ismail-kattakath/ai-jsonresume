@@ -8,7 +8,6 @@ import type { ResumeData } from '@/types/resume'
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>) => {
-    // eslint-disable-next-line @next/next/no-img-element
     return <img {...props} />
   },
 }))

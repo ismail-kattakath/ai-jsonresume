@@ -24,7 +24,7 @@ interface UseArrayFormOptions<T> {
  *   endYear: '',
  * }, { urlFields: ['url'] })
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function useArrayForm<T extends Record<string, any>>(
   dataKey: keyof ResumeData,
   initialItem: T,
@@ -32,7 +32,7 @@ export function useArrayForm<T extends Record<string, any>>(
 ) {
   const context = useContext(ResumeContext)
   const { resumeData, setResumeData } = context
-  // eslint-disable-next-line security/detect-object-injection
+
   const data = (resumeData[dataKey] as unknown as T[]) || []
 
   /**

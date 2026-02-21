@@ -7,7 +7,7 @@ import { useAISettings } from '@/lib/contexts/ai-settings-context'
 import { ResumeContext } from '@/lib/contexts/document-context'
 import { sortAchievementsGraph } from '@/lib/ai/strands/agent'
 import { toast } from 'sonner'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
 // @ts-ignore
 import { DropResult } from '@hello-pangea/dnd'
 import { DnDContext } from '@/components/ui/drag-and-drop'
