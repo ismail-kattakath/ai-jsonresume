@@ -8,7 +8,7 @@ import type { Certification } from '@/types'
  */
 export function useSimpleArrayForm(dataKey: 'certifications' | 'languages') {
   const { resumeData, setResumeData } = useContext(ResumeContext)
-  // eslint-disable-next-line security/detect-object-injection
+
   const rawData = resumeData[dataKey] || []
 
   // Map to strings for the UI

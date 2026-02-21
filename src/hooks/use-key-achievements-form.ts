@@ -9,7 +9,6 @@ import type { Achievement } from '@/types'
 export function useKeyAchievementsForm(workExperienceIndex: number) {
   const { resumeData, setResumeData } = useContext(ResumeContext)
 
-  // eslint-disable-next-line security/detect-object-injection
   const workExperience = resumeData.workExperience[workExperienceIndex]
 
   if (!workExperience) {

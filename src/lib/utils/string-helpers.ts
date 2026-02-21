@@ -60,7 +60,6 @@ export function splitTextIntoSentences(text: string): string[] {
   const spaceAfterPunct = `${abbrevRegex}${initialRegex}${punctuationRegex}\\s+(?=[A-Z"\\-•*\\d])`
   const newlineSplit = '\\s*\\n+\\s*'
 
-  // eslint-disable-next-line security/detect-non-literal-regexp
   const pattern = new RegExp(`(${spaceAfterPunct}|${newlineSplit})`, 'g')
 
   return (
