@@ -232,9 +232,13 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
 
   // Reset all data
   const resetAll = useCallback(() => {
-    localStorage.removeItem('jsonresume_ai_credentials')
+    // Preserve credentials: remove resumeData but keep jsonresume_ai_credentials
     localStorage.removeItem('resumeData')
-    setSettings(defaultSettings)
+    setSettings((prev) => ({
+      ...prev,
+      jobDescription: DEFAULT_JOB_DESCRIPTION,
+      skillsToHighlight: '',
+    }))
     setConnectionStatus('idle')
     setJobDescriptionStatus('idle')
     lastValidatedJD.current = ''

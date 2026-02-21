@@ -164,7 +164,7 @@ const ImportExport = ({
 
     if (
       window.confirm(
-        'Are you sure you want to reset EVERYTHING? This will clear your resume, AI credentials, and settings.'
+        'Are you sure you want to reset? This will clear your resume, job description, and cover letter, but your AI credentials will be preserved.'
       )
     ) {
       resetAll()
