@@ -4,7 +4,7 @@ import { convertFromJSONResume } from '../src/lib/resume-adapter';
 async function syncResumeMarkdown() {
     const gistUrl = process.env['RESUME_JSON_GIST'];
     const mdGistId = process.env['RESUME_MD_GIST'];
-    const githubToken = process.env['GH_TOKEN'] || process.env['GIST_TOKEN'];
+    const githubToken = process.env['GIST_TOKEN'];
 
     if (!gistUrl) {
         console.error('RESUME_JSON_GIST is not defined.');
@@ -31,10 +31,10 @@ async function syncResumeMarkdown() {
 
         if (!githubToken) {
             if (process.env['GITHUB_ACTIONS']) {
-                console.error('GH_TOKEN is not defined in GitHub Actions. This is required to update the Gist.');
+                console.error('GIST_TOKEN is not defined in GitHub Actions. This is required to update the Gist.');
                 process.exit(1);
             }
-            console.warn('GH_TOKEN is not defined. Printing Markdown to console instead of updating Gist.');
+            console.warn('GIST_TOKEN is not defined. Printing Markdown to console instead of updating Gist.');
             console.log('--- GENERATED MARKDOWN (Snippet) ---');
             console.log(markdown.substring(0, 500) + '...');
             console.log('------------------------------------');
