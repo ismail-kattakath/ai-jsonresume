@@ -29,23 +29,58 @@ import { Tooltip } from '@/components/ui/tooltip'
 import { BaseButton } from '@/components/ui/base-button'
 import { registerServiceWorker } from '@/lib/pwa/register-service-worker'
 
+import { SectionSkeleton } from '@/components/ui/section-skeleton'
+
 // Dynamically import heavy components to reduce initial bundle size
-const ImportExport = dynamic(() => import('@/components/document-builder/shared-forms/import-export'))
-const AISettings = dynamic(() => import('@/components/document-builder/shared-forms/ai-settings'))
+const ImportExport = dynamic(() => import('@/components/document-builder/shared-forms/import-export'), {
+  loading: () => <SectionSkeleton />,
+})
+const AISettings = dynamic(() => import('@/components/document-builder/shared-forms/ai-settings'), {
+  loading: () => <SectionSkeleton />,
+})
 const JobDescriptionSection = dynamic(
-  () => import('@/components/document-builder/shared-forms/job-description-section')
+  () => import('@/components/document-builder/shared-forms/job-description-section'),
+  {
+    loading: () => <SectionSkeleton />,
+  }
 )
-const PersonalInformation = dynamic(() => import('@/components/document-builder/shared-forms/personal-information'))
-const SocialMedia = dynamic(() => import('@/components/document-builder/shared-forms/social-media'))
-const Summary = dynamic(() => import('@/components/resume/forms/summary'))
-const Education = dynamic(() => import('@/components/resume/forms/education'))
-const WorkExperience = dynamic(() => import('@/components/resume/forms/work-experience'))
-const SkillsSection = dynamic(() => import('@/components/resume/forms/skills-section').then((mod) => mod.SkillsSection))
-const Projects = dynamic(() => import('@/components/resume/forms/projects'))
-const AdditionalSections = dynamic(() => import('@/components/resume/forms/additional-sections'))
-const CoverLetterContent = dynamic(() => import('@/components/cover-letter/forms/cover-letter-content'))
-const Preview = dynamic(() => import('@/components/resume/preview/preview'))
-const CoverLetterPreview = dynamic(() => import('@/components/cover-letter/preview/cover-letter-preview'))
+const PersonalInformation = dynamic(() => import('@/components/document-builder/shared-forms/personal-information'), {
+  loading: () => <SectionSkeleton />,
+})
+const SocialMedia = dynamic(() => import('@/components/document-builder/shared-forms/social-media'), {
+  loading: () => <SectionSkeleton />,
+})
+const Summary = dynamic(() => import('@/components/resume/forms/summary'), {
+  loading: () => <SectionSkeleton />,
+})
+const Education = dynamic(() => import('@/components/resume/forms/education'), {
+  loading: () => <SectionSkeleton />,
+})
+const WorkExperience = dynamic(() => import('@/components/resume/forms/work-experience'), {
+  loading: () => <SectionSkeleton />,
+})
+const SkillsSection = dynamic(
+  () => import('@/components/resume/forms/skills-section').then((mod) => mod.SkillsSection),
+  {
+    loading: () => <SectionSkeleton />,
+  }
+)
+const Projects = dynamic(() => import('@/components/resume/forms/projects'), {
+  loading: () => <SectionSkeleton />,
+})
+const AdditionalSections = dynamic(() => import('@/components/resume/forms/additional-sections'), {
+  loading: () => <SectionSkeleton />,
+})
+const CoverLetterContent = dynamic(() => import('@/components/cover-letter/forms/cover-letter-content'), {
+  loading: () => <SectionSkeleton />,
+})
+import { A4Skeleton } from '@/components/ui/section-skeleton'
+const Preview = dynamic(() => import('@/components/resume/preview/preview'), {
+  loading: () => <A4Skeleton />,
+})
+const CoverLetterPreview = dynamic(() => import('@/components/cover-letter/preview/cover-letter-preview'), {
+  loading: () => <A4Skeleton />,
+})
 
 import type { ResumeData } from '@/types'
 
@@ -98,6 +133,7 @@ export function UnifiedEditor() {
 
   return (
     <>
+      <Tooltip />
       <Toaster
         position="bottom-right"
         theme="dark"
@@ -114,7 +150,6 @@ export function UnifiedEditor() {
           },
         }}
       />
-      <Tooltip />
       <AISettingsProvider>
         <ResumeContext.Provider value={currentContext}>
           <MainLayout

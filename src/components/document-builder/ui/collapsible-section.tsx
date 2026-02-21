@@ -107,7 +107,7 @@ const CollapsibleSection = ({
       <button
         type="button"
         onClick={() => !isEditing && handleToggle()}
-        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
+        className="flex min-h-[64px] w-full items-center justify-between p-4 text-left transition-colors hover:bg-white/5"
         data-tooltip-id={tooltip ? 'app-tooltip' : undefined}
         data-tooltip-content={tooltip}
       >
