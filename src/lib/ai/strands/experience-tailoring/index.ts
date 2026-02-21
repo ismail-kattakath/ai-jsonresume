@@ -1,5 +1,5 @@
 import { StreamCallback } from '@/types/openai'
-import { AgentConfig } from '@/lib/ai/strands/types'
+import { AgentConfig, OptimizationContext } from '@/lib/ai/strands/types'
 import { ExperienceTailoringResult, TailoringInvocationState } from '@/lib/ai/strands/experience-tailoring/types'
 import { createTailoringAgents } from '@/lib/ai/strands/experience-tailoring/agents'
 
@@ -34,7 +34,8 @@ export async function tailorExperienceToJDGraph(
   jobDescription: string,
   techStack: string[] = [],
   config: AgentConfig,
-  onProgress?: StreamCallback
+  onProgress?: StreamCallback,
+  context?: OptimizationContext
 ): Promise<ExperienceTailoringResult> {
   const agents = createTailoringAgents(config)
 
@@ -45,6 +46,7 @@ export async function tailorExperienceToJDGraph(
     originalDescription: description,
     originalAchievements: achievements,
     originalTechStack: techStack,
+    context,
   }
 
   // Stage 1: Analyze alignment potential & rewrite description

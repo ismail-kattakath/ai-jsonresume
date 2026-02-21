@@ -573,4 +573,49 @@ describe('convertFromJSONResume', () => {
       expect(result).toBeNull()
     })
   })
+
+  it('handles empty objects within arrays across JSON Resume', () => {
+    const jr = makeJSONResume({
+      basics: {
+        profiles: [{} as any],
+      } as any,
+      work: [{} as any],
+      education: [{} as any],
+      skills: [{} as any],
+      projects: [{} as any],
+      certificates: [{} as any],
+      languages: [{} as any],
+    })
+    const result = convertFromJSONResume(jr)
+
+    // Basics / profiles
+    expect(result?.socialMedia?.[0]?.socialMedia).toBe('')
+    expect(result?.socialMedia?.[0]?.link).toBe('')
+    expect(result?.name).toBe('')
+    expect(result?.position).toBe('')
+
+    // Work
+    expect(result?.workExperience?.[0]?.organization).toBe('')
+    expect(result?.workExperience?.[0]?.position).toBe('')
+    expect(result?.workExperience?.[0]?.description).toBe('')
+    expect(result?.workExperience?.[0]?.startYear).toBe('')
+    expect(result?.workExperience?.[0]?.endYear).toBe('Present')
+
+    // Education
+    expect(result?.education?.[0]?.school).toBe('')
+    expect(result?.education?.[0]?.area).toBe('')
+    expect(result?.education?.[0]?.studyType).toBe('')
+
+    // Skills
+    expect(result?.skills?.[0]?.title).toBe('Skills')
+
+    // Projects
+    expect(result?.projects?.[0]?.name).toBe('')
+
+    // Certs
+    expect(result?.certifications?.[0]?.name).toBe('')
+
+    // Languages
+    expect(result?.languages?.[0]).toBe('')
+  })
 })

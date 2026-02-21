@@ -55,4 +55,13 @@ describe('skillsExtractionGraph', () => {
     const result = await extractSkillsGraph('RETRY_TRIGGER', mockConfig)
     expect(result).toContain('React')
   })
+
+  it('should call onProgress if provided', async () => {
+    const onProgress = jest.fn()
+    await extractSkillsGraph('JD', mockConfig, onProgress)
+
+    expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Extracting key skills from JD...' }))
+    expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Verifying skill accuracy...' }))
+    expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ content: 'Skills extracted and verified!' }))
+  })
 })

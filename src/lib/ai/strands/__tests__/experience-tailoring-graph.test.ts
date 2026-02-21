@@ -584,4 +584,58 @@ describe('experienceTailoringGraph', () => {
     expect(validatorCallCount).toBe(2)
     expect(result.techStack).toBeDefined()
   })
+  it('should handle undefined techStack gracefully', async () => {
+    // Missing techStack argument triggers default techStack = []
+    const result = await tailorExperienceToJDGraph(
+      'Built backend services',
+      achievements,
+      'DevOps Engineer',
+      'Acme Corp',
+      'Requires Kubernetes',
+      undefined,
+      mockConfig
+    )
+    expect(result).toBeDefined()
+    expect(result.description).toBe('Tailored description')
+  })
+
+  it('should handle analyzer stage failing to produce rewritten description', async () => {
+    const { Agent } = jest.requireMock('@strands-agents/sdk') as { Agent: jest.Mock }
+    Agent.mockImplementation(({ systemPrompt }: { systemPrompt: string }) => {
+      return {
+        messages: [],
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Analysis' }),
+        stream: jest.fn().mockImplementation(async () => {
+          const sp = (systemPrompt || '').toLowerCase()
+          if (sp.includes('resume writer')) {
+            return createMockStream('') // Empty stream, won't produce rewrittenDescription
+          }
+          return createMockStream('Tailored')
+        }),
+      }
+    })
+
+    const result = await tailorExperienceToJDGraph('Original desc', achievements, 'Pos', 'Org', 'JD', [], mockConfig)
+    expect(result.description).toBe('Original desc') // Falls back to original
+  })
+
+  it('should handle achievements stage failing to produce rewritten achievements', async () => {
+    const { Agent } = jest.requireMock('@strands-agents/sdk') as { Agent: jest.Mock }
+    Agent.mockImplementation(({ systemPrompt }: { systemPrompt: string }) => {
+      return {
+        messages: [],
+        invoke: jest.fn().mockResolvedValue({ toString: () => 'Analysis' }),
+        stream: jest.fn().mockImplementation(async () => {
+          const sp = (systemPrompt || '').toLowerCase()
+          if (sp.includes('keyword enrichment capability')) {
+            return createMockStream('')
+          }
+          return createMockStream('Tailored')
+        }),
+      }
+    })
+
+    const result = await tailorExperienceToJDGraph('Desc', achievements, 'Pos', 'Org', 'JD', [], mockConfig)
+    expect(result.achievements).toEqual([]) // Output of empty string mock
+  })
 })

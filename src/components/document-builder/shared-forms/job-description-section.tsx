@@ -133,7 +133,7 @@ const JobDescriptionSection = () => {
       if (result.refinedJD || result.extractedSkills) {
         updateSettings({
           jobDescription: result.refinedJD || settings.jobDescription,
-          skillsToHighlight: result.extractedSkills || settings.skillsToHighlight
+          skillsToHighlight: result.extractedSkills || settings.skillsToHighlight,
         })
       }
 
