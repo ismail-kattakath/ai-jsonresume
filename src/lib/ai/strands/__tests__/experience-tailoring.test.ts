@@ -54,6 +54,7 @@ describe('experienceTailoringGraph', () => {
       'Dev',
       'Company',
       'JD',
+      [],
       mockConfig
     )
 
@@ -69,6 +70,7 @@ describe('experienceTailoringGraph', () => {
       'Dev',
       'Company',
       'JD',
+      [],
       mockConfig
     )
 
@@ -82,6 +84,7 @@ describe('experienceTailoringGraph', () => {
       'Dev',
       'Company',
       'JD',
+      [],
       mockConfig
     )
 

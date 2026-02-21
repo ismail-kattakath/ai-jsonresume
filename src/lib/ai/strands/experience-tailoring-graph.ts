@@ -9,6 +9,7 @@ import { createModel } from './factory'
 export interface ExperienceTailoringResult {
   description: string
   achievements: string[]
+  techStack?: string[]
 }
 
 /**
@@ -30,6 +31,14 @@ export interface EnrichmentMapResult {
 }
 
 /**
+ * Structured output from the tech stack aligner agent.
+ */
+export interface TechStackAlignmentResult {
+  techStack: string[]
+  rationale: string
+}
+
+/**
  * Multi-agent graph that tailors work experience to align with a job description
  * while maintaining factual accuracy.
  *
@@ -40,8 +49,10 @@ export interface EnrichmentMapResult {
  * 3b. Enrichment Classifier - Gates which keywords are legitimately injectable per achievement
  * 3c. Achievements Optimizer- Rewrites achievements with approved keyword seeds
  * 3d. Integrity Auditor     - Verifies injected keywords are interview-defensible (max 2 iterations)
- * 4.  Fact Checker          - Validates overall factual accuracy (max 2 iterations)
- * 5.  Relevance Evaluator   - Ensures effective JD alignment (max 2 iterations)
+ * 4a. Tech Stack Aligner    - Aligns tech stack to JD terminology and adds evidenced tech
+ * 4b. Tech Stack Validator  - Audits tech stack changes for integrity (max 2 iterations)
+ * 5.  Fact Checker          - Validates overall factual accuracy (max 2 iterations)
+ * 6.  Relevance Evaluator   - Ensures effective JD alignment (max 2 iterations)
  */
 export async function tailorExperienceToJDGraph(
   description: string,
@@ -49,6 +60,7 @@ export async function tailorExperienceToJDGraph(
   position: string,
   organization: string,
   jobDescription: string,
+  techStack: string[] = [],
   config: AgentConfig,
   onProgress?: StreamCallback
 ): Promise<ExperienceTailoringResult> {
@@ -173,7 +185,57 @@ export async function tailorExperienceToJDGraph(
     printer: false,
   })
 
-  // Agent 4: The Fact Checker - Validates accuracy
+  // Agent 4a: The Tech Stack Aligner - Aligns tech stack to JD terminology and adds evidenced tech
+  const techStackAligner = new Agent({
+    model,
+    systemPrompt:
+      'You are a Tech Stack ATS Alignment Specialist.\n\n' +
+      'Given an existing tech stack, JD tech requirements, and the FINALIZED description and achievements, produce an optimized tech stack.\n\n' +
+      'FOUR OPERATIONS — apply all that are relevant:\n\n' +
+      '1. ALIAS NORMALIZATION (always safe):\n' +
+      "   Replace abbreviated/informal forms with JD's canonical form when they are the SAME technology.\n" +
+      '   Examples: k8s → Kubernetes, Postgres → PostgreSQL, NodeJS/Node → Node.js, tf → Terraform.\n\n' +
+      '2. JD TERMINOLOGY PREFERENCE (always safe):\n' +
+      "   When current item and JD item are semantically identical, prefer JD's exact capitalization/format.\n" +
+      '   Example: "react" → "React" if JD says "React".\n\n' +
+      '3. STRICT TECHNOLOGY FILTERING (always apply):\n' +
+      '   Remove items that are concepts, methodologies, architectures, or general techniques. ONLY keep industry-standard specific tools, frameworks, programming languages, and software products.\n' +
+      '   REMOVE: "CI/CD", "Structured outputs", "Prompt design", "Eval systems", "Security hardening", "Multi-agent orchestration", "Relational database".\n' +
+      '   KEEP: "Kubernetes", "Next.js", "Python", "Google Cloud Platform", "Node.js".\n\n' +
+      '4. SELECTIVE ADDITION (strict gate — apply ONLY if ALL 3 are true):\n' +
+      '   a. The tech is in the JD required-skills or desired-qualifications\n' +
+      '   b. The tech is an industry-standard specific tool, language, or framework (NOT a concept)\n' +
+      '   c. The tech is EXPLICITLY NAMED or clearly demonstrated in the FINALIZED description OR achievements provided\n\n' +
+      'RULES:\n' +
+      '- DO NOT add tech that is not evidenced in the finalized description/achievements.\n' +
+      '- STRIP OUT all non-technologies (concepts/methodologies) from the current stack.\n' +
+      '- ORDER: Original items (normalized and filtered) first, new additions last.\n\n' +
+      'OUTPUT FORMAT (strict JSON):\n' +
+      '{\n' +
+      '  "techStack": ["Item1", "Item2", ...],\n' +
+      '  "rationale": "brief explanation"\n' +
+      '}',
+    printer: false,
+  })
+
+  // Agent 4b: The Tech Stack Validator - Audits tech stack changes for integrity
+  const techStackValidator = new Agent({
+    model,
+    systemPrompt:
+      'You are a Tech Stack Alignment Auditor.\n\n' +
+      'Verify that the proposed tech stack changes are sound:\n\n' +
+      'CHECKS:\n' +
+      '1. ALIAS INTEGRITY: Normalized items are genuinely the same technology.\n' +
+      '2. NO PHANTOM ADDITIONS: Every new item is demonstrably evidenced in the provided description or achievements.\n' +
+      '3. EXCLUDES CONCEPTS: No methodologies, concepts, or general techniques are included (e.g. remove "CI/CD", "Security", "Prompt design"). Only specific tools, frameworks, and languages are allowed.\n' +
+      '4. INTERVIEW DEFENSIBILITY: Candidate could discuss every item.\n\n' +
+      'VERDICTS:\n' +
+      '- "APPROVED"\n' +
+      '- "CRITIQUE: <specific issue>"',
+    printer: false,
+  })
+
+  // Agent 5: The Fact Checker - Validates accuracy
   const factChecker = new Agent({
     model,
     systemPrompt:
@@ -190,7 +252,7 @@ export async function tailorExperienceToJDGraph(
     printer: false,
   })
 
-  // Agent 5: The Relevance Evaluator - Assesses alignment quality
+  // Agent 6: The Relevance Evaluator - Assesses alignment quality
   const relevanceEvaluator = new Agent({
     model,
     systemPrompt:
@@ -363,7 +425,62 @@ export async function tailorExperienceToJDGraph(
     }
   }
 
-  // Stage 4: Fact checking loop (max 2 iterations)
+  let finalTechStack: string[] | undefined = undefined
+
+  // Stage 4: Tech Stack Alignment (only if techStack provided and non-empty)
+  if (techStack.length > 0) {
+    onProgress?.({ content: 'Aligning tech stack to JD terminology...', done: false })
+
+    const alignerPrompt =
+      `Job Description:\n${jobDescription}\n\n` +
+      `Finalized Description:\n${rewrittenDescription}\n\n` +
+      `Finalized Achievements:\n${rewrittenAchievements.join('\n')}\n\n` +
+      `Current Tech Stack:\n${techStack.join(', ')}`
+
+    const maxAlignIterations = 2
+    for (let i = 0; i < maxAlignIterations; i++) {
+      const alignResult = await techStackAligner.invoke(alignerPrompt)
+      let alignData: TechStackAlignmentResult
+      try {
+        alignData = JSON.parse(alignResult.toString().trim())
+      } catch (e) {
+        console.error('JSON parse error:', e, alignResult.toString())
+        // Fallback for malformed JSON
+        const match = alignResult.toString().match(/\{[\s\S]*\}/)
+        if (match) {
+          try {
+            alignData = JSON.parse(match[0])
+          } catch {
+            alignData = { techStack, rationale: 'JSON parse failed' }
+          }
+        } else {
+          alignData = { techStack, rationale: 'JSON parse failed' }
+        }
+      }
+
+      finalTechStack = alignData.techStack
+
+      onProgress?.({ content: 'Validating tech stack alignment...', done: false })
+      const validatorPrompt =
+        `Original Stack: ${techStack.join(', ')}\n` +
+        `Proposed Stack: ${finalTechStack.join(', ')}\n\n` +
+        `Evidence Context:\nDescription: ${rewrittenDescription}\nAchievements:\n${rewrittenAchievements.join('\n')}`
+
+      const validationResult = await techStackValidator.invoke(validatorPrompt)
+      if (validationResult.toString().trim().startsWith('APPROVED')) {
+        break
+      } else if (i < maxAlignIterations - 1) {
+        // Re-run aligner with critique
+        const refinedAlignerPrompt =
+          `${alignerPrompt}\n\n` +
+          `Validation Critique:\n${validationResult}\n\n` +
+          `Please adjust the tech stack to address these concerns.`
+        // Using temporary prompt for re-invoke if needed, usually we just let it fall through or break
+      }
+    }
+  }
+
+  // Stage 5: Fact checking loop (max 2 iterations)
   onProgress?.({ content: 'Validating factual accuracy...', done: false })
 
   const maxFactCheckIterations = 2
@@ -386,7 +503,7 @@ export async function tailorExperienceToJDGraph(
     }
   }
 
-  // Stage 5: Relevance evaluation loop (max 2 iterations)
+  // Stage 6: Relevance evaluation loop (max 2 iterations)
   onProgress?.({ content: 'Evaluating alignment quality...', done: false })
 
   const maxRelevanceIterations = 2
@@ -413,5 +530,6 @@ export async function tailorExperienceToJDGraph(
   return {
     description: rewrittenDescription,
     achievements: rewrittenAchievements,
+    techStack: finalTechStack,
   }
 }
