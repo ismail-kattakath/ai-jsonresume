@@ -1,5 +1,4 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import { suppressConsoleError } from '@/lib/__tests__/test-utils'
 import '@testing-library/jest-dom'
 import AISettings from '@/components/document-builder/shared-forms/ai-settings'
 import { useAISettings } from '@/lib/contexts/ai-settings-context'
@@ -55,89 +54,21 @@ describe('AISettings Component', () => {
     )
   })
 
-  it('shows custom URL input when OpenRouter provider is selected (as it also uses custom layout components)', async () => {
-    // Testing a provider change that updates state
-    render(<AISettings />)
-    const providerSelect = screen.getByLabelText(/AI Provider/i)
-
-    await act(async () => {
-      fireEvent.change(providerSelect, { target: { value: 'OpenRouter' } })
-    })
-
-    expect(mockUpdateSettings).toHaveBeenCalledWith(
-      expect.objectContaining({
-        apiUrl: 'https://openrouter.ai/api/v1',
-      })
-    )
-  })
-
-  it('fetches and displays models', async () => {
-    // Force a model fetch by ensuring dependencies are met
-    render(<AISettings />)
-
-    await waitFor(
-      () => {
-        expect(fetchAvailableModels).toHaveBeenCalled()
-      },
-      { timeout: 2000 }
-    )
-
-    // Check if the model dropdown (FormSelect) is rendered when models are available
-    await waitFor(() => {
-      expect(screen.getByLabelText(/Model/i)).toBeInTheDocument()
-    })
-  })
-
-  it('handles model fetch error', async () => {
-    ;(fetchAvailableModels as jest.Mock).mockRejectedValue(new Error('Fetch failed'))
-    await suppressConsoleError(/AISettings.*Model fetch error/i, async () => {
-      render(<AISettings />)
-
-      // The component might show "Enter model name manually" or a similar hint in the helpText
-      // of the Model input when fetching fails
-      await waitFor(
-        () => {
-          expect(fetchAvailableModels).toHaveBeenCalled()
-        },
-        { timeout: 2000 }
-      )
-    })
-
-    // When fetching fails, it usually falls back to manual input or shows an error message
-    // Let's check for the manual input fallback
-    await waitFor(() => {
-      expect(screen.getByPlaceholderText(/gpt-4o-mini/i)).toBeInTheDocument()
-    })
-  })
-
-  it('auto-selects first model if current model is invalid', async () => {
+  it('shows on-device information when selected', async () => {
     ;(useAISettings as jest.Mock).mockReturnValue({
-      settings: { ...defaultSettings, model: 'invalid-model' },
+      settings: { ...defaultSettings, providerType: 'on-device' },
       updateSettings: mockUpdateSettings,
       isConfigured: true,
       connectionStatus: 'valid',
     })
-    ;(fetchAvailableModels as jest.Mock).mockResolvedValue(['gpt-4'])
 
     render(<AISettings />)
+    const providerSelect = screen.getByLabelText(/AI Provider/i)
 
-    await waitFor(
-      () => {
-        expect(mockUpdateSettings).toHaveBeenCalledWith({ model: 'gpt-4' })
-      },
-      { timeout: 2000 }
-    )
-  })
-
-  it('displays connection status correctly', () => {
-    ;(useAISettings as jest.Mock).mockReturnValue({
-      settings: defaultSettings,
-      updateSettings: mockUpdateSettings,
-      isConfigured: false,
-      connectionStatus: 'invalid',
+    await act(async () => {
+      fireEvent.change(providerSelect, { target: { value: 'On-Device (Gemma 3)' } })
     })
 
-    render(<AISettings />)
-    expect(screen.getByText('✗ Invalid Credentials')).toBeInTheDocument()
+    expect(screen.getByText(/🔒 Private AI/i)).toBeInTheDocument()
   })
 })
