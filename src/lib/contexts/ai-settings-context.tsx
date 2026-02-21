@@ -153,7 +153,13 @@ export function AISettingsProvider({ children }: { children: ReactNode }) {
       model: settings.model,
     })
 
-    // Check if URL is present (always required)
+    // On-device provider: no network call needed — always valid
+    if (settings.providerType === 'on-device' || settings.apiUrl === 'on-device') {
+      setConnectionStatus('valid')
+      return true
+    }
+
+    // Check if URL is present (always required for cloud providers)
     if (!settings.apiUrl.trim()) {
       console.log('[AISettings] Validation failed: Missing API URL')
       setConnectionStatus('invalid')
