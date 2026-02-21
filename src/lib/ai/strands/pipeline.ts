@@ -23,6 +23,7 @@ export interface PipelineProgress {
   workExperiences?: WorkExperience[]
   skills?: SkillGroup[]
   coverLetter?: string
+  extractedSkills?: string
 }
 
 /**
@@ -35,6 +36,7 @@ export interface PipelineResult {
   workExperiences: WorkExperience[]
   skills: SkillGroup[]
   coverLetter: string
+  extractedSkills: string
 }
 
 /**
@@ -125,7 +127,8 @@ export async function runAIGenerationPipeline(
   const tailoredExperiences: WorkExperience[] = []
   for (let i = 0; i < workExperiences.length; i++) {
     currentStep++
-    const exp = workExperiences[i]!
+    const exp = workExperiences[i]
+    if (!exp) continue
     onProgress?.({
       currentStep,
       totalSteps,
@@ -200,7 +203,9 @@ export async function runAIGenerationPipeline(
   // Transform SkillsSortResult back to SkillGroup[]
   const sortedSkills: SkillGroup[] = skillsResult.groupOrder.map((groupTitle) => {
     const originalGroup = resumeData.skills?.find((g) => g.title === groupTitle)
-    const skillsInGroup = skillsResult.skillOrder[groupTitle] || []
+    const skillsInGroup = (Object.prototype.hasOwnProperty.call(skillsResult.skillOrder, groupTitle)
+      ? skillsResult.skillOrder[groupTitle]
+      : []) || []
     return {
       title: groupTitle,
       skills: skillsInGroup.map((skillText) => ({
@@ -222,9 +227,10 @@ export async function runAIGenerationPipeline(
     summary,
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
+    extractedSkills: '',
   })
 
-  const _extractedKeywords = await extractSkillsGraph(refinedJD, config, (progress) => {
+  const extractedSkills = await extractSkillsGraph(refinedJD, config, (progress) => {
     if (progress.content && !progress.done) {
       onProgress?.({
         currentStep,
@@ -236,6 +242,7 @@ export async function runAIGenerationPipeline(
         summary,
         workExperiences: tailoredExperiences,
         skills: sortedSkills,
+        extractedSkills: '',
       })
     }
   })
@@ -252,6 +259,7 @@ export async function runAIGenerationPipeline(
     summary,
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
+    extractedSkills,
   })
 
   const coverLetter = await generateCoverLetterGraph(
@@ -270,6 +278,7 @@ export async function runAIGenerationPipeline(
           summary,
           workExperiences: tailoredExperiences,
           skills: sortedSkills,
+          extractedSkills,
         })
       }
     }
@@ -286,6 +295,7 @@ export async function runAIGenerationPipeline(
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
     coverLetter,
+    extractedSkills,
   })
 
   return {
@@ -295,5 +305,6 @@ export async function runAIGenerationPipeline(
     workExperiences: tailoredExperiences,
     skills: sortedSkills,
     coverLetter,
+    extractedSkills,
   }
 }

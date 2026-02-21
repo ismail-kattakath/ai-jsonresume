@@ -94,36 +94,36 @@ describe('runAIGenerationPipeline', () => {
     const mockCoverLetter = 'Dear Hiring Manager...'
 
     // Setup mocks
-    ;(analyzeJobDescriptionGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
+    ; (analyzeJobDescriptionGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
       onProgress({ content: 'Analyzing JD...', done: false })
       return mockRefinedJD
     })
-    ;(generateJobTitleGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
-      onProgress({ content: 'Crafting Job Title...', done: false })
-      return mockJobTitle
-    })
-    ;(generateSummaryGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
-      onProgress({ content: 'Writing Summary...', done: false })
-      return mockSummary
-    })
-    ;(tailorExperienceToJDGraph as jest.Mock).mockImplementation(
-      async (desc, ach, title, org, jd, tech, config, onProgress) => {
-        onProgress({ content: 'Tailoring experience...', done: false })
-        return mockTailoredExp
-      }
-    )
-    ;(sortSkillsGraph as jest.Mock).mockImplementation(async (skills, jd, config, onProgress) => {
-      onProgress({ content: 'Sorting skills...', done: false })
-      return mockSortedSkills
-    })
-    ;(extractSkillsGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
-      onProgress({ content: 'Extracting keywords...', done: false })
-      return mockExtractedKeywords
-    })
-    ;(generateCoverLetterGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
-      onProgress({ content: 'Drafting Cover Letter...', done: false })
-      return mockCoverLetter
-    })
+      ; (generateJobTitleGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
+        onProgress({ content: 'Crafting Job Title...', done: false })
+        return mockJobTitle
+      })
+      ; (generateSummaryGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
+        onProgress({ content: 'Writing Summary...', done: false })
+        return mockSummary
+      })
+      ; (tailorExperienceToJDGraph as jest.Mock).mockImplementation(
+        async (desc, ach, title, org, jd, tech, config, onProgress) => {
+          onProgress({ content: 'Tailoring experience...', done: false })
+          return mockTailoredExp
+        }
+      )
+      ; (sortSkillsGraph as jest.Mock).mockImplementation(async (skills, jd, config, onProgress) => {
+        onProgress({ content: 'Sorting skills...', done: false })
+        return mockSortedSkills
+      })
+      ; (extractSkillsGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
+        onProgress({ content: 'Extracting keywords...', done: false })
+        return mockExtractedKeywords
+      })
+      ; (generateCoverLetterGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
+        onProgress({ content: 'Drafting Cover Letter...', done: false })
+        return mockCoverLetter
+      })
 
     const onProgress = jest.fn()
 
@@ -149,6 +149,7 @@ describe('runAIGenerationPipeline', () => {
         },
       ],
       coverLetter: mockCoverLetter,
+      extractedSkills: mockExtractedKeywords,
     })
 
     // Assert graph functions were called correctly
@@ -175,17 +176,17 @@ describe('runAIGenerationPipeline', () => {
   })
 
   it('runs successfully without an onProgress callback', async () => {
-    ;(analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
-    ;(generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
-    ;(generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
-    ;(tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
-      description: 'Desc',
-      achievements: ['Ach'],
-      techStack: ['Tech'],
-    })
-    ;(sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
-    ;(extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
-    ;(generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+    ; (analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
+      ; (generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+      ; (generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
+      ; (tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
+        description: 'Desc',
+        achievements: ['Ach'],
+        techStack: ['Tech'],
+      })
+      ; (sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
+      ; (extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
+      ; (generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
 
     const result = await runAIGenerationPipeline(mockResumeData, mockJobDescription, mockConfig)
 
@@ -198,17 +199,17 @@ describe('runAIGenerationPipeline', () => {
       ...mockResumeData,
       workExperience: undefined,
     } as unknown as ResumeData
-    ;(analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
-    ;(generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
-    ;(generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
-    ;(tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
-      description: 'Desc',
-      achievements: ['Ach'],
-      techStack: ['Tech'],
-    })
-    ;(sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
-    ;(extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
-    ;(generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+      ; (analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
+      ; (generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+      ; (generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
+      ; (tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
+        description: 'Desc',
+        achievements: ['Ach'],
+        techStack: ['Tech'],
+      })
+      ; (sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
+      ; (extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
+      ; (generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
 
     const result = await runAIGenerationPipeline(resumeWithoutExp, mockJobDescription, mockConfig)
 
@@ -216,28 +217,59 @@ describe('runAIGenerationPipeline', () => {
   })
 
   it('checks coverage for onProgress skips (done: true or no content)', async () => {
-    ;(analyzeJobDescriptionGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
+    ; (analyzeJobDescriptionGraph as jest.Mock).mockImplementation(async (jd, config, onProgress) => {
       onProgress({ done: true }) // No content, should skip updating the progress callback
       return 'JD'
     })
-    ;(generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
-    ;(generateSummaryGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
-      onProgress({ content: 'Done writing!', done: true }) // Done is true, should skip updating the progress callback
-      return 'Summary'
-    })
-    ;(tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
-      description: 'Desc',
-      achievements: ['Ach'],
-      techStack: ['Tech'],
-    })
-    ;(sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
-    ;(extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
-    ;(generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+      ; (generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+      ; (generateSummaryGraph as jest.Mock).mockImplementation(async (data, jd, config, onProgress) => {
+        onProgress({ content: 'Done writing!', done: true }) // Done is true, should skip updating the progress callback
+        return 'Summary'
+      })
+      ; (tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
+        description: 'Desc',
+        achievements: ['Ach'],
+        techStack: ['Tech'],
+      })
+      ; (sortSkillsGraph as jest.Mock).mockResolvedValue({ groupOrder: [], skillOrder: {} })
+      ; (extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
+      ; (generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
 
     const onProgress = jest.fn()
 
     await runAIGenerationPipeline(mockResumeData, mockJobDescription, mockConfig, onProgress)
 
     expect(onProgress).not.toHaveBeenCalledWith(expect.objectContaining({ message: 'Done writing!' }))
+  })
+
+  it('covers skills transformation edge cases (missing group in original or result)', async () => {
+    const resumeWithEmptySkills = {
+      ...mockResumeData,
+      skills: [],
+    } as unknown as ResumeData
+
+    const mockSortedSkills = {
+      groupOrder: ['NonExistent'],
+      skillOrder: { NonExistent: ['React'] },
+    }
+
+    ; (analyzeJobDescriptionGraph as jest.Mock).mockResolvedValue('JD')
+      ; (generateJobTitleGraph as jest.Mock).mockResolvedValue('Title')
+      ; (generateSummaryGraph as jest.Mock).mockResolvedValue('Summary')
+      ; (tailorExperienceToJDGraph as jest.Mock).mockResolvedValue({
+        description: 'Desc',
+        achievements: ['Ach'],
+        techStack: ['Tech'],
+      })
+      ; (sortSkillsGraph as jest.Mock).mockResolvedValue(mockSortedSkills)
+      ; (extractSkillsGraph as jest.Mock).mockResolvedValue(['Keyword'])
+      ; (generateCoverLetterGraph as jest.Mock).mockResolvedValue('Letter')
+
+    const result = await runAIGenerationPipeline(resumeWithEmptySkills, mockJobDescription, mockConfig)
+
+    expect(result.skills[0]).toEqual({
+      title: 'NonExistent',
+      skills: [{ text: 'React', highlight: undefined }],
+    })
   })
 })

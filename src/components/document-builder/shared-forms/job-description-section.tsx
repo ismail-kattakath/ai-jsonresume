@@ -111,9 +111,8 @@ const JobDescriptionSection = () => {
             incrementalUpdate.skills = progress.skills
             hasResumeUpdate = true
           }
-          if (progress.coverLetter) {
-            incrementalUpdate.content = progress.coverLetter
-            hasResumeUpdate = true
+          if (progress.extractedSkills) {
+            updateSettings({ skillsToHighlight: progress.extractedSkills })
           }
 
           if (hasResumeUpdate) {
@@ -130,9 +129,12 @@ const JobDescriptionSection = () => {
 
       console.log('[Pipeline] Pipeline completed. Result:', result)
 
-      // Update AI settings with refined JD
-      if (result.refinedJD) {
-        updateSettings({ jobDescription: result.refinedJD })
+      // Update AI settings with results
+      if (result.refinedJD || result.extractedSkills) {
+        updateSettings({
+          jobDescription: result.refinedJD || settings.jobDescription,
+          skillsToHighlight: result.extractedSkills || settings.skillsToHighlight
+        })
       }
 
       // Update resume with results
