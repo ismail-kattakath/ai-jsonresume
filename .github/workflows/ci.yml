@@ -33,7 +33,7 @@ jobs:
         run: npx tsc --noEmit
 
   test:
-    name: Unit Tests
+    name: Test Coverage
     needs: install
     runs-on: ubuntu-latest
     env:
